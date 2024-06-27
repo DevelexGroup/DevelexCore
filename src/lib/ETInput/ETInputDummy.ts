@@ -1,0 +1,121 @@
+import type { GazeDataPointWithoutFixation } from '$lib/ETGazeData/ETGazeData';
+import { ETInput } from '$lib/ETInput/ETInput';
+import { ETWindowCalibrator } from '../ETWindowCalibrator/ETWindowCalibrator';
+import type { ETWindowCalibratorConfig } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
+import type { ETInputDummyConfig } from './ETInputConfig';
+
+/**
+ * Dummy input for testing purposes which does not require any hardware.
+ * Mouse position is used as gaze input in the given frequency.
+ * It has its precision and frequency configurable.
+ * TODO: Input classes simpler, more consistent, and more robust to handle high-frequency data.
+ */
+export class ETInputDummy extends ETInput<ETInputDummyConfig> {
+	lastMouseCoordinates: { x: number; y: number } = { x: 0, y: 0 };
+	intervalId: number | null = null;
+	precisionError: number | null = null;
+	windowCalibrator: ETWindowCalibrator | null = null;
+
+	constructor(config: ETInputDummyConfig) {
+		super(config);
+		this.precisionError = config.precisionMinimalError;
+	}
+
+	connect(): Promise<void> {
+
+		if (!this.windowCalibrator) {
+			return Promise.reject('Window calibrator is not set.');
+		}
+
+		this.sessionID = this.createSessionId();
+		const gazePointGetter = createGazePointFactory(this.sessionID, this.windowCalibrator);
+		this.isConnected = true;
+
+		const interval = 1000 / this.config.frequency;
+		document.addEventListener('mousemove', this.updateMousePosition.bind(this));
+
+		this.intervalId = setInterval(() => {
+			if (this.config && this.isConnected) {
+				const { x, y } = this.calculateCoordinates();
+				this.emit('data', gazePointGetter(x, y));
+			}
+		}, interval);
+
+		return Promise.resolve();
+	}
+
+	disconnect(): Promise<void> {
+		if (this.intervalId != null) {
+			clearInterval(this.intervalId);
+		}
+		document.removeEventListener('mousemove', this.updateMousePosition.bind(this));
+		this.sessionID = null;
+		this.isConnected = false;
+		return Promise.resolve();
+	}
+
+	calibrate(): Promise<void> {
+		const precisionError = this.config?.precisionMinimalError;
+		if (precisionError) {
+			this.precisionError = precisionError;
+		}
+		return Promise.resolve();
+	}
+
+	send(msg: string): void {
+		console.log(msg);
+	}
+
+	updateMousePosition(event: MouseEvent): void {
+		this.lastMouseCoordinates = { x: event.clientX, y: event.clientY };
+	}
+
+	setWindowCalibration(config: ETWindowCalibratorConfig): Promise<void> {
+		this.windowCalibrator = new ETWindowCalibrator(config);
+		return Promise.resolve();
+		
+	}
+
+	/**
+	 * Calculate the coordinates of the fake gaze point.
+	 * Based on mouse position and precision error.
+	 */
+	calculateCoordinates(): { x: number; y: number } {
+		const x = this.simulateCoordinate(this.lastMouseCoordinates.x);
+		const y = this.simulateCoordinate(this.lastMouseCoordinates.y);
+		this.precisionError = Math.min(
+			this.precisionError! + this.config!.precisionDecayRate,
+			this.config!.precisionMaximumError
+		);
+		return { x, y };
+	}
+
+	/**
+	 * Simulate the precision error of the dummy input.
+	 * @param coordinate - The coordinate to simulate.
+	 * @returns The simulated coordinate.
+	 */
+	simulateCoordinate(coordinate: number): number {
+		return coordinate + (Math.random() - 0.5) * 2 * (this.precisionError || 0);
+	}
+}
+
+export const createGazePointFactory = (
+	sessionId: string,
+	windowCalibrator: ETWindowCalibrator
+): (x: number, y: number) => GazeDataPointWithoutFixation => {
+	return (x: number, y: number) => {
+		return {
+			x,
+			xScreenRelative: windowCalibrator.toScreenRelativeX(x),
+			y,
+			yScreenRelative: windowCalibrator.toScreenRelativeY(y),
+			sessionId,
+			timestamp: Date.now(),
+			deviceValidity: true,
+			parseValidity: true, // todo: implement validity check on window coordinates decorrelation
+			parseTimestamp: Date.now(),
+			type: 'point'
+		};
+	};
+}
