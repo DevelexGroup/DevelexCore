@@ -1,6 +1,6 @@
 import type { ETInput } from './ETInput';
 
-export type ETInputConfig = ETInputConfigGazePoint | ETInputDummyConfig;
+export type ETInputConfig = ETInputConfigGazePoint | ETInputConfigDummy;
 
 /**
  * An eye tracker input that emits fixations.
@@ -28,7 +28,7 @@ export type ETInputConfigGazePoint = {
  * @property precisionDecayRate - The decay rate of the precision of the dummy input in px per frame.
  * @property precisionMaximumError - The cap of the precision decay of the dummy input in px.
  */
-export type ETInputDummyConfig = {
+export type ETInputConfigDummy = {
     type: 'dummy';
     fixationDetection: 'none' | 'device';
     frequency: number;
