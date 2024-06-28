@@ -18,6 +18,7 @@ let sessionId: string | null = null;
 let socket: WebSocket | null = null;
 let gazePointProcessor: (data: GazePayloadPoint) => void = erroneousGazePointProcessor;
 let isPaused = true;
+let windowCalibrator: ETWindowCalibrator | null = null;
 
 /**
  * Bridge between main thread and worker thread.
@@ -48,6 +49,14 @@ self.onmessage = (event) => {
 const handleConnect = (config: ETInputConfigGazePoint, newSessionId: string) => {
     socket = new WebSocket(config.uri);
     sessionId = newSessionId;
+    if (!config) {
+        throw new Error('Config is null');
+    }
+    if (!windowCalibrator) {
+        throw new Error('Window calibrator is null');
+    }
+    const fixationDetector = createGazeFixationDetector(config.fixationDetection);
+    gazePointProcessor = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
 
     socket.onopen = () => {
         self.postMessage({ messageType: 'connected' });
@@ -77,16 +86,8 @@ const handleDisconnect = () => {
  * It will set up the gazePointProcessor function with the correct window calibration and configuration.
  * @param config for the window calibration.
  */
-const handleSetWindowCalibration = ({ windowConfig, config }: { windowConfig: ETWindowCalibratorConfig, config: ETInputConfigGazePoint }) => {
-    const windowCalibrator = new ETWindowCalibrator(windowConfig);
-    if (!config) {
-        throw new Error('Config is null');
-    }
-    if (!sessionId) {
-        throw new Error('Session ID is null');
-    }
-    const fixationDetector = createGazeFixationDetector(config.fixationDetection);
-    gazePointProcessor = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
+const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCalibratorConfig }) => {
+    windowCalibrator = new ETWindowCalibrator(windowConfig);
     self.postMessage({ messageType: 'windowCalibrated' });
 }
 

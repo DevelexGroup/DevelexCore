@@ -80,7 +80,6 @@ export class ETInputBridge extends ETInput<ETInputConfigGazePoint> {
         this.worker.postMessage({
             messageType: 'setWindowCalibration',
             data: {
-                config: this.config,
                 windowConfig
             }
         });
