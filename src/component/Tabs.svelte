@@ -20,13 +20,13 @@
       {/if}
   {/each}
   <style>
-      .box {
-          margin-bottom: 10px;
-          padding: 40px;
-          border: 1px solid #dee2e6;
+    .box {
+      margin-bottom: 10px;
+      padding: 20px;
+      border: 1px solid #dee2e6;
       border-radius: 0 0 .5rem .5rem;
       border-top: 0;
-      }
+    }
     ul {
       display: flex;
       flex-wrap: wrap;

@@ -1,6 +1,6 @@
 import {ETGazeDataCircularBuffer} from "./ETGazeDataCircularBuffer.js";
 import {ETGazeDataDatabase} from "./ETGazeDataDatabase.js";
-import type {ETGazeData} from "./ETGazeData.js";
+import type {ETGazeData} from "./GazeData.js";
 
 export class ETGazeDataLogger {
     buffer: ETGazeDataCircularBuffer;

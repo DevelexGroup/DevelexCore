@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { ETGazeIndicator } from "$lib/ETGazeIndicator/ETGazeIndicator";
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
-    import { gazeInputStore } from "../store/gazeInputStore";
+    import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+    import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
 
     let isGazeIndicatorVisible = true;
@@ -21,15 +22,9 @@
     const handleEmitEvent = (data: GazeInputMessage) => {
         if (!$gazeInputStore) return;
         if (data.value) {
-            indicator.init(document);
-            $gazeInputStore.on("data", (gaze) => {
-                indicator.draw(gaze);
-            });
+            initIndicator();
         } else {
-            $gazeInputStore.off("data", (gaze) => {
-                indicator.draw(gaze);
-            });
-            indicator.remove();
+            destroyIndicator();
         }
     };
 
@@ -38,6 +33,38 @@
             handleGazeInputMessage(data);
         });
     }
+
+    const drawGaze = (gaze: GazeDataPoint) => {
+        indicator.draw(gaze);
+    };
+
+    const initIndicator = () => {
+        if ($gazeInputStore === null) {
+            return;
+        }
+        indicator.init(document);
+        $gazeInputStore.on("data", drawGaze);
+    };
+
+    const destroyIndicator = () => {
+        if ($gazeInputStore === null) {
+            return;
+        }
+        $gazeInputStore.off("data", drawGaze);
+        indicator.remove();
+    };
+
+    const toggleGazeIndicator = (targetValue: boolean) => {
+        if ($gazeInputStore === null) {
+            return;
+        }
+        if (targetValue) {
+            initIndicator();
+        } else {
+            destroyIndicator();
+        }
+        isGazeIndicatorVisible = targetValue;
+    };
 
     const connect = () => {
         try {
@@ -94,6 +121,21 @@
         <Button text={"Start"} on:click={start} />
         <Button text={"Stop"} on:click={stop} />
         <Button text={"Disconnect"} on:click={disconnect} />
-        <Button text={"Null gaze input"} on:click={() => gazeInputStore.set(null)} />
+        <Button text={isGazeIndicatorVisible ? "Hide gaze indicator" : "Show gaze indicator"} on:click={() => {
+            toggleGazeIndicator(!isGazeIndicatorVisible);
+        }} />
+        <Button text={"Null gaze input"} on:click={() => setGazeInput(null)} />
     {/if}
 </div>
+
+<style>
+.container {
+    margin-bottom: 10px;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: .5rem;
+}
+p {
+    margin: 0;
+}
+</style>

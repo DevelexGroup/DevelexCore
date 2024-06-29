@@ -1,4 +1,4 @@
-import type { GazeDataPoint } from '../ETGazeData/ETGazeData';
+import type { GazeDataPoint } from '../GazeData/GazeData';
 import type { ETDwellSettingsType } from './ETDwellSettingsType';
 
 /**

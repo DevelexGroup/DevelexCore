@@ -1,4 +1,4 @@
-import type { GazeDataPoint } from "../ETGazeData/ETGazeData";
+import type { GazeDataPoint } from "../GazeData/GazeData";
 
 /**
  * Abstract class that defines the structure of the GazeFixationDetector class.

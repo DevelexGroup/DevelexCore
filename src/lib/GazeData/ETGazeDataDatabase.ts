@@ -1,4 +1,4 @@
-import type {ETGazeData} from "./ETGazeData.js";
+import type {ETGazeData} from "./GazeData.js";
 
 export class ETGazeDataDatabase {
     readonly dbName: string;

@@ -2,7 +2,7 @@
 // in form of enum
 
 
-import type {GazeDataPoint} from "../ETGazeData/ETGazeData.js";
+import type {GazeDataPoint} from "../GazeData/GazeData.js";
 
 export type GazeInputMessage = GazeInputStateBools | GazeInputStateMessage;
 
