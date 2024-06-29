@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ETGazeIndicator } from "$lib/GazeIndicator/GazeIndicatorr
+	import { ETGazeIndicator } from "$lib/GazeIndicator/GazeIndicator";
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
@@ -10,9 +10,6 @@
 
     const handleGazeInputMessage = (data: GazeInputMessage) => {
         switch (data.type) {
-            case "connect":
-                
-                break;
             case "emit":
                 handleEmitEvent(data);
                 break;
