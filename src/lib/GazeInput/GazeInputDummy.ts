@@ -1,8 +1,8 @@
 import type { GazeDataPointWithoutFixation } from '$lib/ETGazeData/ETGazeData';
-import { ETInput } from '$lib/ETInput/ETInput';
+import { GazeInput } from '$lib/GazeInput/GazeInput';
 import { ETWindowCalibrator } from '../ETWindowCalibrator/ETWindowCalibrator';
 import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
-import type { ETInputConfigDummy } from './ETInputConfig';
+import type { GazeInputConfigDummy } from './GazeInputConfig';
 
 /**
  * Dummy input for testing purposes which does not require any hardware.
@@ -10,13 +10,13 @@ import type { ETInputConfigDummy } from './ETInputConfig';
  * It has its precision and frequency configurable.
  * TODO: Input classes simpler, more consistent, and more robust to handle high-frequency data.
  */
-export class ETInputDummy extends ETInput<ETInputConfigDummy> {
+export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	lastMouseCoordinates: { x: number; y: number } = { x: 0, y: 0 };
 	intervalId: number | null = null;
 	precisionError: number | null = null;
 	windowCalibrator: ETWindowCalibrator | null = null;
 
-	constructor(config: ETInputConfigDummy) {
+	constructor(config: GazeInputConfigDummy) {
 		super(config);
 		this.precisionError = config.precisionMinimalError;
 	}

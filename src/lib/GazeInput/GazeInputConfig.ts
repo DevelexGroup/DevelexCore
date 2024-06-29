@@ -1,12 +1,12 @@
-import type { ETInput } from './ETInput';
+import type { GazeInput } from './GazeInput';
 
-export type ETInputConfig = ETInputConfigGazePoint | ETInputConfigDummy;
+export type GazeInputConfig = GazeInputConfigGazePoint | GazeInputConfigDummy;
 
 /**
  * An eye tracker input that emits fixations.
- * This is a type alias for an instance of {@link ETInput} with a configuration that emits fixations.
+ * This is a type alias for an instance of {@link GazeInput} with a configuration that emits fixations.
  */
-export type ETInputConfigWithFixations = ETInputConfigGazePoint & { fixationDetection: 'device' };
+export type GazeInputConfigWithFixations = GazeInputConfigGazePoint & { fixationDetection: 'device' };
 
 /**
  * Configuration for the input of GazePoint remote eye tracker.
@@ -14,7 +14,7 @@ export type ETInputConfigWithFixations = ETInputConfigGazePoint & { fixationDete
  * @property uri - The URI of the DeveLex Bridge WebSocket server.
  * @property fixationDetection - The fixation detection method, either 'none' or 'device'.
  */ 
-export type ETInputConfigGazePoint = {
+export type GazeInputConfigGazePoint = {
     type: 'gazepoint';
     uri: string;
     fixationDetection: 'none' | 'device';
@@ -28,7 +28,7 @@ export type ETInputConfigGazePoint = {
  * @property precisionDecayRate - The decay rate of the precision of the dummy input in px per frame.
  * @property precisionMaximumError - The cap of the precision decay of the dummy input in px.
  */
-export type ETInputConfigDummy = {
+export type GazeInputConfigDummy = {
     type: 'dummy';
     fixationDetection: 'none' | 'device';
     frequency: number;

@@ -6,8 +6,8 @@ import type { ETWindowCalibratorConfig } from "./ETWindowCalibratorConfig";
  * screen and window coordinates.
  * WARNING: On window resize, create a new instance of this class.
  * 
- * It is generally used in ETInput classes to convert screen relative coordinates to window px coordinates and vice versa.
- * If ETInput uses worker threads, it should be placed there and send configurations from the main thread.
+ * It is generally used in GazeInput classes to convert screen relative coordinates to window px coordinates and vice versa.
+ * If GazeInput uses worker threads, it should be placed there and send configurations from the main thread.
  * 
  * @category Core
  */

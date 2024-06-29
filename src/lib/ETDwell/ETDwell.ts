@@ -1,9 +1,9 @@
-import { ETInput } from '$lib/ETInput/ETInput.ts';
+import { GazeInput } from '$lib/GazeInput/GazeInput';
 import type { GazeDataPoint } from '$lib/ETGazeData/ETGazeData';
 import type { ETDwellSettingsType } from './ETDwellSettingsType';
 import type { ETDwellListenerType } from './ETDwellListenerType';
 import type { ETDwellEventType } from './ETDwellEventType';
-import type { ETInputConfig } from '../ETInput/ETInputConfig';
+import type { GazeInputConfig } from '../GazeInput/GazeInputConfig';
 
 /**
  * Manages dwell events from the given eye-tracker input for elements,
@@ -16,11 +16,11 @@ import type { ETInputConfig } from '../ETInput/ETInputConfig';
  */
 export class ETDwell {
 	listeners: ETDwellListenerType[];
-	eyetracker: ETInput<ETInputConfig>;
+	eyetracker: GazeInput<GazeInputConfig>;
 	readonly eyetrackerCallback: (data: GazeDataPoint) => void = (data) =>
 		this.evaluateEyeTrackerData(data);
 
-	constructor(eyetracker: ETInput<ETInputConfig>) {
+	constructor(eyetracker: GazeInput<GazeInputConfig>) {
 		this.listeners = [];
 		this.eyetracker = eyetracker;
 		this.init();

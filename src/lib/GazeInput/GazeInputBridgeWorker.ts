@@ -1,8 +1,8 @@
 /**
- * Worker thread for the ETInputBridge.
+ * Worker thread for the GazeInputBridge.
  */
 
-import type { ETInputConfigGazePoint } from './ETInputConfig';
+import type { GazeInputConfigGazePoint } from './GazeInputConfig';
 import type { ETWindowCalibratorConfig } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
 import { ETWindowCalibrator } from '../ETWindowCalibrator/ETWindowCalibrator';
 import type { GazeDataPoint, GazePayload, GazePayloadPoint } from '../ETGazeData/ETGazeData';
@@ -13,7 +13,7 @@ const erroneousGazePointProcessor = (data: GazePayloadPoint) => {
     throw new Error('Gaze point processor is not set. Received data: ' + JSON.stringify(data));
 }
 
-let config: ETInputConfigGazePoint | null = null;
+let config: GazeInputConfigGazePoint | null = null;
 let sessionId: string | null = null;
 let socket: WebSocket | null = null;
 let gazePointProcessor: (data: GazePayloadPoint) => void = erroneousGazePointProcessor;
@@ -29,7 +29,7 @@ self.onmessage = (event) => {
     const { messageType, data } = event.data;
     switch (messageType) {
         case 'connect':
-            config = data.config as ETInputConfigGazePoint;
+            config = data.config as GazeInputConfigGazePoint;
             handleConnect(config, data.sessionId);
             break;
         case 'disconnect':
@@ -38,7 +38,7 @@ self.onmessage = (event) => {
         case 'setWindowCalibration':
             handleSetWindowCalibration(data as {
                 windowConfig: ETWindowCalibratorConfig,
-                config: ETInputConfigGazePoint
+                config: GazeInputConfigGazePoint
             });
             break;
         default:
@@ -46,7 +46,7 @@ self.onmessage = (event) => {
     }
 };
 
-const handleConnect = (config: ETInputConfigGazePoint, newSessionId: string) => {
+const handleConnect = (config: GazeInputConfigGazePoint, newSessionId: string) => {
     socket = new WebSocket(config.uri);
     sessionId = newSessionId;
     if (!config) {

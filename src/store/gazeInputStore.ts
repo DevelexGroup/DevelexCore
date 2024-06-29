@@ -2,18 +2,18 @@
  * Svelte store containing the gaze input instance.
  */
 import { writable } from 'svelte/store';
-import { createETInput } from '$lib';
-import { ETInput } from '$lib/ETInput/ETInput';
-import type { ETInputConfig } from '$lib/ETInput/ETInputConfig';
+import { createGazeInput } from '$lib';
+import { GazeInput } from '$lib/GazeInput/GazeInput';
+import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 
 /**
  * The gaze input store.
  */
-export const gazeInputStore = writable<ETInput<ETInputConfig> | null>(null);
+export const gazeInputStore = writable<GazeInput<GazeInputConfig> | null>(null);
 
 
 interface Input {
-    inputConfig: ETInputConfig;
+    inputConfig: GazeInputConfig;
     mouseEvent: MouseEvent;
     window: Window;
 }
@@ -24,9 +24,9 @@ interface Input {
  */
 export const setGazeInput = (input: Input | null) => {
     if (input !== null) {
-        const etInput = createETInput(input.inputConfig);
-        etInput.setWindowCalibration(input.mouseEvent, input.window);
-        gazeInputStore.set(etInput);
+        const GazeInput = createGazeInput(input.inputConfig);
+        GazeInput.setWindowCalibration(input.mouseEvent, input.window);
+        gazeInputStore.set(GazeInput);
         // call a method on the instance of 
 
     } else {

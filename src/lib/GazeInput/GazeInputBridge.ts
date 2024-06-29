@@ -1,6 +1,6 @@
-import type { ETInputConfigGazePoint } from "./ETInputConfig";
+import type { GazeInputConfigGazePoint } from "./GazeInputConfig";
 import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../ETWindowCalibrator/ETWindowCalibratorConfig";
-import { ETInput } from "./ETInput";
+import { GazeInput } from "./GazeInput";
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., GazePoint).
@@ -8,13 +8,13 @@ import { ETInput } from "./ETInput";
  * Every parsing of the data and communication with eye-tracker is done in the worker for performance reasons.
  * This is a wrapper for the worker.
  */
-export class ETInputBridge extends ETInput<ETInputConfigGazePoint> {
+export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
 
     readonly worker: Worker;
 
-    constructor(config: ETInputConfigGazePoint) {
+    constructor(config: GazeInputConfigGazePoint) {
         super(config);
-        this.worker = new Worker(new URL('ETInputBridgeWorker.ts', import.meta.url), {
+        this.worker = new Worker(new URL('GazeInputBridgeWorker.ts', import.meta.url), {
             type: 'module'
         });
     }
@@ -39,7 +39,6 @@ export class ETInputBridge extends ETInput<ETInputConfigGazePoint> {
                     this.sessionID = sessionId;
                     this.isConnected = true;
                     resolve();
-                    this.emit('connected');
                 }
             };
         });
