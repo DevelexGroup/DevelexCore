@@ -21,7 +21,7 @@
 
     const handleEmitEvent = (data: GazeInputMessage) => {
         if (!$gazeInputStore) return;
-        if (data.value) {
+        if (data.value && isGazeIndicatorVisible) {
             initIndicator();
         } else {
             destroyIndicator();
