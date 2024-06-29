@@ -1,17 +1,26 @@
-<script>
+<script lang="ts">
 	import { ETGazeIndicator } from "$lib/ETGazeIndicator/ETGazeIndicator";
+	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
     import { gazeInputStore } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
-    import { onMount } from "svelte";
 
     let isGazeIndicatorVisible = true;
-    let isDocumentReady = false;
     const indicator = new ETGazeIndicator();
 
-    /*
-    $: if ($gazeInputStore !== null && isGazeIndicatorVisible && document) {
-        if ($gazeInputStore !== null && isGazeIndicatorVisible) {
-            alert($gazeInputStore.isEmitting)
+    const handleGazeInputMessage = (data: GazeInputMessage) => {
+        switch (data.type) {
+            case "connect":
+                
+                break;
+            case "emit":
+                handleEmitEvent(data);
+                break;
+        }
+    };
+
+    const handleEmitEvent = (data: GazeInputMessage) => {
+        if (!$gazeInputStore) return;
+        if (data.value) {
             indicator.init(document);
             $gazeInputStore.on("data", (gaze) => {
                 indicator.draw(gaze);
@@ -22,11 +31,13 @@
             });
             indicator.remove();
         }
-    }*/
+    };
 
-    onMount(() => {
-        isDocumentReady = true;
-    });
+    $: if ($gazeInputStore !== null) {
+        $gazeInputStore.on("message", (data) => {
+            handleGazeInputMessage(data);
+        });
+    }
 
     const connect = () => {
         try {

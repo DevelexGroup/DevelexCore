@@ -23,13 +23,15 @@ interface Input {
  * @param input - The gaze input instance.
  */
 export const setGazeInput = (input: Input | null) => {
-    if (input !== null) {
-        const GazeInput = createGazeInput(input.inputConfig);
-        GazeInput.setWindowCalibration(input.mouseEvent, input.window);
-        gazeInputStore.set(GazeInput);
-        // call a method on the instance of 
-
-    } else {
-        gazeInputStore.set(null);
-    }
+    gazeInputStore.update((gazeInput) => {
+        if (gazeInput) {
+            gazeInput.disconnect();
+        }
+        if (input !== null) {
+            const GazeInput = createGazeInput(input.inputConfig);
+            GazeInput.setWindowCalibration(input.mouseEvent, input.window);
+            return GazeInput;
+        }
+        return null;
+    });
 };
