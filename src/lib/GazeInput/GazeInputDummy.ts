@@ -1,7 +1,7 @@
 import type { GazeDataPointWithoutFixation } from '$lib/GazeData/GazeData';
 import { GazeInput } from '$lib/GazeInput/GazeInput';
-import { ETWindowCalibrator } from '../ETWindowCalibrator/ETWindowCalibrator';
-import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
+import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
+import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
 import type { GazeInputConfigDummy } from './GazeInputConfig';
 
 /**

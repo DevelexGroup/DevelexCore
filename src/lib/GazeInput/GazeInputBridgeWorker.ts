@@ -3,8 +3,8 @@
  */
 
 import type { GazeInputConfigGazePoint } from './GazeInputConfig';
-import type { ETWindowCalibratorConfig } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
-import { ETWindowCalibrator } from '../ETWindowCalibrator/ETWindowCalibrator';
+import type { ETWindowCalibratorConfig } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
+import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
 import type { GazeDataPoint, GazePayload, GazePayloadPoint } from '../GazeData/GazeData';
 import type { GazeFixationDetector } from '../GazeFixationDetector/GazeFixationDetector';
 import { createGazeFixationDetector } from '../GazeFixationDetector';

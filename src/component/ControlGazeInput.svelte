@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ETGazeIndicator } from "$lib/ETGazeIndicator/ETGazeIndicator";
+	import { ETGazeIndicator } from "$lib/GazeIndicator/GazeIndicatorr
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
