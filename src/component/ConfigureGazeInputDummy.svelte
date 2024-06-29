@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type { ETInputConfigDummy } from "$lib";
+    import type { GazeInputConfigDummy } from "$lib";
     import { setGazeInput } from "../store/gazeInputStore";
 	import InputNumber from "./InputNumber.svelte";
 	import InputSubmit from "./InputSubmit.svelte";
     import InputText from "./InputText.svelte";
 
     const type = "dummy";
-    let config: ETInputConfigDummy = {
+    let config: GazeInputConfigDummy = {
         type,
         fixationDetection: "none",
         frequency: 30,
@@ -15,13 +15,18 @@
         precisionDecayRate: 0.5,
     };
 
-    const submit = () => {
-        alert(JSON.stringify(config))
-        setGazeInput(config);
+    const submit = (event: MouseEvent) => {
+        event.preventDefault();
+        alert(JSON.stringify(config));
+        setGazeInput({
+            inputConfig: config,
+            mouseEvent: event,
+            window
+        });
     };
 </script>
 
-<form on:submit|preventDefault={submit}>
+<form>
     <div class="container">
         <InputNumber label="Frequency" bind:value={config.frequency} />
         <InputNumber label="Precision Minimal Error" bind:value={config.precisionMinimalError} step={0.001} />
@@ -29,7 +34,7 @@
         <InputNumber label="Precision Decay Rate" bind:value={config.precisionDecayRate} step={0.001} />
         <InputText label="Fixation Detection" bind:value={config.fixationDetection} />
     </div>
-    <InputSubmit text="Start new input instance" />
+    <InputSubmit text="Start new input instance" on:click={submit} />
 </form>
 
 <style>

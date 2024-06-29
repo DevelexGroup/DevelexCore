@@ -2,10 +2,12 @@
     export let text: string;
 </script>
 
-<input type="submit" value={text} on:click/>
+<button on:click>
+    {text}
+</button>
 
 <style>
-    input {
+    button {
         border-radius: 5px;
         padding: 5px;
         background-color: #007bff;
@@ -13,7 +15,7 @@
         border: none;
         cursor: pointer;
     }
-    input:hover {
+    button:hover {
         background-color: #0056b3;
     }
 </style>

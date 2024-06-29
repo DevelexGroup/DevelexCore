@@ -1,3 +1,3 @@
 <script lang="ts">
-    import type { ETInputConfigGazePoint } from "$lib";
+    import type { GazeInputConfigGazePoint } from "$lib";
 </script>
