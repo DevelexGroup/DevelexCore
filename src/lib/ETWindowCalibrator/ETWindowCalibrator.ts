@@ -19,7 +19,7 @@ export class ETWindowCalibrator {
 	isListenerAttached: boolean = false;
 
 	constructor(config: ETWindowCalibratorConfig) {
-		const { xCoeff, yCoeff } = this.processPointerEvent(config.event);
+		const { xCoeff, yCoeff } = this.processPointerEvent(config);
 		this.xCoeff = xCoeff;
 		this.yCoeff = yCoeff;
 		this.windowScreenWidth = config.windowScreenWidth;
@@ -30,11 +30,11 @@ export class ETWindowCalibrator {
 	 * Pointer move event is used to calculate the difference between screen and window coordinates.
 	 * @param event - The pointer move event.
 	 */
-	processPointerEvent(event: MouseEvent): { xCoeff: number; yCoeff: number } {
-		const x = event.clientX;
-		const y = event.clientY;
-		const screenX = event.screenX;
-		const screenY = event.screenY;
+	processPointerEvent(config: ETWindowCalibratorConfig): { xCoeff: number; yCoeff: number } {
+		const x = config.clientX;
+		const y = config.clientY;
+		const screenX = config.screenX;
+		const screenY = config.screenY;
 		return {
 			xCoeff: x - screenX,
 			yCoeff: y - screenY

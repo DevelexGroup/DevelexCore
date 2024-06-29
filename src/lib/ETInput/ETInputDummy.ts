@@ -1,7 +1,7 @@
 import type { GazeDataPointWithoutFixation } from '$lib/ETGazeData/ETGazeData';
 import { ETInput } from '$lib/ETInput/ETInput';
 import { ETWindowCalibrator } from '../ETWindowCalibrator/ETWindowCalibrator';
-import type { ETWindowCalibratorConfig } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
+import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../ETWindowCalibrator/ETWindowCalibratorConfig';
 import type { ETInputConfigDummy } from './ETInputConfig';
 
 /**
@@ -28,26 +28,45 @@ export class ETInputDummy extends ETInput<ETInputConfigDummy> {
 		}
 
 		this.sessionID = this.createSessionId();
-		const gazePointGetter = createGazePointFactory(this.sessionID, this.windowCalibrator);
 		this.isConnected = true;
 
-		const interval = 1000 / this.config.frequency;
 		document.addEventListener('mousemove', this.updateMousePosition.bind(this));
 
+		return Promise.resolve();
+	}
+
+	start(): Promise<void> {
+		if (this.isEmitting) {
+			return Promise.reject('Already emitting.');
+		}
+		if (!this.sessionID) {
+			return Promise.reject('Session ID is not set.');
+		}
+		if (!this.windowCalibrator) {
+			return Promise.reject('Window calibrator is not set.');
+		}
+		const gazePointGetter = createGazePointFactory(this.sessionID, this.windowCalibrator);
+		const interval = 1000 / this.config.frequency;
 		this.intervalId = setInterval(() => {
 			if (this.config && this.isConnected) {
 				const { x, y } = this.calculateCoordinates();
 				this.emit('data', gazePointGetter(x, y));
 			}
 		}, interval);
+		this.isEmitting = true;
+		return Promise.resolve();
+	}
 
+	stop(): Promise<void> {
+		if (this.intervalId != null) {
+			clearInterval(this.intervalId);
+		}
+		this.isEmitting = false;
 		return Promise.resolve();
 	}
 
 	disconnect(): Promise<void> {
-		if (this.intervalId != null) {
-			clearInterval(this.intervalId);
-		}
+		this.stop();
 		document.removeEventListener('mousemove', this.updateMousePosition.bind(this));
 		this.sessionID = null;
 		this.isConnected = false;
@@ -70,10 +89,9 @@ export class ETInputDummy extends ETInput<ETInputConfigDummy> {
 		this.lastMouseCoordinates = { x: event.clientX, y: event.clientY };
 	}
 
-	setWindowCalibration(config: ETWindowCalibratorConfig): Promise<void> {
-		this.windowCalibrator = new ETWindowCalibrator(config);
+	setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, windowConfig: ETWindowCalibratorConfigWindowFields): Promise<void> {
+		this.windowCalibrator = new ETWindowCalibrator(createETWindowCalibrator(mouseEvent, windowConfig));
 		return Promise.resolve();
-		
 	}
 
 	/**

@@ -1,5 +1,5 @@
 import type { ETInputConfigGazePoint } from "./ETInputConfig";
-import type { ETWindowCalibratorConfig } from "../ETWindowCalibrator/ETWindowCalibratorConfig";
+import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../ETWindowCalibrator/ETWindowCalibratorConfig";
 import { ETInput } from "./ETInput";
 
 /**
@@ -76,11 +76,11 @@ export class ETInputBridge extends ETInput<ETInputConfigGazePoint> {
         console.log(msg);
     }
 
-    setWindowCalibration(windowConfig: ETWindowCalibratorConfig): Promise<void> {
+    setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, window: ETWindowCalibratorConfigWindowFields): Promise<void> {
         this.worker.postMessage({
             messageType: 'setWindowCalibration',
             data: {
-                windowConfig
+                windowConfig: createETWindowCalibrator(mouseEvent, window),
             }
         });
         return new Promise<void>((resolve) => {

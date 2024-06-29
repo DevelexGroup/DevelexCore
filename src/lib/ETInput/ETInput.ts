@@ -1,6 +1,6 @@
 import { ET_EVENT_CONNECTED, ET_EVENT_DATA, ET_EVENT_MESSAGE } from '../ETEvent.js';
 import type { ETEvent, ETHandlerMapping } from '../ETEvent.js';
-import type { ETWindowCalibratorConfig } from '../ETWindowCalibrator/ETWindowCalibratorConfig.js';
+import type { ETWindowCalibratorConfigMouseEventFields, ETWindowCalibratorConfigWindowFields } from '../ETWindowCalibrator/ETWindowCalibratorConfig.js';
 import type { ETInputConfig } from './ETInputConfig.js';
 
 /**
@@ -82,7 +82,7 @@ export abstract class ETInput<T extends ETInputConfig> {
 	abstract disconnect(): Promise<void>;
 	abstract calibrate(): Promise<void>;
 	abstract send(msg: string): void;
-	abstract setWindowCalibration(config: ETWindowCalibratorConfig): Promise<void>;
+	abstract setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, window: ETWindowCalibratorConfigWindowFields): Promise<void>;
 	abstract start(): Promise<void>;
 	abstract stop(): Promise<void>;
 }
