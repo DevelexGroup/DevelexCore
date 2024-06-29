@@ -1,5 +1,5 @@
 import { GazeInput } from '$lib/GazeInput/GazeInput';
-import type { GazeDataPoint } from '$lib/ETGazeData/ETGazeData';
+import type { GazeDataPoint } from '$lib/GazeData/GazeData';
 import type { ETDwellSettingsType } from './ETDwellSettingsType';
 import type { ETDwellListenerType } from './ETDwellListenerType';
 import type { ETDwellEventType } from './ETDwellEventType';
@@ -12,7 +12,7 @@ import type { GazeInputConfig } from '../GazeInput/GazeInputConfig';
  *
  * @property {ETDwellListenerType[]} listeners The list of registered elements and their settings.
  * @property {ET} eyetracker The eye-tracker to listen to.
- * @property {(data: ETGazeData) => void} eyetrackerCallback The callback function to be called when the eye-tracker sends new data.
+ * @property {(data: GazeDataPoint) => void} eyetrackerCallback The callback function to be called when the eye-tracker sends new data.
  */
 export class ETDwell {
 	listeners: ETDwellListenerType[];

@@ -1,7 +1,7 @@
-import type {ETGazeData} from "./GazeData.js";
+import type {GazeDataPoint} from "./GazeData.js";
 
-export class ETGazeDataCircularBuffer {
-    buffer: ETGazeData[];
+export class GazeDataCircularBuffer {
+    buffer: GazeDataPoint[];
     readonly size: number;
     pointer: number;
     isFull: boolean;
@@ -12,7 +12,7 @@ export class ETGazeDataCircularBuffer {
         this.isFull = false;
     }
 
-    push(item: ETGazeData) {
+    push(item: GazeDataPoint) {
         this.buffer[this.pointer] = item;
         this.pointer = (this.pointer + 1) % this.size;
         if (!this.isFull && this.pointer === 0) {
@@ -20,7 +20,7 @@ export class ETGazeDataCircularBuffer {
         }
     }
 
-    toArray(): ETGazeData[] {
+    toArray(): GazeDataPoint[] {
         const result = new Array(this.isFull ? this.size : this.pointer);
 
         if (this.isFull) {
@@ -43,7 +43,7 @@ export class ETGazeDataCircularBuffer {
      * Returns the buffer from 0 to pointer.
      * Used for saving the buffer to the database.
      */
-    fromZeroToPointer(): ETGazeData[] {
+    fromZeroToPointer(): GazeDataPoint[] {
         const len = this.pointer === 0 ? this.size : this.pointer;
         const result = new Array(len);
         for (let i = 0; i < len; i++) {
