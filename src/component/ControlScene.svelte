@@ -1,6 +1,7 @@
 <script>
     import SceneInputState from "./SceneInputState.svelte";
     import Tabs from "./Tabs.svelte";
+    import { gazeInputStore } from "../store/gazeInputStore";
 
     // List of tab items with labels, values and assigned components
     let items = [
