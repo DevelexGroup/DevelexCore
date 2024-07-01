@@ -5,9 +5,9 @@
 	import InputSubmit from "./InputSubmit.svelte";
     import InputText from "./InputText.svelte";
 
-    const type = "dummy";
+    const tracker = "dummy";
     let config: GazeInputConfigDummy = {
-        type,
+        tracker,
         fixationDetection: "none",
         frequency: 30,
         precisionMinimalError: 0.5,
@@ -17,7 +17,6 @@
 
     const submit = (event: MouseEvent) => {
         event.preventDefault();
-        alert(JSON.stringify(config));
         setGazeInput({
             inputConfig: config,
             mouseEvent: event,

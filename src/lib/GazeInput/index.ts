@@ -15,10 +15,10 @@ import { GazeInputBridge } from './GazeInputBridge';
 export const createGazeInput = <T extends GazeInputConfig>(
 	config: T
 ): GazeInput<T> => {
-	switch (config.type) {
+	switch (config.tracker) {
 		case 'dummy':
 			return new GazeInputDummy(config) as unknown as GazeInput<T>;
-		case 'gazepoint':
+		case 'opengaze':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
 		default:
 			// @ts-expect-error - In case of unsupported input type, throw an error and give a hint.
