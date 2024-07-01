@@ -1,9 +1,9 @@
 <script lang="ts">
     import type { GazeInputConfigDummy } from "$lib";
-    import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
+    import { setGazeInput } from "../store/gazeInputStore";
 	import InputNumber from "./InputNumber.svelte";
 	import InputSubmit from "./InputSubmit.svelte";
-    import InputText from "./InputText.svelte";
+    import InputSelect from "./InputSelect.svelte";
 
     const tracker = "dummy";
     let config: GazeInputConfigDummy = {
@@ -31,7 +31,7 @@
         <InputNumber label="Precision Minimal Error" bind:value={config.precisionMinimalError} step={0.001} />
         <InputNumber label="Precision Maximum Error" bind:value={config.precisionMaximumError} step={0.001} />
         <InputNumber label="Precision Decay Rate" bind:value={config.precisionDecayRate} step={0.001} />
-        <InputText label="Fixation Detection" bind:value={config.fixationDetection} />
+        <InputSelect label="Fixation Detection" bind:value={config.fixationDetection} options={["none"]} />
     </div>
     <InputSubmit text="Start new input instance" on:click={submit} />
 </form>
