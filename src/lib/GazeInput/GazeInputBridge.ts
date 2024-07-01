@@ -1,5 +1,5 @@
 import type { GazeInputConfigGazePoint } from "./GazeInputConfig";
-import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
+import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
 import { GazeInput } from "./GazeInput";
 
 /**

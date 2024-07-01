@@ -59,7 +59,21 @@ const handleConnect = (config: GazeInputConfigGazePoint, newSessionId: string) =
     gazePointProcessor = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
 
     socket.onopen = () => {
-        self.postMessage({ messageType: 'connected' });
+        if (socket === null) {
+            throw new Error('Socket is null');
+        }
+
+        const messageBase = {
+            type: 'connect',
+            tracker: config.tracker,
+        }
+
+        const message = config.tracker === 'gazepoint' ? {
+            ...messageBase,
+            keepFixations: config.fixationDetection === 'device',
+        } : messageBase;
+
+        socket.send(JSON.stringify(message));
     };
 
     socket.onmessage = (event) => {
@@ -104,6 +118,9 @@ const processWebsocketMessage = (event: MessageEvent) => {
                 return;
             }
             gazePointProcessor(attributes as GazePayloadPoint);
+            break;
+        case 'connected':
+            self.postMessage({ messageType: 'connected' });
             break;
         default:
             throw new Error('Unknown message type. Received data: ' + JSON.stringify(attributes));

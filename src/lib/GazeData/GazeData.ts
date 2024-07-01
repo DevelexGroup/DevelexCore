@@ -21,7 +21,7 @@ export type GazeDataPointWithFixation = GazeDataPointWithoutFixation & {
     fixationId: number;
 }
 
-export type GazePayload = GazePayloadPoint;
+export type GazePayload = GazePayloadPoint | GazePayloadConnected;
 
 export type GazePayloadPoint = GazePayloadPointBase | GazePayloadFixation;
 
@@ -36,4 +36,8 @@ export type GazePayloadPointBase = {
 export type GazePayloadFixation = GazePayloadPointBase & {
     fixationDuration: number;
     fixationId: number;
+}
+
+export type GazePayloadConnected = {
+    type: 'connected';
 }
