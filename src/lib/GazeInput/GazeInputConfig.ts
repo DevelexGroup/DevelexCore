@@ -13,7 +13,7 @@ export type GazeInputConfigWithFixations = GazeInputConfigGazePoint & { fixation
  * @property fixationDetection - The fixation detection method, either 'none' or 'device'.
  */ 
 export type GazeInputConfigGazePoint = {
-    tracker: 'gazepoint';
+    tracker: 'opengaze';
     uri: string;
     fixationDetection: 'none' | 'device';
 };
