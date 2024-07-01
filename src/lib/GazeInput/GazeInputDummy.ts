@@ -40,7 +40,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			return Promise.reject('Already emitting.');
 		}
 		if (!this.sessionID) {
-			return Promise.reject('Session ID is not set.');
+			return Promise.reject('Session ID is not set. Connect first.');
 		}
 		if (!this.windowCalibrator) {
 			return Promise.reject('Window calibrator is not set.');
@@ -58,6 +58,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	}
 
 	stop(): Promise<void> {
+		if (!this.isEmitting) return Promise.reject('Already not emitting.');
 		if (this.intervalId != null) {
 			clearInterval(this.intervalId);
 		}
@@ -66,7 +67,8 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	}
 
 	disconnect(): Promise<void> {
-		this.stop();
+		if (!this.isConnected) return Promise.reject('Already disconnected.');
+		if (this.isEmitting) this.stop();
 		document.removeEventListener('mousemove', this.updateMousePosition.bind(this));
 		this.sessionID = null;
 		this.isConnected = false;
@@ -91,6 +93,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 	setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, windowConfig: ETWindowCalibratorConfigWindowFields): Promise<void> {
 		this.windowCalibrator = new ETWindowCalibrator(createETWindowCalibrator(mouseEvent, windowConfig));
+		this.isWindowCalibrated = true;
 		return Promise.resolve();
 	}
 

@@ -138,7 +138,4 @@
     border: 1px solid #dee2e6;
     border-radius: .5rem;
 }
-p {
-    margin: 0;
-}
 </style>
