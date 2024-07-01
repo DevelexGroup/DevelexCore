@@ -20,8 +20,10 @@
     .invalid-feedback {
         color: red;
     }
-    .form-group :global(input)  {
+    .form-group :global(input), .form-group :global(select)  {
         border: 1px solid #ced4da;
+        width: 100%;
+        box-sizing: border-box;
     }
     label {
         display: block;

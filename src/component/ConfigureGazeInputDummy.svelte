@@ -40,6 +40,6 @@
     .container {
         display: flex;
         flex-direction: row;
-        gap: 0.1rem;
+        gap: 0.5rem;
     }
 </style>
