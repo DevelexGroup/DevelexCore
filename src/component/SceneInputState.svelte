@@ -35,6 +35,10 @@
         <h2>Gaze input configuration</h2>
         {#if $gazeInputStore === null}
             <p>No gaze input configured. Choose a gaze input in the previous step and its configuration.</p>
+        {:else}
+            {#each Object.entries($gazeInputStore.config) as [key, value]}
+                <p>{key}: {value}</p>
+            {/each}
         {/if}
     </div>
     <div class="state-section">
