@@ -6,7 +6,7 @@ import type { GazeInputConfigGazePoint } from './GazeInputConfig';
 import type { ETWindowCalibratorConfig } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
 import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
 import type { GazeDataPoint } from '../GazeData/GazeData';
-import type { GazeInputBridgeWebsocketIncomer, GazeInputBridgeWebsocketIncomerPoint } from "./GazeInputBridgeWebsocketIncomer";
+import type { GazeInputBridgeWebsocketIncomer, GazeInputBridgeWebsocketIncomerDisconnected, GazeInputBridgeWebsocketIncomerPoint } from "./GazeInputBridgeWebsocketIncomer";
 import type { GazeFixationDetector } from '../GazeFixationDetector/GazeFixationDetector';
 import { createGazeFixationDetector } from '../GazeFixationDetector';
 import { GazeInputBridgeWebsocket } from './GazeInputBridgeWebsocket';
@@ -57,10 +57,10 @@ const sendConnect = (config: GazeInputConfigGazePoint, newSessionId: string) => 
 
     socket = new GazeInputBridgeWebsocket(config.uri);
     socket.onPointCallback = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
-    socket.onConnectedCallback = generateOtherMessage;
-    socket.onDisconnectedCallback = generateOtherMessage;
-    socket.onErrorCallback = generateOtherMessage;
-    socket.onCalibratedCallback = generateOtherMessage;
+    socket.onConnectedCallback = generateMessage;
+    socket.onDisconnectedCallback = generateDisconnectMessage; // disconnects the socket and sets sessionId to null
+    socket.onErrorCallback = generateMessage;
+    socket.onCalibratedCallback = generateMessage;
 
     const connectMessage: GazeInputBridgeWebsocketOutcomerConnect = config.tracker === 'opengaze' ? {
         type: 'connect',
@@ -75,12 +75,8 @@ const sendConnect = (config: GazeInputConfigGazePoint, newSessionId: string) => 
 }
 
 const handleDisconnect = () => {
-    if (!socket) {
-        throw new Error('Socket is null');
-    }
-    socket = null;
-    sessionId = null;
-    self.postMessage({ messageType: 'disconnected' });
+    if (!socket) throw new Error('Socket is null');
+    socket.send({ type: 'disconnect' });
 }
 
 /**
@@ -114,6 +110,12 @@ const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixati
     }
 }
 
-const generateOtherMessage = (data: GazeInputBridgeWebsocketIncomer) => {
-    self.postMessage({ type: data.type });
+const generateDisconnectMessage = (data: GazeInputBridgeWebsocketIncomerDisconnected) => {
+    socket = null;
+    sessionId = null;
+    generateMessage(data);
+}
+
+const generateMessage = (data: GazeInputBridgeWebsocketIncomer) => {
+    self.postMessage({ ...data });
 }
