@@ -1,7 +1,7 @@
 <script>
     import SceneInputState from "./SceneInputState.svelte";
+	import ScenePointData from "./ScenePointData.svelte";
     import Tabs from "./Tabs.svelte";
-    import { gazeInputStore } from "../store/gazeInputStore";
 
     // List of tab items with labels, values and assigned components
     let items = [
@@ -9,6 +9,10 @@
             value: 1,
             component: SceneInputState
         },
+        { label: "Point Data",
+            value: 2,
+            component: ScenePointData
+        }
     ];
 </script>
 
