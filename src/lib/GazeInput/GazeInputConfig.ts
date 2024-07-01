@@ -1,5 +1,3 @@
-import type { GazeInput } from './GazeInput';
-
 export type GazeInputConfig = GazeInputConfigGazePoint | GazeInputConfigDummy;
 
 /**
@@ -15,7 +13,7 @@ export type GazeInputConfigWithFixations = GazeInputConfigGazePoint & { fixation
  * @property fixationDetection - The fixation detection method, either 'none' or 'device'.
  */ 
 export type GazeInputConfigGazePoint = {
-    type: 'gazepoint';
+    tracker: 'opengaze';
     uri: string;
     fixationDetection: 'none' | 'device';
 };
@@ -29,7 +27,7 @@ export type GazeInputConfigGazePoint = {
  * @property precisionMaximumError - The cap of the precision decay of the dummy input in px.
  */
 export type GazeInputConfigDummy = {
-    type: 'dummy';
+    tracker: 'dummy';
     fixationDetection: 'none' | 'device';
     frequency: number;
     precisionMinimalError: number;

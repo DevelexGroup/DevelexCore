@@ -5,20 +5,18 @@
 import type { GazeInputConfigGazePoint } from './GazeInputConfig';
 import type { ETWindowCalibratorConfig } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
 import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
-import type { GazeDataPoint, GazePayload, GazePayloadPoint } from '../GazeData/GazeData';
+import type { GazeDataPoint } from '../GazeData/GazeData';
+import type { GazeInputBridgeWebsocketIncomer, GazeInputBridgeWebsocketIncomerDisconnected, GazeInputBridgeWebsocketIncomerPoint } from "./GazeInputBridgeWebsocketIncomer";
 import type { GazeFixationDetector } from '../GazeFixationDetector/GazeFixationDetector';
 import { createGazeFixationDetector } from '../GazeFixationDetector';
-
-const erroneousGazePointProcessor = (data: GazePayloadPoint) => {
-    throw new Error('Gaze point processor is not set. Received data: ' + JSON.stringify(data));
-}
+import { GazeInputBridgeWebsocket } from './GazeInputBridgeWebsocket';
+import type {GazeInputBridgeWebsocketOutcomerConnect } from './GazeInputBridgeWebsocketOutcomer';
 
 let config: GazeInputConfigGazePoint | null = null;
 let sessionId: string | null = null;
-let socket: WebSocket | null = null;
-let gazePointProcessor: (data: GazePayloadPoint) => void = erroneousGazePointProcessor;
-let isPaused = true;
+let socket: GazeInputBridgeWebsocket | null = null;
 let windowCalibrator: ETWindowCalibrator | null = null;
+let fixationDetector: GazeFixationDetector | null = null;
 
 /**
  * Bridge between main thread and worker thread.
@@ -30,7 +28,7 @@ self.onmessage = (event) => {
     switch (messageType) {
         case 'connect':
             config = data.config as GazeInputConfigGazePoint;
-            handleConnect(config, data.sessionId);
+            sendConnect(config, data.sessionId);
             break;
         case 'disconnect':
             handleDisconnect();
@@ -46,39 +44,39 @@ self.onmessage = (event) => {
     }
 };
 
-const handleConnect = (config: GazeInputConfigGazePoint, newSessionId: string) => {
-    socket = new WebSocket(config.uri);
-    sessionId = newSessionId;
+const sendConnect = (config: GazeInputConfigGazePoint, newSessionId: string) => {
     if (!config) {
         throw new Error('Config is null');
     }
     if (!windowCalibrator) {
         throw new Error('Window calibrator is null');
     }
-    const fixationDetector = createGazeFixationDetector(config.fixationDetection);
-    gazePointProcessor = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
 
-    socket.onopen = () => {
-        self.postMessage({ messageType: 'connected' });
+    sessionId = newSessionId;
+    fixationDetector = createGazeFixationDetector(config.fixationDetection);
+
+    socket = new GazeInputBridgeWebsocket(config.uri);
+    socket.onPointCallback = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
+    socket.onConnectedCallback = generateMessage;
+    socket.onDisconnectedCallback = generateDisconnectMessage; // disconnects the socket and sets sessionId to null
+    socket.onErrorCallback = generateMessage;
+    socket.onCalibratedCallback = generateMessage;
+
+    const connectMessage: GazeInputBridgeWebsocketOutcomerConnect = config.tracker === 'opengaze' ? {
+        type: 'connect',
+        tracker: config.tracker,
+        keepFixations: config.fixationDetection === 'device',
+    } : {
+        type: 'connect',
+        tracker: config.tracker,
     };
 
-    socket.onmessage = (event) => {
-        processWebsocketMessage(event);
-    };
-
-    socket.onerror = (error) => {
-        self.postMessage({ messageType: 'error', data: error });
-    };
+    socket.send(connectMessage);
 }
 
 const handleDisconnect = () => {
-    if (!socket) {
-        throw new Error('Socket is null');
-    }
-    socket.close();
-    socket = null;
-    sessionId = null;
-    self.postMessage({ messageType: 'disconnected' });
+    if (!socket) throw new Error('Socket is null');
+    socket.send({ type: 'disconnect' });
 }
 
 /**
@@ -88,30 +86,14 @@ const handleDisconnect = () => {
  */
 const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCalibratorConfig }) => {
     windowCalibrator = new ETWindowCalibrator(windowConfig);
+    if (socket && sessionId && fixationDetector) {
+        socket.onPointCallback = generateGazePointProcessor(windowCalibrator, fixationDetector, sessionId);
+    }
     self.postMessage({ messageType: 'windowCalibrated' });
 }
 
-/**
- * Processes the message received from the WebSocket server.
- * It can be calibration data or gaze data.
- * @param event contains the message from the WebSocket server in form of JSON.
- */
-const processWebsocketMessage = (event: MessageEvent) => {
-    const attributes = JSON.parse(event.data) as GazePayload;
-    switch (attributes.type) {
-        case 'point':
-            if (isPaused) {
-                return;
-            }
-            gazePointProcessor(attributes as GazePayloadPoint);
-            break;
-        default:
-            throw new Error('Unknown message type. Received data: ' + JSON.stringify(attributes));
-    }   
-}
-
-export const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixationDetector: GazeFixationDetector, sessionId: string) => {
-    return (data: GazePayloadPoint) => {
+const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixationDetector: GazeFixationDetector, sessionId: string) => {
+    return (data: GazeInputBridgeWebsocketIncomerPoint) => {
         const windowX = windowCalibrator.toWindowX(data.x);
         const windowY = windowCalibrator.toWindowY(data.y);
         const windowCalibratedData: GazeDataPoint = { 
@@ -126,4 +108,14 @@ export const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator,
         const fixation = fixationDetector.processGazePoint(windowCalibratedData);
         self.postMessage({ messageType: 'gazeData', data: fixation });
     }
-}   
+}
+
+const generateDisconnectMessage = (data: GazeInputBridgeWebsocketIncomerDisconnected) => {
+    socket = null;
+    sessionId = null;
+    generateMessage(data);
+}
+
+const generateMessage = (data: GazeInputBridgeWebsocketIncomer) => {
+    self.postMessage({ ...data });
+}

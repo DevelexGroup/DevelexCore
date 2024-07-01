@@ -1,5 +1,5 @@
 import type { GazeInputConfigGazePoint } from "./GazeInputConfig";
-import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
+import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
 import { GazeInput } from "./GazeInput";
 
 /**
@@ -34,8 +34,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
         });
         return new Promise<void>((resolve) => {
             this.worker.onmessage = (event) => {
-                const { messageType } = event.data;
-                if (messageType === 'connected') {
+                const { type } = event.data;
+                if (type === 'connected') {
                     this.sessionID = sessionId;
                     this.isConnected = true;
                     resolve();
@@ -57,8 +57,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
         });
         return new Promise<void>((resolve) => {
             this.worker.onmessage = (event) => {
-                const { messageType } = event.data;
-                if (messageType === 'disconnected') {
+                const { type } = event.data;
+                if (type === 'disconnected') {
                     this.isConnected = false;
                     this.sessionID = null;
                     resolve();

@@ -20,20 +20,3 @@ export type GazeDataPointWithFixation = GazeDataPointWithoutFixation & {
     fixationDuration: number;
     fixationId: number;
 }
-
-export type GazePayload = GazePayloadPoint;
-
-export type GazePayloadPoint = GazePayloadPointBase | GazePayloadFixation;
-
-export type GazePayloadPointBase = {
-    timestamp: number;
-    type: 'point';
-    x: number;
-    y: number;
-    deviceValidity: boolean;
-}
-
-export type GazePayloadFixation = GazePayloadPointBase & {
-    fixationDuration: number;
-    fixationId: number;
-}
