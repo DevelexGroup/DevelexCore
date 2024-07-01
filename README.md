@@ -4,17 +4,6 @@ Everything you need to build a Svelte library, powered by [`create-svelte`](http
 
 Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in develex-core
-npm create svelte@latest develex-core
-```
 
 ## Developing
 
@@ -48,11 +37,24 @@ You can preview the production build with `npm run preview`.
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
 
 ## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
+The package is published to the GitLab package registry. To publish the package, you need to set the `CI_JOB_TOKEN` environment variable and run the `npm publish` command.
 
 ```bash
+set CI_JOB_TOKEN=<your-token>
 npm publish
+```
+
+## Using the package
+To use the package, you need to set the GitLab package registry and pass the token to the npm configuration.
+
+```bash
+npm config set -- //gitlab.ics.muni.cz/:_authToken=<your-token>
+```
+
+```bash
+npm config set @473783:registry=https://gitlab.ics.muni.cz/api/v4/projects/7015/packages/npm/
+```
+
+```bash
+npm i @473783/develex-core
 ```
