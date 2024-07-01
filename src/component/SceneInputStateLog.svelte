@@ -1,22 +1,10 @@
 <script lang="ts">
-	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
-    import { gazeInputStore } from "../store/gazeInputStore";
-
-    let inputStateMessageLogs: GazeInputMessage[] = [];
-
-    const addMessage = (message: GazeInputMessage) => {
-        inputStateMessageLogs = [...inputStateMessageLogs, message];
-    };
-
-    $: if ($gazeInputStore) {
-        $gazeInputStore.on("message", addMessage);
-    }
-
+    import { sceneStateStore } from "../store/sceneStores";
 </script>
 
 
 <ul>
-    {#each inputStateMessageLogs as message, i}
+    {#each $sceneStateStore as message, i}
         <li>
             <span>{new Date(message.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
             <span>{message.type}</span>

@@ -4,12 +4,16 @@
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
-	import { scenePointDataStore } from "../store/scenePointDataStore";
+	import { scenePointDataStore, sceneStateStore } from "../store/sceneStores";
 
     let isGazeIndicatorVisible = true;
     const indicator = new ETGazeIndicator();
 
     const handleGazeInputMessage = (data: GazeInputMessage) => {
+        sceneStateStore.update((store) => {
+            store.push(data);
+            return store;
+        });
         switch (data.type) {
             case "emit":
                 handleEmitEvent(data);

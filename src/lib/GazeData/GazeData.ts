@@ -20,3 +20,7 @@ export type GazeDataPointWithFixation = GazeDataPointWithoutFixation & {
     fixationDuration: number;
     fixationId: number;
 }
+
+export const isGazeDataPointWithFixation = (point: GazeDataPoint): point is GazeDataPointWithFixation => {
+    return (point as GazeDataPointWithFixation).fixationDuration !== undefined;
+}
