@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { GazeInputConfigDummy } from "$lib";
-    import { setGazeInput } from "../store/gazeInputStore";
+    import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
 	import InputNumber from "./InputNumber.svelte";
 	import InputSubmit from "./InputSubmit.svelte";
     import InputText from "./InputText.svelte";

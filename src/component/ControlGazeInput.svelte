@@ -8,6 +8,7 @@
 
     let isGazeIndicatorVisible = true;
     const indicator = new ETGazeIndicator();
+    $: disabled = $gazeInputStore === null;
 
     const handleGazeInputMessage = (data: GazeInputMessage) => {
         sceneStateStore.update((store) => {
@@ -120,20 +121,14 @@
 </script>
 
 <div class="container">
-    {#if $gazeInputStore === null}
-        <p>
-            No gaze input configured.
-        </p>
-    {:else}
-        <Button text={"Connect"} on:click={connect} />
-        <Button text={"Start"} on:click={start} />
-        <Button text={"Stop"} on:click={stop} />
-        <Button text={"Disconnect"} on:click={disconnect} />
-        <Button text={isGazeIndicatorVisible ? "Hide gaze indicator" : "Show gaze indicator"} on:click={() => {
+        <Button {disabled} text={"Connect"} on:click={connect} />
+        <Button {disabled} text={"Start"} on:click={start} />
+        <Button {disabled} text={"Stop"} on:click={stop} />
+        <Button {disabled} text={"Disconnect"} on:click={disconnect} />
+        <Button {disabled} text={isGazeIndicatorVisible ? "Hide gaze indicator" : "Show gaze indicator"} on:click={() => {
             toggleGazeIndicator(!isGazeIndicatorVisible);
         }} />
-        <Button text={"Null gaze input"} on:click={() => setGazeInput(null)} />
-    {/if}
+        <Button {disabled} text={"Null gaze input"} on:click={() => setGazeInput(null)} />
 </div>
 
 <style>

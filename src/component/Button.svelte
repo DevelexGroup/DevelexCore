@@ -1,8 +1,9 @@
 <script lang="ts">
     export let text: string;
+    export let disabled: boolean = false;
 </script>
 
-<button on:click>
+<button {disabled} on:click>
     {text}
 </button>
 
@@ -17,5 +18,9 @@
     }
     button:hover {
         background-color: #0056b3;
+    }
+    button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
     }
 </style>

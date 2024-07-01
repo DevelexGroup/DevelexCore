@@ -6,9 +6,10 @@
     export let placeholder: string = "";
     export let error: string = "";
     export let step: number = 1;
+    export let disabled: boolean = false;
     export const id = Math.random().toString(36).substring(7);
 </script>
 
 <InputScaffold {id} {label} {error}>
-    <input type="number" class="form-control" id={id} placeholder={placeholder} bind:value step={step} />
+    <input type="number" class="form-control" id={id} placeholder={placeholder} {disabled} bind:value step={step} />
 </InputScaffold>
