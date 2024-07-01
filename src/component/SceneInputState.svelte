@@ -59,13 +59,10 @@
         font-size: 1rem;
     }
     .state-container {
-        display: flex;
+        display: grid;
         flex-wrap: wrap;
         justify-content: space-between;
         gap: 1rem;
-    }
-    .state-section {
-        flex: 1 1 100%;
-        max-width: 400px;
+        grid-template-columns: 250px 250px 1fr;
     }
 </style>
