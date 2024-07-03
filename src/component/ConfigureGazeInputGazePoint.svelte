@@ -8,7 +8,7 @@
     const config: GazeInputConfigGazePoint = {
         tracker,
         fixationDetection: "device",
-        uri: "ws://localhost:8080",
+        uri: "ws://localhost:13892",
     };
 
     const submit = (event: MouseEvent) => {

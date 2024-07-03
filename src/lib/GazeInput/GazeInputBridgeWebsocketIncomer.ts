@@ -3,7 +3,7 @@
  * GazeInputBridgeWebsocketIncomer are messages sent from the Python Bridge server to the worker.
  * The messages contain either gaze data or status of the connection and the eye tracker.
  */
-export type GazeInputBridgeWebsocketIncomer = GazeInputBridgeWebsocketIncomerPoint | GazeInputBridgeWebsocketIncomerConnected | GazeInputBridgeWebsocketIncomerDisconnected | GazeInputBridgeWebsocketIncomerError | GazeInputBridgeWebsocketIncomerCalibrated;
+export type GazeInputBridgeWebsocketIncomer = GazeInputBridgeWebsocketIncomerPoint | GazeInputBridgeWebsocketIncomerConnected | GazeInputBridgeWebsocketIncomerDisconnected | GazeInputBridgeWebsocketIncomerError | GazeInputBridgeWebsocketIncomerCalibrated | GazeInputBridgeWebsocketIncomerStarted | GazeInputBridgeWebsocketIncomerStopped;
 
 export type GazeInputBridgeWebsocketIncomerPoint = GazeInputBridgeWebsocketIncomerPointBase | GazeInputBridgeWebsocketIncomerFixation;
 
@@ -35,4 +35,12 @@ export type GazeInputBridgeWebsocketIncomerError = {
 
 export type GazeInputBridgeWebsocketIncomerCalibrated = {
     type: 'calibrated';
+};
+
+export type GazeInputBridgeWebsocketIncomerStarted = {
+    type: 'started';
+};
+
+export type GazeInputBridgeWebsocketIncomerStopped = {
+    type: 'stopped';
 };

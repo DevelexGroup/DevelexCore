@@ -33,6 +33,16 @@ self.onmessage = (event) => {
         case 'disconnect':
             handleDisconnect();
             break;
+        case 'start':
+            if (socket) {
+                socket.send({ type: 'start' });
+            }
+            break;
+        case 'stop':
+            if (socket) {
+                socket.send({ type: 'stop' });
+            }
+            break;
         case 'setWindowCalibration':
             handleSetWindowCalibration(data as {
                 windowConfig: ETWindowCalibratorConfig,
@@ -61,6 +71,8 @@ const sendConnect = (config: GazeInputConfigGazePoint, newSessionId: string) => 
     socket.onDisconnectedCallback = generateDisconnectMessage; // disconnects the socket and sets sessionId to null
     socket.onErrorCallback = generateMessage;
     socket.onCalibratedCallback = generateMessage;
+    socket.onStartedCallback = generateMessage;
+    socket.onStoppedCallback = generateMessage;
 
     const connectMessage: GazeInputBridgeWebsocketOutcomerConnect = config.tracker === 'opengaze' ? {
         type: 'connect',
@@ -94,6 +106,7 @@ const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCa
 
 const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixationDetector: GazeFixationDetector, sessionId: string) => {
     return (data: GazeInputBridgeWebsocketIncomerPoint) => {
+        console.log(data);
         const windowX = windowCalibrator.toWindowX(data.x);
         const windowY = windowCalibrator.toWindowY(data.y);
         const windowCalibratedData: GazeDataPoint = { 

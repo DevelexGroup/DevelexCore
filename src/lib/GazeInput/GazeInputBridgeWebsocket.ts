@@ -1,4 +1,4 @@
-import type { GazeInputBridgeWebsocketIncomer, GazeInputBridgeWebsocketIncomerCalibrated, GazeInputBridgeWebsocketIncomerConnected, GazeInputBridgeWebsocketIncomerDisconnected, GazeInputBridgeWebsocketIncomerError, GazeInputBridgeWebsocketIncomerPoint } from "./GazeInputBridgeWebsocketIncomer";
+import type { GazeInputBridgeWebsocketIncomer, GazeInputBridgeWebsocketIncomerCalibrated, GazeInputBridgeWebsocketIncomerConnected, GazeInputBridgeWebsocketIncomerDisconnected, GazeInputBridgeWebsocketIncomerError, GazeInputBridgeWebsocketIncomerPoint, GazeInputBridgeWebsocketIncomerStarted, GazeInputBridgeWebsocketIncomerStopped } from "./GazeInputBridgeWebsocketIncomer";
 import type { GazeInputBridgeWebsocketOutcomer, GazeInputBridgeWebsocketOutcomerConnect } from "./GazeInputBridgeWebsocketOutcomer";
 
 export class GazeInputBridgeWebsocket {
@@ -10,6 +10,8 @@ export class GazeInputBridgeWebsocket {
     onPointCallback: (data: GazeInputBridgeWebsocketIncomerPoint) => void = this.logToConsole;
     onErrorCallback: (data: GazeInputBridgeWebsocketIncomerError) => void = this.logToConsole;
     onCalibratedCallback: (data: GazeInputBridgeWebsocketIncomerCalibrated) => void = this.logToConsole;
+    onStartedCallback: (data: GazeInputBridgeWebsocketIncomerStarted) => void = this.logToConsole;
+    onStoppedCallback: (data: GazeInputBridgeWebsocketIncomerStopped) => void = this.logToConsole;
 
     constructor(uri: string) {
         this.uri = uri;
@@ -35,6 +37,7 @@ export class GazeInputBridgeWebsocket {
     }
 
     private sendToWebsocket(data: GazeInputBridgeWebsocketOutcomer): void {
+        console.log(data);
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(JSON.stringify(data));
         } else {
@@ -50,6 +53,12 @@ export class GazeInputBridgeWebsocket {
                 break;
             case 'connected':
                 this.onConnectedCallback(attributes);
+                break;
+            case 'started':
+                this.onStartedCallback(attributes);
+                break;
+            case 'stopped':
+                this.onStoppedCallback(attributes);
                 break;
             case 'disconnected':
                 this.onDisconnectedCallback(attributes);

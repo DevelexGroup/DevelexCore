@@ -103,8 +103,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
         });
         return new Promise<void>((resolve) => {
             this.worker.onmessage = (event) => {
-                const { messageType } = event.data;
-                if (messageType === 'started') {
+                const { type } = event.data;
+                if (type === 'started') {
                     this.isEmitting = true;
                     resolve();
                 }
@@ -121,8 +121,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
         });
         return new Promise<void>((resolve) => {
             this.worker.onmessage = (event) => {
-                const { messageType } = event.data;
-                if (messageType === 'stopped') {
+                const { type } = event.data;
+                if (type === 'stopped') {
                     this.isEmitting = false;
                     resolve();
                 }

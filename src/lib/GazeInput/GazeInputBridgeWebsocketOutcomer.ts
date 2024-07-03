@@ -2,7 +2,7 @@
  * GazeInputBridgeWebsocketOutcomers are messages sent from the worker to the Python Bridge server.
  * The messages contain either commands to the eye tracker or configuration data.
  */
-export type GazeInputBridgeWebsocketOutcomer = GazeInputBridgeWebsocketOutcomerConnect | GazeInputBridgeWebsocketOutcomerDisconnect;
+export type GazeInputBridgeWebsocketOutcomer = GazeInputBridgeWebsocketOutcomerConnect | GazeInputBridgeWebsocketOutcomerDisconnect | GazeInputBridgeWebsocketOutcomerStart | GazeInputBridgeWebsocketOutcomerStop;
 
 export type GazeInputBridgeWebsocketOutcomerConnect = GazeInputBridgeWebsocketOutcomerConnectOpenGaze | GazeInputBridgeWebsocketOutcomerConnectSMI;
 
@@ -21,4 +21,12 @@ export type GazeInputBridgeWebsocketOutcomerConnectSMI = GazeInputBridgeWebsocke
 
 export type GazeInputBridgeWebsocketOutcomerDisconnect = {
     type: 'disconnect';
+};
+
+export type GazeInputBridgeWebsocketOutcomerStart = {
+    type: 'start';
+};
+
+export type GazeInputBridgeWebsocketOutcomerStop = {
+    type: 'stop';
 };
