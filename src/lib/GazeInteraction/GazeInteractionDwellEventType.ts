@@ -1,5 +1,5 @@
 import type { GazeDataPoint } from '../GazeData/GazeData';
-import type { ETDwellSettingsType } from './ETDwellSettingsType';
+import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSettingsType';
 
 /**
  * Fired when a dwell event occurs.
@@ -7,15 +7,15 @@ import type { ETDwellSettingsType } from './ETDwellSettingsType';
  * @property {number} timestamp of the event.
  * @property {number} elapsed time since the dwell was activated.
  * @property {Element} target of the dwell event.
- * @property {ETDwellSettingsType} settings for the dwell event, including the dwell time and callbacks.
+ * @property {GazeInteractionDwellSettingsType} settings for the dwell event, including the dwell time and callbacks.
  *
  *
  */
-export interface ETDwellEventType {
+export interface GazeInteractionDwellEventType {
 	type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel';
 	timestamp: number;
 	elapsed: number;
 	target: Element;
-	settings: ETDwellSettingsType;
+	settings: GazeInteractionDwellSettingsType;
 	gazeData: GazeDataPoint;
 }

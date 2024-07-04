@@ -1,8 +1,8 @@
 import { GazeInput } from '$lib/GazeInput/GazeInput';
 import type { GazeDataPoint } from '$lib/GazeData/GazeData';
-import type { ETDwellSettingsType } from './ETDwellSettingsType';
-import type { ETDwellListenerType } from './ETDwellListenerType';
-import type { ETDwellEventType } from './ETDwellEventType';
+import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSettingsType';
+import type { GazeInteractionDwellListenerType } from './GazeInteractionDwellListenerType';
+import type { GazeInteractionDwellEventType } from './GazeInteractionDwellEventType';
 import type { GazeInputConfig } from '../GazeInput/GazeInputConfig';
 
 /**
@@ -10,12 +10,12 @@ import type { GazeInputConfig } from '../GazeInput/GazeInputConfig';
  * that have been registered with the given settings.
  * TODO: Implement spatial indexing to improve performance!!! quadtree or something
  *
- * @property {ETDwellListenerType[]} listeners The list of registered elements and their settings.
+ * @property {GazeInteractionDwellListenerType[]} listeners The list of registered elements and their settings.
  * @property {ET} eyetracker The eye-tracker to listen to.
  * @property {(data: GazeDataPoint) => void} eyetrackerCallback The callback function to be called when the eye-tracker sends new data.
  */
-export class ETDwell {
-	listeners: ETDwellListenerType[];
+export class GazeInteractionDwell {
+	listeners: GazeInteractionDwellListenerType[];
 	eyetracker: GazeInput<GazeInputConfig>;
 	readonly eyetrackerCallback: (data: GazeDataPoint) => void = (data) =>
 		this.evaluateEyeTrackerData(data);
@@ -31,7 +31,7 @@ export class ETDwell {
 	 * @param element to register for dwell events.
 	 * @param settings for the dwell events, including the dwell time and callbacks when the dwell is activated, finished, or canceled.
 	 */
-	register(element: Element, settings: ETDwellSettingsType) {
+	register(element: Element, settings: GazeInteractionDwellSettingsType) {
 		this.listeners.push({ element, settings, timestamp: null });
 	}
 
@@ -74,7 +74,7 @@ export class ETDwell {
 	 * @param data The eye-tracker data to evaluate.
 	 * @param listener The listener to evaluate for dwell events.
 	 */
-	evaluateListener(data: GazeDataPoint, listener: ETDwellListenerType) {
+	evaluateListener(data: GazeDataPoint, listener: GazeInteractionDwellListenerType) {
 		const { element, settings, timestamp } = listener;
 		const { dwellTime, bufferSize, onDwellProgress, onDwellFinish, onDwellCancel } = settings;
 		const { x, y } = data;
@@ -164,11 +164,11 @@ export class ETDwell {
 	 */
 	createDwellEvent(
 		type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel',
-		listener: ETDwellListenerType,
+		listener: GazeInteractionDwellListenerType,
 		timestamp: number,
 		elapsed: number,
 		data: GazeDataPoint
-	): ETDwellEventType {
+	): GazeInteractionDwellEventType {
 		const { element, settings } = listener;
 		return {
 			type,
