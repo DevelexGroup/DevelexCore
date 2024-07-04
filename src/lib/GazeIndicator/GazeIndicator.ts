@@ -6,7 +6,7 @@
 
 import { type GazeDataPoint } from "$lib/GazeData/GazeData";
 
-export class ETGazeIndicator {
+export class GazeIndicator {
 
 	canvas: HTMLCanvasElement | null;
 	ctx: CanvasRenderingContext2D | null;

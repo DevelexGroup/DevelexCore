@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ETGazeIndicator } from "$lib/GazeIndicator/GazeIndicator";
+	import { GazeIndicator } from "$lib/GazeIndicator/GazeIndicator";
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
@@ -7,7 +7,7 @@
 	import { scenePointDataStore, sceneStateStore } from "../store/sceneStores";
 
     let isGazeIndicatorVisible = true;
-    const indicator = new ETGazeIndicator();
+    const indicator = new GazeIndicator();
     $: disabled = $gazeInputStore === null;
 
     const handleGazeInputMessage = (data: GazeInputMessage) => {
