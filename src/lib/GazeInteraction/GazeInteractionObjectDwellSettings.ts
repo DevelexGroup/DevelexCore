@@ -1,4 +1,4 @@
-import type { GazeInteractionDwellCallbackType } from './GazeInteractionDwellCallbackType';
+import type { GazeInteractionDwellCallbackType } from './GazeInteractionObjectDwellCallback';
 
 /**
  * Needed for the dwell event listener setup.

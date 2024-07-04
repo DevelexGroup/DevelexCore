@@ -1,5 +1,5 @@
 import type { GazeDataPoint } from '../GazeData/GazeData';
-import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSettingsType';
+import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
 
 /**
  * Fired when a dwell event occurs.
@@ -8,10 +8,8 @@ import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSet
  * @property {number} elapsed time since the dwell was activated.
  * @property {Element} target of the dwell event.
  * @property {GazeInteractionDwellSettingsType} settings for the dwell event, including the dwell time and callbacks.
- *
- *
  */
-export interface GazeInteractionDwellEventType {
+export interface GazeInteractionObjectDwellEvent {
 	type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel';
 	timestamp: number;
 	elapsed: number;

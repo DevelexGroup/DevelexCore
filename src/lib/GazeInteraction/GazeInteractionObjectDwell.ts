@@ -1,80 +1,21 @@
-import { GazeInput } from '$lib/GazeInput/GazeInput';
 import type { GazeDataPoint } from '$lib/GazeData/GazeData';
-import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSettingsType';
-import type { GazeInteractionDwellListenerType } from './GazeInteractionDwellListenerType';
-import type { GazeInteractionDwellEventType } from './GazeInteractionDwellEventType';
-import type { GazeInputConfig } from '../GazeInput/GazeInputConfig';
+import type { GazeInteractionObjectDwellListener } from './GazeInteractionObjectDwellListener';
+import { GazeInteractionObject } from './GazeInteractionObject';
+import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
 
 /**
  * Manages dwell events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
- * TODO: Implement spatial indexing to improve performance!!! quadtree or something
- *
- * @property {GazeInteractionDwellListenerType[]} listeners The list of registered elements and their settings.
- * @property {ET} eyetracker The eye-tracker to listen to.
- * @property {(data: GazeDataPoint) => void} eyetrackerCallback The callback function to be called when the eye-tracker sends new data.
+ * TODO: Implement spatial indexing to improve performance!!! quadtree or something similar.
  */
-export class GazeInteractionDwell {
-	listeners: GazeInteractionDwellListenerType[];
-	eyetracker: GazeInput<GazeInputConfig>;
-	readonly eyetrackerCallback: (data: GazeDataPoint) => void = (data) =>
-		this.evaluateEyeTrackerData(data);
-
-	constructor(eyetracker: GazeInput<GazeInputConfig>) {
-		this.listeners = [];
-		this.eyetracker = eyetracker;
-		this.init();
-	}
-
-	/**
-	 * Registers an element for dwell events.
-	 * @param element to register for dwell events.
-	 * @param settings for the dwell events, including the dwell time and callbacks when the dwell is activated, finished, or canceled.
-	 */
-	register(element: Element, settings: GazeInteractionDwellSettingsType) {
-		this.listeners.push({ element, settings, timestamp: null });
-	}
-
-	/**
-	 * Unregisters an element from dwell events.
-	 * @param element to unregister from dwell events.
-	 */
-	unregister(element: Element) {
-		this.listeners = this.listeners.filter((e) => e.element !== element);
-	}
-
-	/**
-	 * Activates listening to the eye-tracker for data. Called in the constructor.
-	 */
-	init() {
-		this.eyetracker.on('data', this.eyetrackerCallback);
-	}
-
-	/**
-	 * Deactivates listening to the eye-tracker for data. Called in the destructor.
-	 */
-	deactivate() {
-		this.eyetracker.off('data', this.eyetrackerCallback);
-	}
-
-	/**
-	 * Calls the listeners' callbacks if valid for dwell events.
-	 * TODO: Implement spatial indexing to improve performance, quadtree or something
-	 * @param data The eye-tracker data to evaluate.
-	 */
-	evaluateEyeTrackerData(data: GazeDataPoint) {
-		if (!(data.validityL || data.validityR)) return;
-		this.listeners.forEach((listener) => {
-			this.evaluateListener(data, listener);
-		});
-	}
+export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionObjectDwellListener> {
 
 	/**
 	 * Evaluates the listener for dwell events and calls the callbacks if valid.
 	 * @param data The eye-tracker data to evaluate.
 	 * @param listener The listener to evaluate for dwell events.
 	 */
-	evaluateListener(data: GazeDataPoint, listener: GazeInteractionDwellListenerType) {
+	evaluateListener(data: GazeDataPoint, listener: GazeInteractionObjectDwellListener) {
 		const { element, settings, timestamp } = listener;
 		const { dwellTime, bufferSize, onDwellProgress, onDwellFinish, onDwellCancel } = settings;
 		const { x, y } = data;
@@ -164,11 +105,11 @@ export class GazeInteractionDwell {
 	 */
 	createDwellEvent(
 		type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel',
-		listener: GazeInteractionDwellListenerType,
+		listener: GazeInteractionObjectDwellListener,
 		timestamp: number,
 		elapsed: number,
 		data: GazeDataPoint
-	): GazeInteractionDwellEventType {
+	): GazeInteractionObjectDwellEvent {
 		const { element, settings } = listener;
 		return {
 			type,
@@ -177,6 +118,30 @@ export class GazeInteractionDwell {
 			target: element,
 			settings,
 			gazeData: data
+		};
+	}
+
+	/**
+	 * Listeners should be evaluated if the gaze data is valid. Either the left or right eye must be valid.
+	 * @param data gaze data to evaluate.
+	 * @returns boolean whether to evaluate the listeners or not.
+	 */
+	shouldEvaluateListeners(data: GazeDataPoint): boolean {
+		return data.validityL || data.validityR;
+	}
+
+	/**
+	 * Generates a listener object for dwell events.
+	 * There is a timestamp property to keep track of the dwell time. Null if the dwell is not active.
+	 * @param element to attach the listener to.
+	 * @param settings for the dwell events.
+	 * @returns the generated listener object.
+	 */
+	generateListener(element: Element, settings: GazeInteractionObjectDwellListener['settings']): GazeInteractionObjectDwellListener {
+		return {
+			element,
+			settings,
+			timestamp: null
 		};
 	}
 }

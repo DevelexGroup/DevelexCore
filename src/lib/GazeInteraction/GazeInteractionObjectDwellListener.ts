@@ -1,4 +1,4 @@
-import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSettingsType';
+import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
 
 /**
  * Listener object for GazeInteractionDwell.
@@ -6,7 +6,7 @@ import type { GazeInteractionDwellSettingsType } from './GazeInteractionDwellSet
  * @property {Element} element that the listener is attached to.
  * @property {number | null} timestamp of when the dwell started, or null if the dwell is not active.
  */
-export interface GazeInteractionDwellListenerType {
+export interface GazeInteractionObjectDwellListener {
 	settings: GazeInteractionDwellSettingsType;
 	element: Element;
 	timestamp: number | null;
