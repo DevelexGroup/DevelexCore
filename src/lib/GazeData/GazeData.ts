@@ -4,15 +4,23 @@ export type GazeDataPointWithoutFixation = {
     type: 'point';
 
     x: number;
-    xScreenRelative: number;
+    xL: number;
+    xLScreenRelative: number;
+    xR: number;
+    xRScreenRelative: number;
 
     y: number;
-    yScreenRelative: number;
+    yL: number;
+    yLScreenRelative: number;
+    yR: number;
+    yRScreenRelative: number;
 
     timestamp: number;
     sessionId: string;
 
-    deviceValidity: boolean;
+    validityL: boolean;
+    validityR: boolean;
+
     parseValidity: boolean;
 }
 

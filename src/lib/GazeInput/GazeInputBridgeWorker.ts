@@ -106,15 +106,28 @@ const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCa
 
 const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixationDetector: GazeFixationDetector, sessionId: string) => {
     return (data: GazeInputBridgeWebsocketIncomerPoint) => {
-        console.log(data);
-        const windowX = windowCalibrator.toWindowX(data.x);
-        const windowY = windowCalibrator.toWindowY(data.y);
+
+        const windowXL = windowCalibrator.toWindowX(data.xL);
+        const windowXR = windowCalibrator.toWindowX(data.xR);
+        const windowYL = windowCalibrator.toWindowY(data.yL);
+        const windowYR = windowCalibrator.toWindowY(data.yR);
+
+        const { x, y } = getGazeDataPointCenter(data);
+        const windowX = windowCalibrator.toWindowX(x);
+        const windowY = windowCalibrator.toWindowY(y);
+
         const windowCalibratedData: GazeDataPoint = { 
             ...data,
             x: windowX,
+            xL: windowXL,
+            xR: windowXR,
+            xLScreenRelative: data.xL,
+            xRScreenRelative: data.xR,
             y: windowY,
-            xScreenRelative: data.x,
-            yScreenRelative: data.y,
+            yL: windowYL,
+            yR: windowYR,
+            yLScreenRelative: data.yL,
+            yRScreenRelative: data.yR,
             sessionId,
             parseValidity: true // can be disvalidated by (i) fixation detector or (ii) window coordinates decorrelation in main thread wrapper
         };
@@ -131,4 +144,28 @@ const generateDisconnectMessage = (data: GazeInputBridgeWebsocketIncomerDisconne
 
 const generateMessage = (data: GazeInputBridgeWebsocketIncomer) => {
     self.postMessage({ ...data });
+}
+
+export const getGazeDataPointCenter = (point: GazeInputBridgeWebsocketIncomerPoint): { x: number; y: number } => {
+    if (point.validityL && point.validityR) {
+        return {
+            x: (point.xL + point.xR) / 2,
+            y: (point.yL + point.yR) / 2
+        };
+    } else if (point.validityL) {
+        return {
+            x: point.xL,
+            y: point.yL
+        };
+    } else if (point.validityR) {
+        return {
+            x: point.xR,
+            y: point.yR
+        };
+    } else {
+        return {
+            x: 0,
+            y: 0
+        };
+    }
 }

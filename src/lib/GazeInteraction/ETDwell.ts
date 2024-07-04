@@ -63,7 +63,7 @@ export class ETDwell {
 	 * @param data The eye-tracker data to evaluate.
 	 */
 	evaluateEyeTrackerData(data: GazeDataPoint) {
-		if (data.x === null || data.y === null) return;
+		if (!(data.validityL || data.validityR)) return;
 		this.listeners.forEach((listener) => {
 			this.evaluateListener(data, listener);
 		});

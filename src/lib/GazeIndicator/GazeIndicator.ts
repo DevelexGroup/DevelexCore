@@ -4,6 +4,8 @@
  * Uses canvas to draw the gaze points which slowly fade away.
  */
 
+import { type GazeDataPoint } from "$lib/GazeData/GazeData";
+
 export class ETGazeIndicator {
 
 	canvas: HTMLCanvasElement | null;
@@ -11,7 +13,7 @@ export class ETGazeIndicator {
 	gazeHistory: { x: number; y: number; opacity: number }[];
 	fadeRate: number;
 	color: string;
-	draw: (recentPoint: { x: number; y: number; }) => void;
+	draw: (recentPoint: GazeDataPoint) => void;
 
 	constructor(color: string = 'red', fadeRate: number = 0.05) {
 		this.canvas = null;
@@ -49,13 +51,13 @@ export class ETGazeIndicator {
 		if (!this.ctx) {
 			throw new Error('Canvas context is not initialized');
 		}
-		return (recentPoint: { x: number; y: number; }) => {
+		return (recentPoint: GazeDataPoint ) => {
 			this.gazeHistory = drawGazeIndicator(this.gazeHistory, this.ctx as CanvasRenderingContext2D, recentPoint.x, recentPoint.y, 10, 1, this.color);
 		};
 	}
 
 	createErroneousDrawFunction() {
-		return (recentPoint: { x: number; y: number; }) => {
+		return () => {
 			throw new Error('Canvas context is not initialized');
 		};
 	}

@@ -126,14 +126,23 @@ export const createGazePointFactory = (
 	windowCalibrator: ETWindowCalibrator
 ): (x: number, y: number) => GazeDataPointWithoutFixation => {
 	return (x: number, y: number) => {
+		const xScreenRelative = windowCalibrator.toScreenRelativeX(x);
+		const yScreenRelative = windowCalibrator.toScreenRelativeY(y);
 		return {
 			x,
-			xScreenRelative: windowCalibrator.toScreenRelativeX(x),
+			xL: x,
+			xR: x,
+			xLScreenRelative: xScreenRelative,
+			xRScreenRelative: xScreenRelative,
 			y,
-			yScreenRelative: windowCalibrator.toScreenRelativeY(y),
+			yL: y,
+			yR: y,
+			yLScreenRelative: yScreenRelative,
+			yRScreenRelative: yScreenRelative,
 			sessionId,
 			timestamp: Date.now(),
-			deviceValidity: true,
+			validityL: true,
+			validityR: true,
 			parseValidity: true, // todo: implement validity check on window coordinates decorrelation
 			parseTimestamp: Date.now(),
 			type: 'point'

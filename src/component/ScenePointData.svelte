@@ -17,15 +17,19 @@
 <ul>
     <li>
         <span>Time</span>
-        <span>X</span>
-        <span>Y</span>
+        <span>X Left</span>
+        <span>X Right</span>
+        <span>Y Left</span>
+        <span>Y Right</span>
         <span>FixDur</span>
     </li>
     {#each log as data}
         <li>
             <span>{new Date(data.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-            <span>{data.x}</span>
-            <span>{data.y}</span>
+            <span>{data.xL}</span>
+            <span>{data.xR}</span>
+            <span>{data.yL}</span>
+            <span>{data.yR}</span>
             <span>{isGazeDataPointWithFixation(data) ? data.fixationDuration : 'None'}</span>
         </li>
     {/each}

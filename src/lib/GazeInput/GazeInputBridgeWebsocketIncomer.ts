@@ -10,8 +10,12 @@ export type GazeInputBridgeWebsocketIncomerPoint = GazeInputBridgeWebsocketIncom
 export type GazeInputBridgeWebsocketIncomerPointBase = {
     timestamp: number;
     type: 'point';
-    x: number;
-    y: number;
+    xL: number;
+    yL: number;
+    xR: number;
+    yR: number;
+    validityL: boolean;
+    validityR: boolean;
     deviceValidity: boolean;
 };
 
