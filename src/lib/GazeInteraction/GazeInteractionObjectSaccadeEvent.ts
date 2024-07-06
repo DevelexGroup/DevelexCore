@@ -16,12 +16,12 @@ import type { GazeInteractionSaccadeSettingsType } from './GazeInteractionObject
  * @property {GazeInteractionSaccadeSettingsType} settings for the saccade event, including the saccade time and callbacks.
  */
 export interface GazeInteractionObjectSaccadeEvent {
-	type: 'saccadeEnd';
+	type: 'saccadeTo' | 'saccadeFrom';
 	timestamp: number;
 	duration: number;
     angleToScreen: number;
-    angleToPrevious: number;
-    angleToPreviousInvalidityTime: number;
+    angleToPrevious?: number;
+    angleToPreviousInvalidityTime?: number;
 	target: Element;
     originTarget: Element;
 	settings: GazeInteractionSaccadeSettingsType;

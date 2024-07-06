@@ -7,6 +7,5 @@ import type { GazeInteractionSaccadeSettingsType } from './GazeInteractionObject
  */
 export interface GazeInteractionObjectSaccadeListener {
 	settings: GazeInteractionSaccadeSettingsType;
-	element: Element;
-	isActive: boolean;
+	element: Element
 }
