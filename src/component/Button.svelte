@@ -15,6 +15,7 @@
         color: white;
         border: none;
         cursor: pointer;
+        font-size: small;
     }
     button:hover {
         background-color: #0056b3;

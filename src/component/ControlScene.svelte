@@ -1,4 +1,6 @@
 <script>
+	import SceneDwell from "./SceneDwell.svelte";
+	import SceneFixation from "./SceneFixation.svelte";
     import SceneInputState from "./SceneInputState.svelte";
 	import ScenePointData from "./ScenePointData.svelte";
     import Tabs from "./Tabs.svelte";
@@ -12,6 +14,15 @@
         { label: "Point Data",
             value: 2,
             component: ScenePointData
+        },
+        { label: "Dwell",
+            value: 3,
+            component: SceneDwell
+        },
+        {
+            label: "Fixation",
+            value: 4,
+            component: SceneFixation
         }
     ];
 </script>

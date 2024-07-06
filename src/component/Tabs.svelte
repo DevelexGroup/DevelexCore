@@ -37,6 +37,7 @@
     }
       li {
           margin-bottom: -1px;
+          font-size: small;
       }
   
     span {
