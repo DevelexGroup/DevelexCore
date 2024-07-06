@@ -28,13 +28,15 @@ export abstract class GazeInteractionObject<T extends GazeInteractionObjectListe
 
     /**
 	 * Calls the listeners' callbacks if valid for object events.
+	 * If there is a need for further action, method should be overridden with using the super method to call the listeners' callbacks first.
 	 * @param {GazeDataPoint} data - The eye-tracker data to evaluate.
 	 */
     evaluateInputData(data: GazeDataPoint): void {
-        if (!this.shouldEvaluateListeners(data)) return;
-        this.listeners.forEach((listener) => {
-            this.evaluateListener(data, listener);
-        });
+        if (this.shouldEvaluateListeners(data)) {
+			this.listeners.forEach((listener) => {
+				this.evaluateListener(data, listener);
+			});
+		}
     }
 
     /**
