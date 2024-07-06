@@ -14,38 +14,54 @@
     bufferLogging();
 </script>
 
-<ul>
-    <li>
-        <span>Time</span>
-        <span>X Left</span>
-        <span>X Right</span>
-        <span>Y Left</span>
-        <span>Y Right</span>
-        <span>FixDur</span>
-    </li>
-    {#each log as data}
-        <li>
-            <span>{new Date(data.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-            <span>{data.xL}</span>
-            <span>{data.xR}</span>
-            <span>{data.yL}</span>
-            <span>{data.yR}</span>
-            <span>{isGazeDataPointWithFixation(data) ? data.fixationDuration : 'None'}</span>
-        </li>
-    {/each}
-</ul>
+<div>
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>X Left</th>
+            <th>X Right</th>
+            <th>Y Left</th>
+            <th>Y Right</th>
+            <th>FixDur</th>
+        </tr>
+    </thead>
+    <tbody>
+        {#each log as data}
+            <tr>
+                <td>{new Date(data.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+                <td>{data.xL}</td>
+                <td>{data.xR}</td>
+                <td>{data.yL}</td>
+                <td>{data.yR}</td>
+                <td>{isGazeDataPointWithFixation(data) ? data.fixationDuration : 'None'}</td>
+            </tr>
+        {/each}
+    </tbody>
+</table>
+</div>
 
 <style>
-    ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
+    div {
+        overflow-x: auto;
+        border: 1px solid #ddd;
+    }
+    table {
+        width: 100%;
+        min-width: 800px;
+        border-collapse: collapse;
     }
 
-    li {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        padding: 0.5rem;
-        border-bottom: 1px solid #ccc;
+    th, td {
+        padding: 5px 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
     }
 </style>
