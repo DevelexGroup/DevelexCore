@@ -77,24 +77,6 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 	}
 
 	/**
-	 * Checks if the given coordinates are inside the given element's bounding box.
-	 * @param element to check if the given coordinates are inside.
-	 * @param x in pixels in the viewport.
-	 * @param y in pixels in the viewport.
-	 * @param bufferSize in pixels to expand the element's bounding box (to make it easier to trigger the dwell event).
-	 * @returns
-	 */
-	isInside(element: Element, x: number, y: number, bufferSize: number): boolean {
-		const { top, left, right, bottom } = element.getBoundingClientRect();
-		return (
-			x >= left - bufferSize &&
-			x <= right + bufferSize &&
-			y >= top - bufferSize &&
-			y <= bottom + bufferSize
-		);
-	}
-
-	/**
 	 * Creates an event object for the dwell event.
 	 * @param type - The type of the dwell event ('dwellProgress', 'dwellFinish', 'dwellCancel').
 	 * @param listener - The listener object for the dwell event.
