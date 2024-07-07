@@ -31,10 +31,10 @@
 
 <div class="holder">
     <Group heading="Dwell Interaction Elements">
-        <div class="circle" bind:this={firstElement}></div>
+        <div id="dwell-a" class="circle" bind:this={firstElement}></div>
     </Group>
     <Group heading="Dwell Interaction Log">
-        <GenericTable data={$sceneObjectDwellStore} headers={["timestamp", "type", "elapsed"]} />
+        <GenericTable data={$sceneObjectDwellStore} headers={["timestamp", "type", "elapsed", "target.id"]} />
     </Group>
 </div>
 

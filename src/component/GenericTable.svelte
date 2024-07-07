@@ -7,6 +7,22 @@
     // Props for the component
     export let data: DataRow[] = [];
     export let headers: string[] = [];
+
+    const getNestedValue = (obj: any, path: string): any =>{
+      return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+    }
+
+    const getTime = (timestamp: number) => {
+      const date = new Date(timestamp);
+      const pad = (num: number, size: number) => num.toString().padStart(size, '0');
+    
+      const hours = pad(date.getHours(), 2);
+      const minutes = pad(date.getMinutes(), 2);
+      const seconds = pad(date.getSeconds(), 2);
+      const milliseconds = pad(date.getMilliseconds(), 3);
+      
+      return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+    }
   </script>
   
   <table>
@@ -23,10 +39,10 @@
           {#each headers as header}
             <td>
               {#if header === 'timestamp'}
-                {new Date(row[header]).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                {getTime(row[header])}
               {:else}
-                {#if row[header] !== undefined}
-                  {row[header]}
+                {#if getNestedValue(row, header) !== undefined}
+                  {getNestedValue(row, header)}
                 {/if}
               {/if}
             </td>
