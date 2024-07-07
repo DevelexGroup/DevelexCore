@@ -2,13 +2,12 @@
     import { gazeInputStore } from "../store/gazeInputStore";
     import { addDwellEvent, sceneObjectDwellStore } from "../store/sceneStores";
     import { GazeInteractionObjectDwell } from "$lib";
-	import { onDestroy, onMount } from "svelte";
+	import { onDestroy } from "svelte";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
+	import GenericTestElement from "./GenericTestElement.svelte";
 
     const dwellHandler = new GazeInteractionObjectDwell();
-
-    let firstElement: HTMLElement;
 
     $: if ($gazeInputStore !== null) {
         dwellHandler.connectInput($gazeInputStore);
@@ -18,20 +17,24 @@
         if ($gazeInputStore !== null) dwellHandler.disconnectInput($gazeInputStore);
     });
 
-    onMount(() => {
-        dwellHandler.register(firstElement, {
-            bufferSize: 10,
-            dwellTime: 500,
-            onDwellProgress: addDwellEvent,
-            onDwellCancel: addDwellEvent,
-            onDwellFinish: addDwellEvent,
-        });
-    });
+    const settings = {
+        bufferSize: 10,
+        dwellTime: 500,
+        onDwellProgress: addDwellEvent,
+        onDwellCancel: addDwellEvent,
+        onDwellFinish: addDwellEvent,
+    };
+
+    const aoiLabels = ["dwell-a", "dwell-b", "dwell-c"];
 </script>
 
 <div class="holder">
     <Group heading="Dwell Interaction Elements">
-        <div id="dwell-a" class="circle" bind:this={firstElement}></div>
+        <div class="grouping">
+        {#each aoiLabels as aoi}
+            <GenericTestElement aoi={aoi} settings={settings} register={dwellHandler.register.bind(dwellHandler)} unregister={dwellHandler.unregister.bind(dwellHandler)} />
+        {/each}
+        </div>
     </Group>
     <Group heading="Dwell Interaction Log">
         <GenericTable data={$sceneObjectDwellStore} headers={["timestamp", "type", "elapsed", "target.id"]} />
@@ -46,10 +49,9 @@
         grid-template-columns: 1fr;
         gap: 2rem;
     }
-    .circle {
-        width: 100px;
-        height: 100px;
-        background-color: #FFDB58;
-        border-radius: 50%;
+    .grouping {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
     }
 </style>

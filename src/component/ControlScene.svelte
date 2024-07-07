@@ -3,6 +3,7 @@
 	import SceneFixation from "./SceneFixation.svelte";
     import SceneInputState from "./SceneInputState.svelte";
 	import ScenePointData from "./ScenePointData.svelte";
+	import SceneSaccade from "./SceneSaccade.svelte";
     import Tabs from "./Tabs.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -23,6 +24,11 @@
             label: "Fixation",
             value: 4,
             component: SceneFixation
+        },
+        {
+            label: "Saccade",
+            value: 5,
+            component: SceneSaccade
         }
     ];
 </script>
