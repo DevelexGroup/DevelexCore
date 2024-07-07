@@ -11,15 +11,18 @@ export type GazeInteractionObjectPayload = {
 
 export abstract class GazeInteractionObject<T extends GazeInteractionObjectPayload> extends GazeInteraction {
     
-    listeners: T['listener'][] = [];
+    abstract defaultSettings: T['listener']['settings'];
+	
+	listeners: T['listener'][] = [];
 
     /**
 	 * Registers an element for object events with the given settings.
      * @param element - Element to register for object events.
 	 * @param settings - Settings for the events, including callbacks when the event is activated, finished, or canceled.
 	 */
-    register(element: Element, settings: T['listener']['settings']): void {
-        this.listeners.push(this.generateListener(element, settings));
+    register(element: Element, settings: Partial<T['listener']['settings']>): void {
+		const mergedSettings = { ...this.defaultSettings, ...settings };
+        this.listeners.push(this.generateListener(element, mergedSettings));
     }
 
     /**

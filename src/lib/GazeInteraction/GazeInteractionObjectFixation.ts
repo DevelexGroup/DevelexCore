@@ -2,12 +2,20 @@ import { isGazeDataPointWithFixation, type GazeDataPoint, type GazeDataPointWith
 import type { GazeInteractionObjectFixationListener, GazeInteractionObjectFixationPayload } from './GazeInteractionObjectFixationListener';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectFixationEvent } from './GazeInteractionObjectFixationEvent';
+import type { GazeInteractionFixationSettingsType } from './GazeInteractionObjectFixationSettings';
 
 /**
  * Manages fixation events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
 export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationPayload> {
+
+    defaultSettings: GazeInteractionFixationSettingsType = {
+        bufferSize: 100,
+        onFixationStart: () => {},
+        onFixationEnd: () => {},
+        onFixationProgress: () => {}
+    };
 
     evaluateListenerFor = {
         "start": this.evaluateListenerForStart.bind(this),
@@ -117,18 +125,18 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
     evaluateListenerForEnd(data: GazeDataPoint, listener: GazeInteractionObjectFixationListener) {
         if (!listener.isActive) return;
         const { onFixationEnd } = listener.settings
-        if (onFixationEnd) {
-            const duration = this.currentFixationLastPoint?.fixationDuration
-            if (!duration) throw new Error('lastPoint is null');
-            const event = this.createFixationEvent(
-                'fixationEnd',
-                listener,
-                data.timestamp,
-                duration,
-                data
-            );
-            onFixationEnd(event);
-        }
+
+        const duration = this.currentFixationLastPoint?.fixationDuration
+        if (!duration) throw new Error('lastPoint is null');
+        const event = this.createFixationEvent(
+            'fixationEnd',
+            listener,
+            data.timestamp,
+            duration,
+            data
+        );
+        onFixationEnd(event);
+
         listener.isActive = false;
     }
 
@@ -142,17 +150,15 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
         if (!this.isInside(listener.element, data.x, data.y, listener.settings.bufferSize)) return;
 
         const { onFixationStart } = listener.settings;
-        if (onFixationStart) {
-            const event = this.createFixationEvent(
-                'fixationStart',
-                listener,
-                data.timestamp,
-                0,
-                data
-            );
-            onFixationStart(event);
-        }
-
+        
+        const event = this.createFixationEvent(
+            'fixationStart',
+            listener,
+            data.timestamp,
+            0,
+            data
+        );
+        onFixationStart(event);
         listener.isActive = true;
     }
 
@@ -175,18 +181,17 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
     evaluateListenerForProgress(data: GazeDataPoint, listener: GazeInteractionObjectFixationListener) {
         if (!listener.isActive) return;
         const { onFixationProgress } = listener.settings;
-        if (onFixationProgress) {
-            const duration = (data as GazeDataPointWithFixation).fixationDuration;
-            if (!duration) throw new Error('lastPoint is null');
-            const event = this.createFixationEvent(
-                'fixationProgress',
-                listener,
-                data.timestamp,
-                duration,
-                data
-            );
-            onFixationProgress(event);
-        }
+
+        const duration = (data as GazeDataPointWithFixation).fixationDuration;
+        if (!duration) throw new Error('lastPoint is null');
+        const event = this.createFixationEvent(
+            'fixationProgress',
+            listener,
+            data.timestamp,
+            duration,
+            data
+        );
+        onFixationProgress(event);
     }
 
 	/**

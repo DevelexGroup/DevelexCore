@@ -3,6 +3,7 @@ import type { GazeInteractionObjectSaccadeData, GazeInteractionObjectSaccadeList
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectSaccadeEvent } from './GazeInteractionObjectSaccadeEvent';
 import { decideFixationPhase } from './GazeInteractionHelperFixation';
+import type { GazeInteractionSaccadeSettingsType } from './GazeInteractionObjectSaccadeSettings';
 
 
 /**
@@ -12,6 +13,12 @@ import { decideFixationPhase } from './GazeInteractionHelperFixation';
  * It works on an interval between two fixations. So it is not a very accurate method.
  */
 export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInteractionObjectSaccadePayload> {
+
+    defaultSettings: GazeInteractionSaccadeSettingsType = {
+        bufferSize: 100,
+        onSaccadeFrom: () => {},
+        onSaccadeTo: () => {}
+    };
 
     endOfFirstFixation: GazeDataPointWithFixation | null = null;
     startOfSecondFixation: GazeDataPointWithFixation | null = null;
@@ -188,19 +195,12 @@ export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInte
 	 * @param listener The listener to evaluate for saccade events.
 	 */
 	evaluateListener(data: GazeInteractionObjectSaccadeData, listener: GazeInteractionObjectSaccadeListener) {
-
-        const { onSaccadeFrom } = listener.settings;
-        if (onSaccadeFrom) {
-            if (this.isInside(listener.element, data.originGazeData.x, data.originGazeData.y, listener.settings.bufferSize)) {
-                this.createSaccadeEvent('saccadeFrom', listener, data);
-            }
+        const { onSaccadeFrom, onSaccadeTo } = listener.settings;
+        if (this.isInside(listener.element, data.originGazeData.x, data.originGazeData.y, listener.settings.bufferSize)) {
+            onSaccadeFrom(this.createSaccadeEvent('saccadeFrom', listener, data));
         }
-
-        const { onSaccadeTo } = listener.settings;
-        if (onSaccadeTo) {
-            if (this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize)) {
-                this.createSaccadeEvent('saccadeTo', listener, data);
-            }
+        if (this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize)) {
+            onSaccadeTo(this.createSaccadeEvent('saccadeTo', listener, data));
         }
 	}
 

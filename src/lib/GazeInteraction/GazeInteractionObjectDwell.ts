@@ -2,6 +2,7 @@ import type { GazeDataPoint } from '$lib/GazeData/GazeData';
 import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayload } from './GazeInteractionObjectDwellListener';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
+import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
 
 /**
  * Manages dwell events from the given eye-tracker input for elements,
@@ -9,6 +10,14 @@ import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwe
  * TODO: Implement spatial indexing to improve performance!!! quadtree or something similar.
  */
 export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionObjectDwellPayload> {
+
+	defaultSettings: GazeInteractionDwellSettingsType = {
+		dwellTime: 1000,
+		bufferSize: 100,
+		onDwellProgress: () => {},
+		onDwellFinish: () => {},
+		onDwellCancel: () => {}
+	};
 
 	/**
 	 * Evaluates the listener for dwell events and calls the callbacks if valid.
