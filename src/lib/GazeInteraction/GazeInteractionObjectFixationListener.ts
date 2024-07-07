@@ -1,3 +1,4 @@
+import type { GazeDataPoint } from '$lib/GazeData/GazeData';
 import type { GazeInteractionFixationSettingsType } from './GazeInteractionObjectFixationSettings';
 
 /**
@@ -9,4 +10,9 @@ export interface GazeInteractionObjectFixationListener {
 	settings: GazeInteractionFixationSettingsType;
 	element: Element;
 	isActive: boolean;
+}
+
+export interface GazeInteractionObjectFixationPayload {
+	data: GazeDataPoint;
+	listener: GazeInteractionObjectFixationListener;
 }

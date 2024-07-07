@@ -1,3 +1,4 @@
+import type { GazeDataPoint } from '$lib/GazeData/GazeData';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
 
 /**
@@ -10,4 +11,9 @@ export interface GazeInteractionObjectDwellListener {
 	settings: GazeInteractionDwellSettingsType;
 	element: Element;
 	timestamp: number | null;
+}
+
+export interface GazeInteractionObjectDwellPayload {
+	data: GazeDataPoint;
+	listener: GazeInteractionObjectDwellListener;
 }

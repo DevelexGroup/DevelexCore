@@ -7,5 +7,6 @@ import type { GazeInteractionSaccadeCallbackType } from './GazeInteractionObject
  */
 export interface GazeInteractionSaccadeSettingsType {
 	bufferSize: number;
-	onSaccadeEnd: GazeInteractionSaccadeCallbackType;
+	onSaccadeFrom?: GazeInteractionSaccadeCallbackType;
+	onSaccadeTo?: GazeInteractionSaccadeCallbackType;
 }

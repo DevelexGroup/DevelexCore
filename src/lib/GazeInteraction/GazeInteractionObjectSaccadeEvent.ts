@@ -19,11 +19,11 @@ export interface GazeInteractionObjectSaccadeEvent {
 	type: 'saccadeTo' | 'saccadeFrom';
 	timestamp: number;
 	duration: number;
+	distance: number;
     angleToScreen: number;
     angleToPrevious?: number;
     angleToPreviousInvalidityTime?: number;
 	target: Element;
-    originTarget: Element;
 	settings: GazeInteractionSaccadeSettingsType;
 	gazeData: GazeDataPoint;
     originGazeData: GazeDataPoint;

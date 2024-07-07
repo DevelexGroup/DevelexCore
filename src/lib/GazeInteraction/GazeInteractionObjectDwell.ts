@@ -1,5 +1,5 @@
 import type { GazeDataPoint } from '$lib/GazeData/GazeData';
-import type { GazeInteractionObjectDwellListener } from './GazeInteractionObjectDwellListener';
+import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayload } from './GazeInteractionObjectDwellListener';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
 
@@ -8,7 +8,7 @@ import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwe
  * that have been registered with the given settings.
  * TODO: Implement spatial indexing to improve performance!!! quadtree or something similar.
  */
-export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionObjectDwellListener> {
+export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionObjectDwellPayload> {
 
 	/**
 	 * Evaluates the listener for dwell events and calls the callbacks if valid.
@@ -108,8 +108,9 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 	 * @param data gaze data to evaluate.
 	 * @returns boolean whether to evaluate the listeners or not.
 	 */
-	shouldEvaluateListeners(data: GazeDataPoint): boolean {
-		return data.validityL || data.validityR;
+	shouldEvaluateListeners(data: GazeDataPoint): GazeDataPoint | null {
+		if (data.validityL || data.validityR) return data;
+		return null;
 	}
 
 	/**

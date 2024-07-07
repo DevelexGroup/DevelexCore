@@ -1,5 +1,5 @@
 import { isGazeDataPointWithFixation, type GazeDataPoint, type GazeDataPointWithFixation } from '$lib/GazeData/GazeData';
-import type { GazeInteractionObjectFixationListener } from './GazeInteractionObjectFixationListener';
+import type { GazeInteractionObjectFixationListener, GazeInteractionObjectFixationPayload } from './GazeInteractionObjectFixationListener';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectFixationEvent } from './GazeInteractionObjectFixationEvent';
 
@@ -7,7 +7,7 @@ import type { GazeInteractionObjectFixationEvent } from './GazeInteractionObject
  * Manages fixation events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationListener> {
+export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationPayload> {
 
     evaluateListenerFor = {
         "start": this.evaluateListenerForStart.bind(this),
@@ -49,10 +49,11 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
 	 * @param data gaze data to evaluate.
 	 * @returns boolean whether to evaluate the listeners or not.
 	 */
-	shouldEvaluateListeners(data: GazeDataPoint): boolean {
+	shouldEvaluateListeners(data: GazeDataPoint): GazeDataPoint | null {
         const fixationPhase = this.decideFixationPhase(data);
         this.currentFixationPhase = fixationPhase;
-        return fixationPhase !== null;
+        if (fixationPhase !== null) return data;
+        return null;
 	}
 
 	/**
