@@ -1,6 +1,7 @@
 import type { GazeInputConfigGazePoint } from "./GazeInputConfig";
 import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
 import { GazeInput } from "./GazeInput";
+import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., GazePoint).
@@ -11,12 +12,27 @@ import { GazeInput } from "./GazeInput";
 export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
 
     readonly worker: Worker;
+    private messageHandlers: { [key: string]: Function } = {};
 
     constructor(config: GazeInputConfigGazePoint) {
         super(config);
         this.worker = new Worker(new URL('GazeInputBridgeWorker.ts', import.meta.url), {
             type: 'module'
         });
+        this.worker.onmessage = (event) => {
+            const { type, data } = event.data;
+            const handler = this.messageHandlers[type];
+            if (handler) {
+                handler(data);
+            }
+        };
+        this.addMessageHandler('point', (data: GazeDataPoint) => {
+            this.emit('data', data);
+        });
+    }
+
+    private addMessageHandler(type: string, handler: Function) {
+        this.messageHandlers[type] = handler;
     }
 
     /**
@@ -33,14 +49,11 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
             }
         });
         return new Promise<void>((resolve) => {
-            this.worker.onmessage = (event) => {
-                const { type } = event.data;
-                if (type === 'connected') {
-                    this.sessionID = sessionId;
-                    this.isConnected = true;
-                    resolve();
-                }
-            };
+            this.addMessageHandler('connected', () => {
+                this.sessionID = sessionId;
+                this.isConnected = true;
+                resolve();
+            });
         });
     }
 
@@ -56,14 +69,11 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
             }
         });
         return new Promise<void>((resolve) => {
-            this.worker.onmessage = (event) => {
-                const { type } = event.data;
-                if (type === 'disconnected') {
-                    this.isConnected = false;
-                    this.sessionID = null;
-                    resolve();
-                }
-            };
+            this.addMessageHandler('disconnected', () => {
+                this.isConnected = false;
+                this.sessionID = null;
+                resolve();
+            });
         });
     }
 
@@ -83,14 +93,11 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
             }
         });
         return new Promise<void>((resolve) => {
-            this.worker.onmessage = (event) => {
-                const { messageType } = event.data;
-                if (messageType === 'windowCalibrated') {
-                    this.isWindowCalibrated = true;
-                    this.isWindowCalibrationContested = false;
-                    resolve();
-                }
-            };
+            this.addMessageHandler('windowCalibrated', () => {
+                this.isWindowCalibrated = true;
+                this.isWindowCalibrationContested = false;
+                resolve();
+            });
         });
     }
 
@@ -102,13 +109,10 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
             }
         });
         return new Promise<void>((resolve) => {
-            this.worker.onmessage = (event) => {
-                const { type } = event.data;
-                if (type === 'started') {
-                    this.isEmitting = true;
-                    resolve();
-                }
-            };
+            this.addMessageHandler('started', () => {
+                this.isEmitting = true;
+                resolve();
+            });
         });
     }
 
@@ -120,13 +124,10 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
             }
         });
         return new Promise<void>((resolve) => {
-            this.worker.onmessage = (event) => {
-                const { type } = event.data;
-                if (type === 'stopped') {
-                    this.isEmitting = false;
-                    resolve();
-                }
-            };
+            this.addMessageHandler('stopped', () => {
+                this.isEmitting = false;
+                resolve();
+            });
         });
     }
 }

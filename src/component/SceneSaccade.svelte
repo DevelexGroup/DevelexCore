@@ -35,7 +35,7 @@
         </div>
     </Group>
     <Group heading="Saccade Interaction Log">
-        <GenericTable data={$sceneObjectSaccadeStore} headers={["timestamp", "type", "elapsed", "target.id"]} />
+        <GenericTable data={$sceneObjectSaccadeStore} headers={["timestamp", "type", "angleToScreen", "angleToPrevious", "target.id"]} />
     </Group>
 </div>
 

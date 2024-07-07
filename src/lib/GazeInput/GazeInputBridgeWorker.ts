@@ -104,8 +104,19 @@ const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCa
     self.postMessage({ messageType: 'windowCalibrated' });
 }
 
-const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixationDetector: GazeFixationDetector, sessionId: string) => {
+const generateGazePointProcessor = (
+    windowCalibrator: ETWindowCalibrator,
+    fixationDetector: GazeFixationDetector,
+    sessionId: string,
+    postMessage: (data: GazeDataPoint) => void = generatePointMessage
+) => {
     return (data: GazeInputBridgeWebsocketIncomerPoint) => {
+
+        data.xL = Number(data.xL);
+        data.xR = Number(data.xR);
+        data.yL = Number(data.yL);
+        data.yR = Number(data.yR);
+        data.timestamp = Number(data.timestamp);
 
         const windowXL = windowCalibrator.toWindowX(data.xL);
         const windowXR = windowCalibrator.toWindowX(data.xR);
@@ -132,8 +143,12 @@ const generateGazePointProcessor = (windowCalibrator: ETWindowCalibrator, fixati
             parseValidity: true // can be disvalidated by (i) fixation detector or (ii) window coordinates decorrelation in main thread wrapper
         };
         const fixation = fixationDetector.processGazePoint(windowCalibratedData);
-        self.postMessage({ messageType: 'gazeData', data: fixation });
+        postMessage(fixation);
     }
+}
+
+const generatePointMessage = (data: GazeDataPoint) => {
+    self.postMessage({ type: 'point', data });
 }
 
 const generateDisconnectMessage = (data: GazeInputBridgeWebsocketIncomerDisconnected) => {
