@@ -3,6 +3,7 @@ import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
 import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
 import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwellEvent';
 import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/GazeInteractionObjectFixationEvent';
+import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccadeEvent';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -30,6 +31,22 @@ export const sceneObjectFixationStore = writable<GazeInteractionObjectFixationEv
 
 export const addFixationEvent = (event: GazeInteractionObjectFixationEvent) => {
     sceneObjectFixationStore.update(events => {
+        // Add the new event
+        const updatedEvents = [event, ...events];
+        
+        // If there are more than 100 events, remove the oldest one
+        if (updatedEvents.length > 100) {
+            updatedEvents.pop();
+        }
+        
+        return updatedEvents;
+    });
+}
+
+export const sceneObjectSaccadeStore = writable<GazeInteractionObjectSaccadeEvent[]>([]);
+
+export const addSaccadeEvent = (event: GazeInteractionObjectSaccadeEvent) => {
+    sceneObjectSaccadeStore.update(events => {
         // Add the new event
         const updatedEvents = [event, ...events];
         
