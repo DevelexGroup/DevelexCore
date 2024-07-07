@@ -1,20 +1,20 @@
-import type { GazeInputConfigGazePoint } from "./GazeInputConfig";
+import type { GazeInputConfigBridge } from "./GazeInputConfig";
 import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
 import { GazeInput } from "./GazeInput";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 /**
- * Class for the bridge input of remote eye trackers (e.g., GazePoint).
+ * Class for the bridge input of remote eye trackers (e.g., Bridge).
  * Gaze data is received from the worker from WebSocket server and emitted here as messages.
  * Every parsing of the data and communication with eye-tracker is done in the worker for performance reasons.
  * This is a wrapper for the worker.
  */
-export class GazeInputBridge extends GazeInput<GazeInputConfigGazePoint> {
+export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     readonly worker: Worker;
     private messageHandlers: { [key: string]: Function } = {};
 
-    constructor(config: GazeInputConfigGazePoint) {
+    constructor(config: GazeInputConfigBridge) {
         super(config);
         this.worker = new Worker(new URL('GazeInputBridgeWorker.ts', import.meta.url), {
             type: 'module'

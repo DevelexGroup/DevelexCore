@@ -6,7 +6,7 @@ export { createGazeInput } from '$lib/GazeInput/index.js';
 /**
  * Configuration types for the input.
  */
-export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigDummy, GazeInputConfigWithFixations } from '$lib/GazeInput/GazeInputConfig.js';
+export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, GazeInputConfigEyelogic, GazeInputConfigDummy, GazeInputConfigWithFixations } from '$lib/GazeInput/GazeInputConfig.js';
 
 
 export { type GazeDataPoint, type GazeDataPointWithFixation, isGazeDataPointWithFixation } from '$lib/GazeData/GazeData.js';

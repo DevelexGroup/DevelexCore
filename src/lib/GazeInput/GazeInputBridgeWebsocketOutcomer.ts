@@ -4,7 +4,7 @@
  */
 export type GazeInputBridgeWebsocketOutcomer = GazeInputBridgeWebsocketOutcomerConnect | GazeInputBridgeWebsocketOutcomerDisconnect | GazeInputBridgeWebsocketOutcomerStart | GazeInputBridgeWebsocketOutcomerStop;
 
-export type GazeInputBridgeWebsocketOutcomerConnect = GazeInputBridgeWebsocketOutcomerConnectOpenGaze | GazeInputBridgeWebsocketOutcomerConnectSMI;
+export type GazeInputBridgeWebsocketOutcomerConnect = GazeInputBridgeWebsocketOutcomerConnectOpenGaze | GazeInputBridgeWebsocketOutcomerConnectSMI | GazeInputBridgeWebsocketOutcomerConnectEyelogic;
 
 export type GazeInputBridgeWebsocketOutcomerConnectBase = {
     type: 'connect';
@@ -17,6 +17,10 @@ export type GazeInputBridgeWebsocketOutcomerConnectOpenGaze = GazeInputBridgeWeb
 
 export type GazeInputBridgeWebsocketOutcomerConnectSMI = GazeInputBridgeWebsocketOutcomerConnectBase & {
     tracker: 'smi';
+};
+
+export type GazeInputBridgeWebsocketOutcomerConnectEyelogic = GazeInputBridgeWebsocketOutcomerConnectBase & {
+    tracker: 'eyelogic';
 };
 
 export type GazeInputBridgeWebsocketOutcomerDisconnect = {
