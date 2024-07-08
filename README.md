@@ -1,9 +1,16 @@
 # develex-core
+develex-core is a npm library for gaze data processing. It provides a set of functions for gaze data input, controlling remote eye-trackers and gaze data processing. The library is built with Svelte Kit and is published to the GitLab package registry.
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+The library is a part of the develex software, which aims to provide a set of tools for gaze data processing for dyslexia interventions. Its parts can be used separately for other purposes as well, from collecting gaze data on a webpage for research to controlling maps with gaze.
 
-Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
+We use Svelte Kit to build the library and showcase it on a webpage. Learn more about [packaging with Svelte Kit](https://kit.svelte.dev/docs/).
 
+## Testing eye-trackers
+We provide a testing webpage, build with GitLab Pages, for you to test functionality of your GazePoint, SMI and EyeLogic eye-tracker. To enable gaze data in a browser environment you have to:
+
+1. Start your eye-tracking controller software (e.g., GazePoint Control)
+2. Start develex-bridge
+3. Proceed to the testing website with develex-core
 
 ## Developing
 
@@ -16,7 +23,7 @@ npm run dev
 npm run dev -- --open
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+Everything inside `src/lib` is part of your library, everything inside `src/routes` is used to showcase its functionality.
 
 ## Building
 
@@ -33,8 +40,6 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
 
 ## Publishing
 The package is published to the GitLab package registry. To publish the package, you need to set the `CI_JOB_TOKEN` environment variable and run the `npm publish` command.
