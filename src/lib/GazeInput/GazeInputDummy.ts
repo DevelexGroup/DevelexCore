@@ -23,12 +23,9 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 	connect(): Promise<void> {
 
-		if (!this.windowCalibrator) {
-			return Promise.reject('Window calibrator is not set.');
-		}
+		if (!this.windowCalibrator) return Promise.reject('Window calibrator is not set.');
 
-		this.sessionID = this.createSessionId();
-		this.handleConnected();
+		this.handleConnected({ sessionID: this.createSessionId() });
 
 		document.addEventListener('mousemove', this.updateMousePosition.bind(this));
 

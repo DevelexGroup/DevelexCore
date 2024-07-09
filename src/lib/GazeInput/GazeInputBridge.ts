@@ -21,6 +21,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
         this.worker.onmessage = (event) => {
             const { type, data } = event.data;
+            console.log(type, data);
             const handler = this.messageHandlers[type];
             if (handler) {
                 handler(data);
@@ -142,11 +143,11 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                 messageType,
                 data
             });
-            const successHandler = () => {
-                updateState();
+            const successHandler = (data: any) => {
+                updateState(data);
                 resolve();
             };
-            this.addMessageHandler(successMessage, successHandler);
+            this.addMessageHandler(successMessage, (data: any) => successHandler(data));
             this.addMessageHandler('error', (data: { type: string, message: string }) => {
                 this.handleError(data);
                 reject(data.message);

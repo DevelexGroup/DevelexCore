@@ -62,7 +62,9 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 		this.emit(GAZE_INPUT_EVENT_MESSAGE, { type: 'calibrated', timestamp: Date.now(), value: isDeviceCalibrated })
 	}
 
-	protected handleConnected() {
+	protected handleConnected(data: any) {
+		console.log('Connected', data);
+		this.sessionID = data.sessionId;
         this.isConnected = true;
     }
 

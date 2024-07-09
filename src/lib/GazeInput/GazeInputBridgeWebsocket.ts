@@ -30,7 +30,9 @@ export class GazeInputBridgeWebsocket {
 
     private sendConnect(data: GazeInputBridgeWebsocketOutcomerConnect): void {
         this.socket = new WebSocket(this.uri);
-        this.socket.onopen = this.sendToWebsocket.bind(this, data);
+        this.socket.onopen = () => {
+            this.sendToWebsocket.bind(this, data)();
+        }
         this.socket.onmessage = this.handleMessage.bind(this);
         this.socket.onerror = this.handleError.bind(this);
         this.socket.onclose = () => this.socket = null;
@@ -79,5 +81,15 @@ export class GazeInputBridgeWebsocket {
 
     logToConsole(data: GazeInputBridgeWebsocketIncomer): void {
         console.log(data);
+    }
+
+    close(): void {
+        if (this.socket) {
+            if (this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send(JSON.stringify({ type: 'disconnect' }));
+            }
+            this.socket.close();
+            this.socket = null;
+        }
     }
 }

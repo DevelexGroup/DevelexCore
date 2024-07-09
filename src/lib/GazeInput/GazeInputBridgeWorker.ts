@@ -25,6 +25,7 @@ let fixationDetector: GazeFixationDetector | null = null;
 
 self.onmessage = (event) => {
     const { messageType, data } = event.data;
+    console.log('Worker received message', messageType, data);
     switch (messageType) {
         case 'connect':
             config = data.config as GazeInputConfigBridge;
@@ -61,13 +62,14 @@ const sendConnect = (config: GazeInputConfigBridge, newSessionId: string) => {
     if (!windowCalibrator) {
         throw new Error('Window calibrator is null');
     }
+    if (socket) socket.close();
 
     sessionId = newSessionId;
     fixationDetector = createGazeFixationDetector(config.fixationDetection);
 
     socket = new GazeInputBridgeWebsocket(config.uri);
     socket.onPointCallback = generateBridgeProcessor(windowCalibrator, fixationDetector, sessionId);
-    socket.onConnectedCallback = generateMessage;
+    socket.onConnectedCallback = generateConnectMessage(sessionId);
     socket.onDisconnectedCallback = generateDisconnectMessage; // disconnects the socket and sets sessionId to null
     socket.onErrorCallback = generateMessage;
     socket.onCalibratedCallback = generateMessage;
@@ -152,9 +154,15 @@ const generatePointMessage = (data: GazeDataPoint) => {
 }
 
 const generateDisconnectMessage = (data: GazeInputBridgeWebsocketIncomerDisconnected) => {
-    socket = null;
+    console.log('Disconnected', data);
     sessionId = null;
     generateMessage(data);
+}
+
+const generateConnectMessage = (sessionId: string) => {
+    return (data: GazeInputBridgeWebsocketIncomer) => {
+        self.postMessage({ type: 'connected', data: { sessionId } });
+    }
 }
 
 const generateMessage = (data: GazeInputBridgeWebsocketIncomer) => {
