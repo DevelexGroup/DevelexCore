@@ -28,7 +28,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		}
 
 		this.sessionID = this.createSessionId();
-		this.isConnected = true;
+		this.handleConnected();
 
 		document.addEventListener('mousemove', this.updateMousePosition.bind(this));
 
@@ -53,7 +53,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 				this.emit('data', gazePointGetter(x, y));
 			}
 		}, interval);
-		this.isEmitting = true;
+		this.handleStarted();
 		return Promise.resolve();
 	}
 
@@ -62,16 +62,15 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		if (this.intervalId != null) {
 			clearInterval(this.intervalId);
 		}
-		this.isEmitting = false;
+		this.handleStopped();
 		return Promise.resolve();
 	}
 
 	disconnect(): Promise<void> {
-		if (!this.isConnected) return Promise.reject('Already disconnected.');
+		if (!this.isConnected) return Promise.resolve();
 		if (this.isEmitting) this.stop();
 		document.removeEventListener('mousemove', this.updateMousePosition.bind(this));
-		this.sessionID = null;
-		this.isConnected = false;
+		this.handleDisconnected();
 		return Promise.resolve();
 	}
 

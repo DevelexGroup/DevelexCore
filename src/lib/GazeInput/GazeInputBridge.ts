@@ -24,14 +24,25 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             const handler = this.messageHandlers[type];
             if (handler) {
                 handler(data);
+            } else {
+                console.error('Unknown message type:', event);
             }
         };
-        this.addMessageHandler('point', (data: GazeDataPoint) => {
-            this.emit('data', data);
-        });
+        this.initMessageHandlers();
     }
 
-    private addMessageHandler(type: string, handler: Function) {
+    private initMessageHandlers() {
+        this.addMessageHandler('point', (data: GazeDataPoint) => this.emit('data', data));
+        this.addMessageHandler('error', this.handleError.bind(this));
+        this.addMessageHandler('disconnected', this.handleDisconnected.bind(this));
+        this.addMessageHandler('stopped', this.handleStopped.bind(this));
+        this.addMessageHandler('connected', this.handleConnected.bind(this));
+        this.addMessageHandler('calibrated', this.handleCalibrated.bind(this));
+        this.addMessageHandler('windowCalibrated', this.handleWindowCalibrated.bind(this));
+        this.addMessageHandler('started', this.handleStarted.bind(this));
+    }
+
+    protected addMessageHandler(type: string, handler: Function) {
         this.messageHandlers[type] = handler;
     }
 
@@ -39,95 +50,107 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      * Triggers the worker to connect to the WebSocket server (DeveLex Bridge).
      * @returns resolved promise after receiving the open event from the WebSocket and the worker confirms the connection via a message.
      */
-    connect(): Promise<void> {
-        const sessionId = this.createSessionId();
-        this.worker.postMessage({
-            messageType: 'connect',
-            data: {
-                config: this.config,
-                sessionId
-            }
-        });
-        return new Promise<void>((resolve) => {
-            this.addMessageHandler('connected', () => {
-                this.sessionID = sessionId;
-                this.isConnected = true;
-                resolve();
-            });
-        });
+    async connect(): Promise<void> {
+        if (this.isConnected) return Promise.resolve();
+        return this.createCommand(
+            'connect',
+            { config: this.config, sessionId: this.createSessionId() },
+            'connected',
+            this.handleConnected.bind(this)
+        );
     }
 
     /**
      * Triggers the worker to disconnect from the WebSocket server.
      * @returns resolved promise after receiving the close event from the WebSocket and the worker confirms the disconnection via a message.
      */
-    disconnect(): Promise<void> {
-        this.worker.postMessage({
-            messageType: 'disconnect',
-            data: {
-                sessionId: this.sessionID
+    async disconnect(): Promise<void> {
+        if (!this.isConnected) return Promise.resolve()
+        if (this.isEmitting) {
+            try {
+                await this.stop();
+            } catch (error) {
+                return Promise.reject(error);
             }
-        });
-        return new Promise<void>((resolve) => {
-            this.addMessageHandler('disconnected', () => {
-                this.isConnected = false;
-                this.sessionID = null;
-                resolve();
-            });
-        });
+        } 
+        return this.createCommand(
+            'disconnect',
+            { sessionId: this.sessionID },
+            'disconnected',
+            this.handleDisconnected.bind(this)
+        );
     }
 
-    calibrate(): Promise<void> {
-        return Promise.resolve();
+    async calibrate(): Promise<void> {
+        return this.createCommand(
+            'calibrate',
+            { sessionId: this.sessionID },
+            'calibrated',
+            this.handleCalibrated.bind(this)
+        );
     }
 
     send(msg: string): void {
         console.log(msg);
     }
 
-    setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, window: ETWindowCalibratorConfigWindowFields): Promise<void> {
-        this.worker.postMessage({
-            messageType: 'setWindowCalibration',
-            data: {
-                windowConfig: createETWindowCalibrator(mouseEvent, window),
-            }
-        });
-        return new Promise<void>((resolve) => {
-            this.addMessageHandler('windowCalibrated', () => {
-                this.isWindowCalibrated = true;
-                this.isWindowCalibrationContested = false;
-                resolve();
-            });
-        });
+    async setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, window: ETWindowCalibratorConfigWindowFields): Promise<void> {
+        return this.createCommand(
+            'setWindowCalibration',
+            { windowConfig: createETWindowCalibrator(mouseEvent, window), config: this.config },
+            'windowCalibrated',
+            this.handleWindowCalibrated.bind(this)
+        );
     }
 
-    start(): Promise<void> {
-        this.worker.postMessage({
-            messageType: 'start',
-            data: {
-                sessionId: this.sessionID
-            }
-        });
-        return new Promise<void>((resolve) => {
-            this.addMessageHandler('started', () => {
-                this.isEmitting = true;
-                resolve();
-            });
-        });
+    async start(): Promise<void> {
+        if (this.isEmitting) return Promise.resolve();
+        if (!this.sessionID) {
+            this.handleError({ type: 'error', message: 'Not connected.' });
+            return Promise.reject('Not connected.');
+        }
+        return this.createCommand(
+            'start',
+            { sessionId: this.sessionID },
+            'started',
+            this.handleStarted.bind(this)
+        );
     }
 
-    stop(): Promise<void> {
-        this.worker.postMessage({
-            messageType: 'stop',
-            data: {
-                sessionId: this.sessionID
-            }
-        });
-        return new Promise<void>((resolve) => {
-            this.addMessageHandler('stopped', () => {
-                this.isEmitting = false;
+    async stop(): Promise<void> {
+        if (!this.isEmitting) return Promise.resolve();
+        if (!this.sessionID) {
+            this.handleError({ type: 'error', message: 'Not connected.' });
+            return Promise.reject('Not connected.');
+        }
+        return this.createCommand(
+            'stop',
+            { sessionId: this.sessionID },
+            'stopped',
+            this.handleStopped.bind(this)
+        );
+    }
+
+    createCommand = (
+        messageType: string,
+        data: Object,
+        successMessage: string, 
+        updateState: Function
+    ): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+            this.worker.postMessage({
+                messageType,
+                data
+            });
+            const successHandler = () => {
+                updateState();
                 resolve();
+            };
+            this.addMessageHandler(successMessage, successHandler);
+            this.addMessageHandler('error', (data: { type: string, message: string }) => {
+                this.handleError(data);
+                reject(data.message);
             });
         });
-    }
+    };
 }

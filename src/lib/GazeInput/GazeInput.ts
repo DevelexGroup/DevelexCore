@@ -11,17 +11,25 @@ import type { GazeInputConfig } from './GazeInputConfig.js';
  * @param isConnected - The connected state of the adapter.
  */
 export abstract class GazeInput<T extends GazeInputConfig> {
-	readonly config: T;
-
-	constructor(config: T) {
-		this.config = config;
-	}
 
 	_isConnected: boolean = false;
 	_isEmitting: boolean = false;
 	_isWindowCalibrated: boolean = false;
 	_isWindowCalibrationContested: boolean = false;
 	_isDeviceCalibrated: boolean = false;
+
+	handlers: Partial<Record<GazeInputEvent, ((...args: unknown[]) => unknown)[]>> = {
+		[GAZE_INPUT_EVENT_DATA]: [],
+		[GAZE_INPUT_EVENT_MESSAGE]: []
+	};
+
+	sessionID: string | null = null;
+
+	readonly config: T;
+
+	constructor(config: T) {
+		this.config = config;
+	}
 
 	get isConnected(): boolean { return this._isConnected }
 	get isEmitting(): boolean { return this._isEmitting }
@@ -34,25 +42,62 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 		this.emit(GAZE_INPUT_EVENT_MESSAGE, { type: 'connect', timestamp: Date.now(), value: isConnected })
 	}
 
-	set isEmitting(isEmitting: boolean) { 
+	protected set isEmitting(isEmitting: boolean) { 
 		this._isEmitting = isEmitting
 		this.emit(GAZE_INPUT_EVENT_MESSAGE, { type: 'emit', timestamp: Date.now(), value: isEmitting })
 	}
 
-	set isWindowCalibrated(isWindowCalibrated: boolean) { 
+	protected set isWindowCalibrated(isWindowCalibrated: boolean) { 
 		this._isWindowCalibrated = isWindowCalibrated
 		this.emit(GAZE_INPUT_EVENT_MESSAGE, { type: 'windowCalibrated', timestamp: Date.now(), value: isWindowCalibrated })
 	}
 
-	set isWindowCalibrationContested(isWindowCalibrationContested: boolean) { 
+	protected set isWindowCalibrationContested(isWindowCalibrationContested: boolean) { 
 		this._isWindowCalibrationContested = isWindowCalibrationContested
 		this.emit(GAZE_INPUT_EVENT_MESSAGE, { type: 'windowCalibrationContested', timestamp: Date.now(), value: isWindowCalibrationContested })
 	}
 
-	set isDeviceCalibrated(isDeviceCalibrated: boolean) { 
+	protected set isDeviceCalibrated(isDeviceCalibrated: boolean) { 
 		this._isDeviceCalibrated = isDeviceCalibrated
 		this.emit(GAZE_INPUT_EVENT_MESSAGE, { type: 'calibrated', timestamp: Date.now(), value: isDeviceCalibrated })
 	}
+
+	protected handleConnected() {
+        this.isConnected = true;
+    }
+
+    protected handleDisconnected() {
+        if (!this.isConnected) return;
+        this.isConnected = false;
+        this.sessionID = null;
+    }
+
+    protected handleStopped() {
+        if (!this.isEmitting) return;
+        this.isEmitting = false;
+    }
+
+    protected handleStarted() {
+        if (this.isEmitting) return;
+        this.isEmitting = true;
+    }
+
+    protected handleWindowCalibrated() {
+        this.isWindowCalibrated = true;
+        this.isWindowCalibrationContested = false;
+    }
+
+    protected handleCalibrated() {
+        this.isDeviceCalibrated = true;
+    }
+
+    protected handleError(data: { type: string, message: string }) {
+        this.emit('message', {
+            type: 'error',
+            timestamp: Date.now(),
+            value: data.message
+        });
+    }
 
 	/**
 	 * Get whether gaze point data contains fixations information.
@@ -61,13 +106,6 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	get isEmittingFixations(): boolean {
 		return this.config.fixationDetection !== 'none';
 	}
-
-	handlers: Partial<Record<GazeInputEvent, ((...args: unknown[]) => unknown)[]>> = {
-		[GAZE_INPUT_EVENT_DATA]: [],
-		[GAZE_INPUT_EVENT_MESSAGE]: []
-	};
-
-	sessionID: string | null = null;
 
 	/**
 	 * Register a handler for an event type.

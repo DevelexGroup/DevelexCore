@@ -73,9 +73,8 @@ export class GazeInputBridgeWebsocket {
         }   
     }
 
-    private handleError(event: Event): void {
-        console.error(event);
-        this.onErrorCallback({ type: 'error', message: JSON.stringify(event) });
+    private handleError(): void {
+        this.onErrorCallback({ type: 'error', message: 'Cannot connect to the Bridge. WebSocket connection error on ' + this.uri });
     }
 
     logToConsole(data: GazeInputBridgeWebsocketIncomer): void {

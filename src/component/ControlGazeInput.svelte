@@ -10,6 +10,11 @@
     const indicator = new GazeIndicator();
     $: disabled = $gazeInputStore === null;
 
+    let isConnectedProcessing = false;
+    let isStartedProcessing = false;
+    let isStoppedProcessing = false;
+    let isDisconnectedProcessing = false;
+
     const handleGazeInputMessage = (data: GazeInputMessage) => {
         sceneStateStore.update((store) => {
             store.push(data);
@@ -75,56 +80,64 @@
         isGazeIndicatorVisible = targetValue;
     };
 
-    const connect = () => {
+    const connect = async () => {
+        isConnectedProcessing = true;
         try {
             if ($gazeInputStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            $gazeInputStore.connect();
+            await $gazeInputStore.connect();
         } catch (error) {
             console.error(error);
         }
+        isConnectedProcessing = false;
     };
 
-    const disconnect = () => {
+    const disconnect = async () => {
+        isDisconnectedProcessing = true;
         try {
             if ($gazeInputStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            $gazeInputStore.disconnect();
+            await $gazeInputStore.disconnect();
         } catch (error) {
             console.error(error);
         }
+        isDisconnectedProcessing = false;
     };
 
-    const start = () => {
+    const start = async () => {
+        isStartedProcessing = true;
         try {
             if ($gazeInputStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            $gazeInputStore.start();
+            await $gazeInputStore.start();
         } catch (error) {
             console.error(error);
         }
+        isStartedProcessing = false;
     };
 
-    const stop = () => {
+    const stop = async () => {
+        isStoppedProcessing = true;
         try {
             if ($gazeInputStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            $gazeInputStore.stop();
+            await $gazeInputStore.stop();
         } catch (error) {
             console.error(error);
         }
+        isStoppedProcessing = false;
     };
 </script>
 
 <div class="container">
-        <Button {disabled} text={"Connect"} on:click={connect} />
-        <Button {disabled} text={"Start"} on:click={start} />
-        <Button {disabled} text={"Stop"} on:click={stop} />
-        <Button {disabled} text={"Disconnect"} on:click={disconnect} />
+        <Button disabled={disabled || isConnectedProcessing} text={"Connect"} on:click={connect} />
+        <Button disabled={disabled || isStartedProcessing} text={"Start"} on:click={start} />
+        <Button disabled={disabled || isStoppedProcessing} text={"Stop"} on:click={stop} />
+        <Button disabled={disabled || isDisconnectedProcessing} text={"Disconnect"} on:click={disconnect} />
         <Button {disabled} text={isGazeIndicatorVisible ? "Hide gaze indicator" : "Show gaze indicator"} on:click={() => {
             toggleGazeIndicator(!isGazeIndicatorVisible);
         }} />
