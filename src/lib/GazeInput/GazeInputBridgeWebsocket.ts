@@ -42,7 +42,8 @@ export class GazeInputBridgeWebsocket {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(JSON.stringify(data));
         } else {
-            throw new Error('WebSocket is not open');
+            this.onErrorCallback({ type: 'error', message: 'WebSocket is not open.' });
+            this.onDisconnectedCallback({ type: 'disconnected' });
         }
     }
 

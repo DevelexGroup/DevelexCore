@@ -44,6 +44,11 @@ self.onmessage = (event) => {
                 socket.send({ type: 'stop' });
             }
             break;
+        case 'calibrate':
+            if (socket) {
+                socket.send({ type: 'calibrate' });
+            }
+            break;
         case 'setWindowCalibration':
             handleSetWindowCalibration(data as {
                 windowConfig: ETWindowCalibratorConfig,

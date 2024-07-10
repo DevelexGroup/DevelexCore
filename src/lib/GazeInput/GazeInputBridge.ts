@@ -83,6 +83,10 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
     }
 
     async calibrate(): Promise<void> {
+        if (!this.sessionID) {
+            this.handleError({ type: 'error', message: 'Not connected.' });
+            return Promise.reject('Not connected.');
+        }
         return this.createCommand(
             'calibrate',
             { sessionId: this.sessionID },

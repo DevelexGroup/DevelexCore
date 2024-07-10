@@ -14,6 +14,7 @@
     let isStartedProcessing = false;
     let isStoppedProcessing = false;
     let isDisconnectedProcessing = false;
+    let isCalibratedProcessing = false;
 
     const handleGazeInputMessage = (data: GazeInputMessage) => {
         sceneStateStore.update((store) => {
@@ -131,10 +132,24 @@
         }
         isStoppedProcessing = false;
     };
+
+    const calibrate = async () => {
+        isCalibratedProcessing = true;
+        try {
+            if ($gazeInputStore === null) {
+                throw new Error("No gaze input configured.");
+            }
+            await $gazeInputStore.calibrate();
+        } catch (error) {
+            console.error(error);
+        }
+        isCalibratedProcessing = false;
+    };
 </script>
 
 <div class="container">
         <Button disabled={disabled || isConnectedProcessing} text={"Connect"} on:click={connect} />
+        <Button disabled={disabled || isCalibratedProcessing} text={"Calibrate"} on:click={calibrate} />
         <Button disabled={disabled || isStartedProcessing} text={"Start"} on:click={start} />
         <Button disabled={disabled || isStoppedProcessing} text={"Stop"} on:click={stop} />
         <Button disabled={disabled || isDisconnectedProcessing} text={"Disconnect"} on:click={disconnect} />
