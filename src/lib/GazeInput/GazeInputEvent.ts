@@ -38,7 +38,7 @@ export const GAZE_INPUT_EVENT_DATA = "data";
 export const GAZE_INPUT_EVENT_MESSAGE = "message";
 
 export type ETHandlerMapping = {
-    [GAZE_INPUT_EVENT_DATA]: (data: GazeDataPoint) => void;
-    [GAZE_INPUT_EVENT_MESSAGE]: (data: GazeInputMessage) => void;
+    [GAZE_INPUT_EVENT_DATA]: GazeDataPoint;
+    [GAZE_INPUT_EVENT_MESSAGE]: GazeInputMessage;
 };
 

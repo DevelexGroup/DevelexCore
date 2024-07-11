@@ -2,6 +2,7 @@ import { GAZE_INPUT_EVENT_DATA, GAZE_INPUT_EVENT_MESSAGE } from './GazeInputEven
 import type { GazeInputEvent, ETHandlerMapping } from './GazeInputEvent.js';
 import type { ETWindowCalibratorConfigMouseEventFields, ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig.js';
 import type { GazeInputConfig } from './GazeInputConfig.js';
+import { Emitter } from '$lib/Emitter/Emitter.js';
 
 /**
  * The base class for all input adapters in the main thread. Adapter-specific implementations are in the worker thread.
@@ -10,23 +11,20 @@ import type { GazeInputConfig } from './GazeInputConfig.js';
  * @param worker - The worker thread for the adapter. Each type of adapter has its own implementations in the worker.
  * @param isConnected - The connected state of the adapter.
  */
-export abstract class GazeInput<T extends GazeInputConfig> {
+export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHandlerMapping> {
 
 	_isConnected: boolean = false;
 	_isEmitting: boolean = false;
 	_isWindowCalibrated: boolean = false;
 	_isWindowCalibrationContested: boolean = false;
 	_isDeviceCalibrated: boolean = false;
-	handlers: Partial<Record<GazeInputEvent, { callback: (...args: unknown[]) => unknown, orderCategory: number }[]>> = {
-		[GAZE_INPUT_EVENT_DATA]: [],
-		[GAZE_INPUT_EVENT_MESSAGE]: []
-	};
 
 	sessionID: string | null = null;
 
 	readonly config: T;
 
 	constructor(config: T) {
+		super();
 		this.config = config;
 	}
 
@@ -105,40 +103,6 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	 */
 	get isEmittingFixations(): boolean {
 		return this.config.fixationDetection !== 'none';
-	}
-
-	/**
-	 * Register a handler for an event type.
-	 * @param eventType - The event type, one of {@link GazeInputEvent}.
-	 * @param handler - The handler function.
-	 * @param orderCategory - The order category of the handler. Events are emitted in the order of the category.
-	 * The order of data emitting is paramount for more complicated GazeInteractions.
-	 * @returns The instance of the adapter.
-	 */
-	on<K extends GazeInputEvent>(eventType: K, handler: ETHandlerMapping[K], orderCategory: number = 0): this {
-		this.handlers[eventType]?.push({ callback: handler as (...args: unknown[]) => unknown, orderCategory });
-		this.handlers[eventType]?.sort((a, b) => a.orderCategory - b.orderCategory);
-		return this;
-	}
-
-	/**
-	 * Unregister a handler for an event type.
-	 * @param eventType - The event type, one of {@link GazeInputEvent}.
-	 * @param handler
-	 */
-	off<K extends GazeInputEvent>(eventType: K, handler: ETHandlerMapping[K]): void {
-		this.handlers[eventType] = this.handlers[eventType]?.filter((h) => h.callback !== handler);
-	}
-
-	/**
-	 * Emit an event.
-	 * @param eventType - The event type, one of {@link GazeInputEvent}.
-	 * @param args
-	 */
-	emit<K extends GazeInputEvent>(eventType: K, ...args: Parameters<ETHandlerMapping[K]>): void {
-		(this.handlers[eventType] as ({ callback: (...args: unknown[]) => unknown, orderCategory: number }[])).forEach((handler) =>
-			handler.callback(...args)
-		);
 	}
 
 	/**
