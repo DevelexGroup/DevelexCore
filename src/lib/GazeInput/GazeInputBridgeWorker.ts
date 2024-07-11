@@ -84,10 +84,12 @@ const sendConnect = (config: GazeInputConfigBridge, newSessionId: string) => {
     const connectMessage: GazeInputBridgeWebsocketOutcomerConnect = config.tracker === 'opengaze' ? {
         type: 'connect',
         tracker: config.tracker,
+        sessionId,
         keepFixations: config.fixationDetection === 'device',
     } : {
         type: 'connect',
         tracker: config.tracker,
+        sessionId,
     };
 
     socket.send(connectMessage);
