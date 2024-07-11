@@ -8,6 +8,7 @@ export type GazeInputBridgeWebsocketOutcomerConnect = GazeInputBridgeWebsocketOu
 
 export type GazeInputBridgeWebsocketOutcomerConnectBase = {
     type: 'connect';
+    sessionId: string;
 };
 
 export type GazeInputBridgeWebsocketOutcomerConnectOpenGaze = GazeInputBridgeWebsocketOutcomerConnectBase & {
