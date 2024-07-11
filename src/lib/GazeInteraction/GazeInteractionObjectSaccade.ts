@@ -4,6 +4,7 @@ import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectSaccadeEvent } from './GazeInteractionObjectSaccadeEvent';
 import { decideFixationPhase } from './GazeInteractionHelperFixation';
 import type { GazeInteractionSaccadeSettingsType } from './GazeInteractionObjectSaccadeSettings';
+import type { GazeInteractionEvents } from './GazeInteraction';
 
 
 /**
@@ -11,8 +12,11 @@ import type { GazeInteractionSaccadeSettingsType } from './GazeInteractionObject
  * that have been registered with the given settings.
  * 
  * It works on an interval between two fixations. So it is not a very accurate method.
+ * 
+ * <T> - The type of the payload for the saccade events.
+ * <K> - The type of the events that can be emitted.
  */
-export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInteractionObjectSaccadePayload> {
+export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInteractionObjectSaccadePayload, GazeInteractionEvents > {
 
     defaultSettings: GazeInteractionSaccadeSettingsType = {
         bufferSize: 100,

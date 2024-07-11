@@ -3,12 +3,13 @@ import type { GazeInteractionObjectFixationListener, GazeInteractionObjectFixati
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectFixationEvent } from './GazeInteractionObjectFixationEvent';
 import type { GazeInteractionFixationSettingsType } from './GazeInteractionObjectFixationSettings';
+import type { GazeInteractionEvents } from './GazeInteraction';
 
 /**
  * Manages fixation events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationPayload> {
+export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationPayload, GazeInteractionEvents> {
 
     defaultSettings: GazeInteractionFixationSettingsType = {
         bufferSize: 100,

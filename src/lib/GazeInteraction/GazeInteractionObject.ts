@@ -1,5 +1,5 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import { GazeInteraction } from "./GazeInteraction";
+import { GazeInteraction, type GazeInteractionEvents } from "./GazeInteraction";
 
 export type GazeInteractionObjectPayload = {
 	data: unknown;
@@ -9,7 +9,7 @@ export type GazeInteractionObjectPayload = {
 	};
 };
 
-export abstract class GazeInteractionObject<T extends GazeInteractionObjectPayload> extends GazeInteraction {
+export abstract class GazeInteractionObject<T extends GazeInteractionObjectPayload, K extends GazeInteractionEvents> extends GazeInteraction<K> {
     
     abstract defaultSettings: T['listener']['settings'];
 	
