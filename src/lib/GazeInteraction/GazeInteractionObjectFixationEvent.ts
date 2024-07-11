@@ -1,5 +1,13 @@
 import type { GazeDataPoint } from '../GazeData/GazeData';
-import type { GazeInteractionFixationSettingsType } from './GazeInteractionObjectFixationSettings';
+import type { GazeInteractionEvents } from './GazeInteraction';
+import type { GazeInteractionFixationSettings } from './GazeInteractionObjectFixationSettings';
+
+export interface GazeInteractionObjectFixationInEvents extends GazeInteractionEvents {
+	'fixationIn': GazeInteractionObjectFixationInEvent;
+	'fixationInProgress': GazeInteractionObjectFixationInEvent;
+	'fixationInEnd': GazeInteractionObjectFixationInEvent;
+	'fixationInStart': GazeInteractionObjectFixationInEvent;
+}
 
 /**
  * Fired when a fixation event occurs.
@@ -7,13 +15,27 @@ import type { GazeInteractionFixationSettingsType } from './GazeInteractionObjec
  * @property {number} timestamp of the event.
  * @property {number} duration time since the fixation started.
  * @property {Element} target of the fixation event.
- * @property {GazeInteractionfixationSettingsType} settings for the fixation event, including the fixation time and callbacks.
+ * @property {GazeInteractionFixationSettings} settings for the fixation event, including the fixation time and callbacks.
  */
-export interface GazeInteractionObjectFixationEvent {
-	type: 'fixationProgress' | 'fixationEnd' | 'fixationStart';
+export interface GazeInteractionObjectFixationInEvent {
+	type: 'fixationInProgress' | 'fixationInEnd' | 'fixationInStart';
 	timestamp: number;
 	duration: number;
 	target: Element;
-	settings: GazeInteractionFixationSettingsType;
+	settings: GazeInteractionFixationSettings;
 	gazeData: GazeDataPoint;
 }
+
+export interface GazeInteractionObjectFixationInProgressEvent extends GazeInteractionObjectFixationInEvent {
+	type: 'fixationInProgress';
+}
+
+export interface GazeInteractionObjectFixationInEndEvent extends GazeInteractionObjectFixationInEvent {
+	type: 'fixationInEnd';
+}
+
+export interface GazeInteractionObjectFixationInStartEvent extends GazeInteractionObjectFixationInEvent {
+	type: 'fixationInStart';
+}
+
+

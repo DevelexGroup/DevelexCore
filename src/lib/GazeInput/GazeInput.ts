@@ -1,5 +1,5 @@
 import { GAZE_INPUT_EVENT_DATA, GAZE_INPUT_EVENT_MESSAGE } from './GazeInputEvent.js';
-import type { GazeInputEvent, ETHandlerMapping } from './GazeInputEvent.js';
+import type { ETHandlerMapping } from './GazeInputEvent.js';
 import type { ETWindowCalibratorConfigMouseEventFields, ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig.js';
 import type { GazeInputConfig } from './GazeInputConfig.js';
 import { Emitter } from '$lib/Emitter/Emitter.js';
