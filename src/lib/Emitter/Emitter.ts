@@ -4,6 +4,8 @@ type EventReceiver<T> = (params: T) => void;
 
 /**
  * Abstract class representing an event emitter with orderCategory support.
+ * OrderCategory is a number that determines the order in which event handlers are executed.
+ * It is crucial for the correct execution of advanced gaze interaction logic.
  * @template T - The event map type.
  */
 export abstract class Emitter<T extends EventMap> {
