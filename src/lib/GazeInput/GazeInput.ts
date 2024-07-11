@@ -17,8 +17,7 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	_isWindowCalibrated: boolean = false;
 	_isWindowCalibrationContested: boolean = false;
 	_isDeviceCalibrated: boolean = false;
-
-	handlers: Partial<Record<GazeInputEvent, ((...args: unknown[]) => unknown)[]>> = {
+	handlers: Partial<Record<GazeInputEvent, { callback: (...args: unknown[]) => unknown, orderCategory: number }[]>> = {
 		[GAZE_INPUT_EVENT_DATA]: [],
 		[GAZE_INPUT_EVENT_MESSAGE]: []
 	};
@@ -63,8 +62,7 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	}
 
 	protected handleConnected(data: any) {
-		console.log('Connected', data);
-		this.sessionID = data.sessionId;
+		this.sessionID = data.sessionID;
         this.isConnected = true;
     }
 
@@ -113,10 +111,13 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	 * Register a handler for an event type.
 	 * @param eventType - The event type, one of {@link GazeInputEvent}.
 	 * @param handler - The handler function.
+	 * @param orderCategory - The order category of the handler. Events are emitted in the order of the category.
+	 * The order of data emitting is paramount for more complicated GazeInteractions.
 	 * @returns The instance of the adapter.
 	 */
-	on<K extends GazeInputEvent>(eventType: K, handler: ETHandlerMapping[K]): this {
-		this.handlers[eventType]?.push(handler as (...args: unknown[]) => unknown);
+	on<K extends GazeInputEvent>(eventType: K, handler: ETHandlerMapping[K], orderCategory: number = 0): this {
+		this.handlers[eventType]?.push({ callback: handler as (...args: unknown[]) => unknown, orderCategory });
+		this.handlers[eventType]?.sort((a, b) => a.orderCategory - b.orderCategory);
 		return this;
 	}
 
@@ -126,7 +127,7 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	 * @param handler
 	 */
 	off<K extends GazeInputEvent>(eventType: K, handler: ETHandlerMapping[K]): void {
-		this.handlers[eventType] = this.handlers[eventType]?.filter((h) => h !== handler);
+		this.handlers[eventType] = this.handlers[eventType]?.filter((h) => h.callback !== handler);
 	}
 
 	/**
@@ -135,8 +136,8 @@ export abstract class GazeInput<T extends GazeInputConfig> {
 	 * @param args
 	 */
 	emit<K extends GazeInputEvent>(eventType: K, ...args: Parameters<ETHandlerMapping[K]>): void {
-		(this.handlers[eventType] as ((...args: unknown[]) => void)[]).forEach((handler) =>
-			handler(...args)
+		(this.handlers[eventType] as ({ callback: (...args: unknown[]) => unknown, orderCategory: number }[])).forEach((handler) =>
+			handler.callback(...args)
 		);
 	}
 
