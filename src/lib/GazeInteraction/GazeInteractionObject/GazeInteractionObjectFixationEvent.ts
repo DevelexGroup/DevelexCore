@@ -17,5 +17,7 @@ export interface GazeInteractionObjectFixationEvent {
 	timestamp: number;
 	duration: number;
 	gazeData: GazeDataPointWithFixation;
+	target: unknown;
+	settings: unknown;
 }
 

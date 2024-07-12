@@ -11,11 +11,15 @@ export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, Gaz
 
 export { type GazeDataPoint, type GazeDataPointWithFixation, isGazeDataPointWithFixation } from '$lib/GazeData/GazeData.js';
 
-export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixation.js';
-
 export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectDwell.js';
 
-export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccade.js';
+export { GazeInteractionObjectInFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectIn/GazeInteractionObjectInFixation.js';
+
+export { GazeInteractionObjectSetFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetFixation.js';
+
+export { GazeInteractionObjectInSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectIn/GazeInteractionObjectInSaccade.js';
+
+export { GazeInteractionObjectSetSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetSaccade.js';
 
 export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixation.js';
 

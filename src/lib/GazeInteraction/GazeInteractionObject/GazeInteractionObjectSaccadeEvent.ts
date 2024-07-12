@@ -19,6 +19,7 @@ export interface GazeInteractionObjectSaccadeEvents extends GazeInteractionEvent
  * @property {GazeInteractionSaccadeSettings} settings for the saccade event, including the saccade time and callbacks.
  */
 export interface GazeInteractionObjectSaccadeEvent {
+	type: string;
 	timestamp: number;
 	duration: number;
 	distance: number;
@@ -27,6 +28,8 @@ export interface GazeInteractionObjectSaccadeEvent {
     angleToPreviousInvalidityTime?: number;
 	gazeData: GazeDataPointWithFixation;
     originGazeData: GazeDataPointWithFixation;
+	target: unknown;
+	settings: unknown;
 }
 
 export interface GazeInteractionObjectSaccadeToEvent extends GazeInteractionObjectSaccadeEvent {
