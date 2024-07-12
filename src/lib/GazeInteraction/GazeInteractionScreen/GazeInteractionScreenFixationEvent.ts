@@ -1,5 +1,5 @@
-import type { GazeDataPoint, GazeDataPointWithFixation } from '../GazeData/GazeData';
-import type { GazeInteractionEvents } from './GazeInteraction';
+import type { GazeDataPointWithFixation } from '$lib/GazeData/GazeData';
+import type { GazeInteractionEvents } from '$lib/GazeInteraction/GazeInteraction';
 
 export interface GazeInteractionScreenFixationEvents extends GazeInteractionEvents {
     'fixation': GazeInteractionScreenFixationEvent,

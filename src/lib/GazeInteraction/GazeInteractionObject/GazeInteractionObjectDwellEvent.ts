@@ -1,4 +1,4 @@
-import type { GazeDataPoint } from '../GazeData/GazeData';
+import type { GazeDataPoint } from '../../GazeData/GazeData';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
 
 /**

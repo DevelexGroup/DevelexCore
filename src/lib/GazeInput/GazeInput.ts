@@ -18,7 +18,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 	_isWindowCalibrationContested: boolean = false;
 	_isDeviceCalibrated: boolean = false;
 
-	sessionID: string | null = null;
+	sessionId: string | null = null;
 
 	readonly config: T;
 
@@ -69,14 +69,14 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 	}
 
 	protected handleConnected(data: any) {
-		this.sessionID = data.sessionID;
+		this.sessionId = data.sessionId;
         this.isConnected = true;
     }
 
     protected handleDisconnected() {
         if (!this.isConnected) return;
         this.isConnected = false;
-        this.sessionID = null;
+        this.sessionId = null;
     }
 
     protected handleStopped() {

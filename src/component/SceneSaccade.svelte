@@ -7,23 +7,31 @@
 
     const settings = {
         bufferSize: 10,
-        onSaccadeTo: addSaccadeEvent,
-        onSaccadeFrom: addSaccadeEvent,
+        saccadeSetFrom: addSaccadeEvent,
+        saccadeSetTo: addSaccadeEvent,
     };
 
     const aoiLabels = ["saccade-a", "saccade-b", "saccade-c"];
+
+    const registerFn = (element: HTMLElement) => {
+        $saccadeObjectStore.register(element, settings);
+    };
+
+    const unregisterFn = (element: HTMLElement) => {
+        $saccadeObjectStore.unregister(element);
+    };
 </script>
 
 <div class="holder">
     <Group heading="Saccade Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
-            <GenericTestElement aoi={aoi} settings={settings} register={$saccadeObjectStore.register.bind($saccadeObjectStore)} unregister={$saccadeObjectStore.unregister.bind($saccadeObjectStore)} />
+            <GenericTestElement aoi={aoi} {registerFn} {unregisterFn} />
         {/each}
         </div>
     </Group>
     <Group heading="Saccade Interaction Log">
-        <GenericTable data={$sceneObjectSaccadeStore} headers={["timestamp", "type", "angleToScreen", "angleToPrevious", "target.id"]} />
+        <GenericTable data={$sceneObjectSaccadeStore} headers={["timestamp", "type", "angleToScreen", "angleToPrevious", "target"]} />
     </Group>
 </div>
 

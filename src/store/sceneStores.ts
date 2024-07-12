@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
 import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
-import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwellEvent';
-import type { GazeInteractionObjectFixationInEvent } from '$lib/GazeInteraction/GazeInteractionObjectFixationEvent';
-import type { GazeInteractionObjectSaccadeInEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccadeEvent';
+import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectDwellEvent';
+import type { GazeInteractionObjectSetFixationEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetFixationEvent';
+import type { GazeInteractionObjectSetSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetSaccadeEvent';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -27,9 +27,9 @@ export const addDwellEvent = (event: GazeInteractionObjectDwellEvent) => {
     });
 }
 
-export const sceneObjectFixationStore = writable<GazeInteractionObjectFixationInEvent[]>([]);
+export const sceneObjectFixationStore = writable<GazeInteractionObjectSetFixationEvent[]>([]);
 
-export const addFixationEvent = (event: GazeInteractionObjectFixationInEvent) => {
+export const addFixationEvent = (event: GazeInteractionObjectSetFixationEvent) => {
     sceneObjectFixationStore.update(events => {
         // Add the new event
         const updatedEvents = [event, ...events];
@@ -43,9 +43,9 @@ export const addFixationEvent = (event: GazeInteractionObjectFixationInEvent) =>
     });
 }
 
-export const sceneObjectSaccadeStore = writable<GazeInteractionObjectSaccadeInEvent[]>([]);
+export const sceneObjectSaccadeStore = writable<GazeInteractionObjectSetSaccadeEvent[]>([]);
 
-export const addSaccadeEvent = (event: GazeInteractionObjectSaccadeInEvent) => {
+export const addSaccadeEvent = (event: GazeInteractionObjectSetSaccadeEvent) => {
     sceneObjectSaccadeStore.update(events => {
         // Add the new event
         const updatedEvents = [event, ...events];

@@ -1,3 +1,6 @@
+import type { GazeInteractionEvents } from './GazeInteraction/GazeInteraction';
+import type { GazeInteractionListenerPayload, GazeInteractionObject } from './GazeInteraction/GazeInteractionObject/GazeInteractionObject';
+
 /**
  * The main functionality of the library. Creating an instance of an eye tracking input. Immutable!
  */ 
@@ -11,12 +14,23 @@ export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, Gaz
 
 export { type GazeDataPoint, type GazeDataPointWithFixation, isGazeDataPointWithFixation } from '$lib/GazeData/GazeData.js';
 
-export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObjectFixation.js';
+export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectDwell.js';
 
-export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObjectDwell.js';
+export { GazeInteractionObjectInFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectIn/GazeInteractionObjectInFixation.js';
 
-export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.js';
+export { GazeInteractionObjectSetFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetFixation.js';
 
-export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreenFixation.js';
+export { GazeInteractionObjectInSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectIn/GazeInteractionObjectInSaccade.js';
 
-export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.js';
+export { GazeInteractionObjectSetSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetSaccade.js';
+
+export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixation.js';
+
+export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccade.js';
+
+export interface GazeInteractionComponentProps<TInteractionEvents extends GazeInteractionEvents, TInputData extends { type: string}, TListenerPayload extends GazeInteractionListenerPayload> {
+    gazeInteractionObject: GazeInteractionObject<TInteractionEvents, TInputData, TListenerPayload>;
+    settings: Partial<TListenerPayload['listener']['settings']>;
+}
+
+export interface GazeInteractionComponentPropsDefault extends GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionListenerPayload> {} 

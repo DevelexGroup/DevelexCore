@@ -21,7 +21,6 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
         this.worker.onmessage = (event) => {
             const { type, data } = event.data;
-            console.log(type, data);
             const handler = this.messageHandlers[type];
             if (handler) {
                 handler(data);
@@ -76,20 +75,20 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         } 
         return this.createCommand(
             'disconnect',
-            { sessionId: this.sessionID },
+            { sessionId: this.sessionId },
             'disconnected',
             this.handleDisconnected.bind(this)
         );
     }
 
     async calibrate(): Promise<void> {
-        if (!this.sessionID) {
+        if (!this.sessionId) {
             this.handleError({ type: 'error', message: 'Not connected.' });
             return Promise.reject('Not connected.');
         }
         return this.createCommand(
             'calibrate',
-            { sessionId: this.sessionID },
+            { sessionId: this.sessionId },
             'calibrated',
             this.handleCalibrated.bind(this)
         );
@@ -110,13 +109,14 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     async start(): Promise<void> {
         if (this.isEmitting) return Promise.resolve();
-        if (!this.sessionID) {
+        console.log('start', this.sessionId);
+        if (!this.sessionId) {
             this.handleError({ type: 'error', message: 'Not connected.' });
             return Promise.reject('Not connected.');
         }
         return this.createCommand(
             'start',
-            { sessionId: this.sessionID },
+            { sessionId: this.sessionId },
             'started',
             this.handleStarted.bind(this)
         );
@@ -124,13 +124,13 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     async stop(): Promise<void> {
         if (!this.isEmitting) return Promise.resolve();
-        if (!this.sessionID) {
+        if (!this.sessionId) {
             this.handleError({ type: 'error', message: 'Not connected.' });
             return Promise.reject('Not connected.');
         }
         return this.createCommand(
             'stop',
-            { sessionId: this.sessionID },
+            { sessionId: this.sessionId },
             'stopped',
             this.handleStopped.bind(this)
         );

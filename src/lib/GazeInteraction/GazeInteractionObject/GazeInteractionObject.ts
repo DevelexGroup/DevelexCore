@@ -1,4 +1,4 @@
-import { GazeInteraction, type GazeInteractionEvents } from "./GazeInteraction";
+import { GazeInteraction, type GazeInteractionEvents } from "../GazeInteraction";
 
 export type GazeInteractionListenerPayload = {
 	data: unknown;

@@ -9,15 +9,18 @@ export interface GazeInteractionEvents extends EventMap {
 
 export abstract class GazeInteraction<
     TInteractionEvents extends GazeInteractionEvents,
-    TInputData extends { type: string; }
+    TInputData
 > extends Emitter<TInteractionEvents> {
 
     readonly inputCallback: (data: TInputData) => void = (data) =>
 		this.evaluateInputData(data);
 
-    abstract connect(input: unknown): void;
+    /**
+     * Unknown arguments to connect.
+     */
+    abstract connect(...args: any[]): void;
 
-    abstract disconnect(input: unknown): void;
+    abstract disconnect(...args: any[]): void;
 
     abstract evaluateInputData(data: TInputData): void;
 }

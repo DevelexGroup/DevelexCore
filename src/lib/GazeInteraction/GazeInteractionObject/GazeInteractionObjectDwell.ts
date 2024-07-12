@@ -3,7 +3,7 @@ import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayl
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
-import type { GazeInteractionEvents } from './GazeInteraction';
+import type { GazeInteractionEvents } from '../GazeInteraction';
 import type { GazeInput } from '$lib/GazeInput/GazeInput';
 import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 
