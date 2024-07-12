@@ -25,7 +25,6 @@ export interface GazeInteractionObjectSaccadeEvent {
     angleToScreen: number;
     angleToPrevious?: number;
     angleToPreviousInvalidityTime?: number;
-	settings: GazeInteractionSaccadeSettings;
 	gazeData: GazeDataPointWithFixation;
     originGazeData: GazeDataPointWithFixation;
 }

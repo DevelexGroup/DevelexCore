@@ -36,7 +36,7 @@ export class GazeInteractionObjectInFixation extends GazeInteractionObjectFixati
 	 */
 	createFixationEvent(
 		type: GazeInteractionObjectFixationInEvent['type'],
-		listener: GazeInteractionObjectFixationListener,
+		listener: GazeInteractionObjectFixationInPayload['listener'],
 		data: GazeInteractionScreenFixationEvent
 	): GazeInteractionObjectFixationInEvent {
 		const { element, settings } = listener;

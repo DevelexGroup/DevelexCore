@@ -1,7 +1,7 @@
 import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccadeEvent';
 import { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccade';
 import type { GazeInteractionObjectSetSaccadeEvent, GazeInteractionObjectSetSaccadeEvents } from './GazeInteractionObjectSetSaccadeEvent';
-import type { GazeInteractionObjectSetSaccadeListener, GazeInteractionObjectSetSaccadePayload, GazeInteractionObjectSetSaccadeSettings } from './GazeInteractionObjectSetSaccadeSettings';
+import type { GazeInteractionObjectSetSaccadePayload, GazeInteractionObjectSetSaccadeSettings } from './GazeInteractionObjectSetSaccadeSettings';
 
 /**
  * 
@@ -10,17 +10,43 @@ import type { GazeInteractionObjectSetSaccadeListener, GazeInteractionObjectSetS
  */
 export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccade<GazeInteractionObjectSetSaccadeEvents, GazeInteractionObjectSetSaccadePayload> {
 
+	triggeredTargetsTo: Element[] = [];
+	triggeredSettingsTo: GazeInteractionObjectSetSaccadeSettings[] = [];
+	triggeredTargetsFrom: Element[] = [];
+	triggeredSettingsFrom: GazeInteractionObjectSetSaccadeSettings[] = [];
+
 	defaultSettings: GazeInteractionObjectSetSaccadeSettings = {
 		bufferSize: 100,
 		saccadeFrom: () => {},
 		saccadeTo: () => {}
 	};
 
+	evaluateInputData(data: GazeInteractionScreenSaccadeEvent): void {
+		this.triggeredTargetsTo = [];
+		this.triggeredSettingsTo = [];
+		this.triggeredTargetsFrom = [];
+		this.triggeredSettingsFrom = [];
+
+		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
+
+		const eventTo = this.createSaccadeEvent('saccadeTo', this.triggeredTargetsTo, this.triggeredSettingsTo, data);
+		const eventFrom = this.createSaccadeEvent('saccadeFrom', this.triggeredTargetsFrom, this.triggeredSettingsFrom, data);
+
+		this.triggeredSettingsFrom.forEach((settings) => settings.saccadeFrom(eventFrom));
+		this.triggeredSettingsTo.forEach((settings) => settings.saccadeTo(eventTo));
+
+		this.emit(eventTo.type, eventTo);
+		this.emit(eventFrom.type, eventFrom);
+	}
+
 	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSetSaccadePayload['listener'], isTo: boolean) {
-		const eventType = isTo ? 'saccadeTo' : 'saccadeFrom';
-		const event = this.createSaccadeEvent(eventType, listener, data);
-		this.emit(event.type, event);
-		listener.settings[event.type](event);
+		if (isTo) {
+			this.triggeredTargetsTo.push(listener.element);
+			this.triggeredSettingsTo.push(listener.settings);
+		} else {
+			this.triggeredTargetsFrom.push(listener.element);
+			this.triggeredSettingsFrom.push(listener.settings);
+		}
 	}
 
 	/**
@@ -34,14 +60,14 @@ export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccad
 	 */
 	createSaccadeEvent(
 		type: GazeInteractionObjectSetSaccadeEvent['type'],
-		listener: GazeInteractionObjectSetSaccadeListener,
+		target: Element[],
+		settings: GazeInteractionObjectSetSaccadeSettings[],
 		data: GazeInteractionScreenSaccadeEvent,
 	): GazeInteractionObjectSetSaccadeEvent {
-		const { element, settings } = listener;
 		return {
             ...data,
 			type,
-			target: element,
+			target,
 			settings
 		};
 	}

@@ -1,4 +1,5 @@
 import type { GazeInteractionObjectFixationEvent, GazeInteractionObjectFixationEvents } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationEvent';
+import type { GazeInteractionInFixationSettings } from './GazeInteractionObjectSetFixationSettings';
 
 export interface GazeInteractionObjectInFixationEvents extends GazeInteractionObjectFixationEvents {
 	'fixationSet': GazeInteractionObjectInFixationEvent;
@@ -15,7 +16,8 @@ export interface GazeInteractionObjectInFixationEvents extends GazeInteractionOb
  */
 export interface GazeInteractionObjectInFixationEvent extends GazeInteractionObjectFixationEvent {
 	type: 'fixationSetProgress' | 'fixationSetEnd' | 'fixationSetStart';
-	target: Element;
+	target: Element[];
+	settings: GazeInteractionInFixationSettings[];
 }
 
 export interface GazeInteractionObjectInFixationProgressEvent extends GazeInteractionObjectInFixationEvent {

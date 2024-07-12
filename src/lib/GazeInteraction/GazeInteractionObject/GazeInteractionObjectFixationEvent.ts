@@ -16,7 +16,6 @@ export interface GazeInteractionObjectFixationEvent {
 	type: string;
 	timestamp: number;
 	duration: number;
-	settings: GazeInteractionFixationSettings;
 	gazeData: GazeDataPointWithFixation;
 }
 

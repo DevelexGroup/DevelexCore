@@ -1,4 +1,3 @@
-import type { GazeInteractionObjectFixationListener } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationSettings';
 import type { GazeInteractionObjectInFixationEvents, GazeInteractionObjectInFixationEvent } from './GazeInteractionObjectSetFixationEvent';
 import type { GazeInteractionScreenFixationEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixationEvent';
 import { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixation';
@@ -11,6 +10,9 @@ import type { GazeInteractionInFixationSettings, GazeInteractionObjectInFixation
  */
 export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixation<GazeInteractionObjectInFixationEvents, GazeInteractionObjectInFixationPayload> {
 
+	triggeredTargets: Element[] = [];
+	triggeredSettings: GazeInteractionInFixationSettings[] = [];
+
 	defaultSettings: GazeInteractionInFixationSettings = {
 		bufferSize: 100,
 		fixationSetStart: () => {},
@@ -18,11 +20,21 @@ export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixat
 		fixationSetProgress: () => {}
 	};
 
-	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectInFixationPayload['listener']): void {
-		const eventType = data.type === 'fixationStart' ? 'fixationSetStart' : data.type === 'fixationEnd' ? 'fixationSetEnd' : 'fixationSetProgress';
-		const event = this.createFixationEvent(eventType, listener, data);
+	evaluateInputData(data: GazeInteractionScreenFixationEvent): void {
+		this.triggeredTargets = [];
+		this.triggeredSettings = [];
+
+		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
+
+		const eventType = data.type === 'fixationStart' ? 'fixationSetStart' : data.type === 'fixationEnd' ? 'fixationSetEnd' : 'fixationSetProgress' as const;
+		const event = this.createFixationEvent(eventType, this.triggeredTargets, this.triggeredSettings, data);
 		this.emit(event.type, event);
-		listener.settings[event.type](event);
+		this.triggeredSettings.forEach((settings) => settings[event.type](event));
+	}
+
+	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectInFixationPayload['listener']): void {
+		this.triggeredTargets.push(listener.element);
+		this.triggeredSettings.push(listener.settings);
 	}
 
 	/**
@@ -36,14 +48,14 @@ export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixat
 	 */
 	createFixationEvent(
 		type: GazeInteractionObjectInFixationEvent['type'],
-		listener: GazeInteractionObjectFixationListener,
+		elements: Element[],
+		settings: GazeInteractionInFixationSettings[],
 		data: GazeInteractionScreenFixationEvent
 	): GazeInteractionObjectInFixationEvent {
-		const { element, settings } = listener;
 		return {
             ...data,
 			type,
-			target: element,
+			target: elements,
 			settings
 		};
 	}

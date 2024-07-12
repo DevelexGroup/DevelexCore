@@ -17,8 +17,8 @@ export interface GazeInteractionObjectSetSaccadeEvents extends GazeInteractionOb
  */
 export interface GazeInteractionObjectSetSaccadeEvent extends GazeInteractionObjectSaccadeEvent {
 	type: 'saccadeTo' | 'saccadeFrom';
-	target: Element;
-	settings: GazeInteractionObjectSetSaccadeSettings;
+	target: Element[];
+	settings: GazeInteractionObjectSetSaccadeSettings[];
 }
 
 export interface GazeInteractionObjectSetSaccadeToEvent extends GazeInteractionObjectSetSaccadeEvent {
