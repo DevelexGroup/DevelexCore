@@ -1,6 +1,6 @@
-import type { GazeInteractionSaccadeInSettings, GazeInteractionObjectSaccadeInListener, GazeInteractionObjectSaccadeInPayload } from './GazeInteractionObjectSaccadeSettings';
+import type { GazeInteractionObjectSaccadePayload } from './GazeInteractionObjectSaccadeSettings';
 import { GazeInteractionObject } from './GazeInteractionObject';
-import type { GazeInteractionObjectSaccadeInEvents, GazeInteractionObjectSaccadeInEvent } from './GazeInteractionObjectSaccadeEvent';
+import type { GazeInteractionObjectSaccadeEvents } from './GazeInteractionObjectSaccadeEvent';
 import type { GazeInteractionScreenSaccadeEvent } from './GazeInteractionScreenSaccadeEvent';
 import type { GazeInteractionScreenSaccade } from './GazeInteractionScreenSaccade';
 
@@ -8,13 +8,10 @@ import type { GazeInteractionScreenSaccade } from './GazeInteractionScreenSaccad
  * Manages saccade events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInteractionObjectSaccadeInEvents, GazeInteractionScreenSaccadeEvent, GazeInteractionObjectSaccadeInPayload> {
-
-	defaultSettings: GazeInteractionSaccadeInSettings = {
-		bufferSize: 100,
-		saccadeTo: () => {},
-		saccadeFrom: () => {},
-	};
+export abstract class GazeInteractionObjectSaccade<
+	TInteractionEvents extends GazeInteractionObjectSaccadeEvents,
+	TListenerPayload extends GazeInteractionObjectSaccadePayload
+> extends GazeInteractionObject<TInteractionEvents, GazeInteractionScreenSaccadeEvent, TListenerPayload> {
 
     connect(input: GazeInteractionScreenSaccade): void {
         input.on('saccade', this.inputCallback);
@@ -31,7 +28,7 @@ export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInte
 	 * @param settings for the saccade events.
 	 * @returns the generated listener object.
 	 */
-	generateListener(element: Element, settings: GazeInteractionObjectSaccadeInListener['settings']): GazeInteractionObjectSaccadeInListener {
+	generateListener(element: Element, settings: TListenerPayload['listener']['settings']): TListenerPayload['listener'] {
 		return {
 			element,
 			settings
@@ -43,36 +40,12 @@ export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInte
 	 * @param data The eye-tracker data to evaluate.
 	 * @param listener The listener to evaluate for saccade events.
 	 */
-	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSaccadeInListener) {
+	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: TListenerPayload['listener']) {
 		const isTo = this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize);
 		const isFrom = this.isInside(listener.element, data.originGazeData.x, data.originGazeData.y, listener.settings.bufferSize);
 		if (!isTo && !isFrom) return;
-		const eventType = isTo ? 'saccadeTo' : 'saccadeFrom';
-		const event = this.createSaccadeEvent(eventType, listener, data);
-		this.emit(event.type, event);
-		listener.settings[event.type](event);
+		this.evaluateActiveListener(data, listener, isTo);
 	}
 
-	/**
-	 * Creates an event object for the saccade event.
-	 * @param type - The type of the saccade event ('saccadeProgress', 'saccadeFinish', 'saccadeCancel').
-	 * @param listener - The listener object for the saccade event.
-	 * @param timestamp - The timestamp of the saccade event.
-	 * @param elapsed - The elapsed time of the saccade event.
-	 * @param data - The gaze data associated with the saccade event.
-	 * @returns The created saccade event object.
-	 */
-	createSaccadeEvent(
-		type: GazeInteractionObjectSaccadeInEvent['type'],
-		listener: GazeInteractionObjectSaccadeInListener,
-		data: GazeInteractionScreenSaccadeEvent
-	): GazeInteractionObjectSaccadeInEvent {
-		const { element, settings } = listener;
-		return {
-            ...data,
-			type,
-			target: element,
-			settings
-		};
-	}
+	abstract evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: TListenerPayload['listener'], isTo: boolean): void;
 }

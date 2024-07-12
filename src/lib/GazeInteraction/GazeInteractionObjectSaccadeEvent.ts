@@ -1,12 +1,8 @@
 import type { GazeDataPointWithFixation } from '../GazeData/GazeData';
-import type { GazeInteractionSaccadeInSettings } from './GazeInteractionObjectSaccadeSettings';
+import type { GazeInteractionSaccadeSettings } from './GazeInteractionObjectSaccadeSettings';
 import type { GazeInteractionEvents } from './GazeInteraction';
 
-export interface GazeInteractionObjectSaccadeInEvents extends GazeInteractionEvents {
-    'saccadeIn': GazeInteractionObjectSaccadeInEvent,
-	'saccadeFrom': GazeInteractionObjectSaccadeToEvent,
-	'saccadeTo': GazeInteractionObjectSaccadeFromEvent
-}
+export interface GazeInteractionObjectSaccadeEvents extends GazeInteractionEvents {}
 
 /**
  * Fired when a saccade event occurs.
@@ -20,26 +16,24 @@ export interface GazeInteractionObjectSaccadeInEvents extends GazeInteractionEve
  * @property {Element} originTarget of the saccade event.
  * @property {GazeDataPointWithFixation} gazeData of the saccade event. I.e. the first gaze data point of the fixation.
  * @property {GazeDataPointWithFixation} originGazeData of the saccade event.
- * @property {GazeInteractionSaccadeInSettings} settings for the saccade event, including the saccade time and callbacks.
+ * @property {GazeInteractionSaccadeSettings} settings for the saccade event, including the saccade time and callbacks.
  */
-export interface GazeInteractionObjectSaccadeInEvent {
-	type: 'saccadeTo' | 'saccadeFrom';
+export interface GazeInteractionObjectSaccadeEvent {
 	timestamp: number;
 	duration: number;
 	distance: number;
     angleToScreen: number;
     angleToPrevious?: number;
     angleToPreviousInvalidityTime?: number;
-	target: Element;
-	settings: GazeInteractionSaccadeInSettings;
+	settings: GazeInteractionSaccadeSettings;
 	gazeData: GazeDataPointWithFixation;
     originGazeData: GazeDataPointWithFixation;
 }
 
-export interface GazeInteractionObjectSaccadeToEvent extends GazeInteractionObjectSaccadeInEvent {
+export interface GazeInteractionObjectSaccadeToEvent extends GazeInteractionObjectSaccadeEvent {
 	type: 'saccadeTo';
 }
 
-export interface GazeInteractionObjectSaccadeFromEvent extends GazeInteractionObjectSaccadeInEvent {
+export interface GazeInteractionObjectSaccadeFromEvent extends GazeInteractionObjectSaccadeEvent {
 	type: 'saccadeFrom';
 }
