@@ -7,8 +7,8 @@
 
     const settings = {
         bufferSize: 10,
-        onSaccadeTo: addSaccadeEvent,
-        onSaccadeFrom: addSaccadeEvent,
+        saccadeSetFrom: addSaccadeEvent,
+        saccadeSetTo: addSaccadeEvent,
     };
 
     const aoiLabels = ["saccade-a", "saccade-b", "saccade-c"];
@@ -31,7 +31,7 @@
         </div>
     </Group>
     <Group heading="Saccade Interaction Log">
-        <GenericTable data={$sceneObjectSaccadeStore} headers={["timestamp", "type", "angleToScreen", "angleToPrevious", "target.id"]} />
+        <GenericTable data={$sceneObjectSaccadeStore} headers={["timestamp", "type", "angleToScreen", "angleToPrevious", "target"]} />
     </Group>
 </div>
 

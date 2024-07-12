@@ -27,9 +27,9 @@ export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixat
 		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
 
 		const eventType = data.type === 'fixationStart' ? 'fixationSetStart' : data.type === 'fixationEnd' ? 'fixationSetEnd' : 'fixationSetProgress' as const;
+		if (eventType === 'fixationSetEnd')	console.log('fixationSetEnd');
 		const event = this.createFixationEvent(eventType, this.triggeredTargets, this.triggeredSettings, data);
-		this.emit(event.type, event);
-		this.triggeredSettings.forEach((settings) => settings[event.type](event));
+		this.listeners.forEach((listener) => listener.settings[event.type](event));
 	}
 
 	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectSetFixationPayload['listener']): void {

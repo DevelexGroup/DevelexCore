@@ -38,6 +38,9 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
                 this.emit("fixation", eventProgress);
                 break;
             case "end":
+                const eventEnd = this.createFixationEvent("fixationEnd", lastFixationPoint.timestamp, lastFixationPoint.fixationDuration, lastFixationPoint);
+                this.emit("fixationEnd", eventEnd);
+                this.emit("fixation", eventEnd);
                 break;
         }
         this.currentFixationLastPoint = fixationPoint;

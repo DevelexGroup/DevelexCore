@@ -2,9 +2,9 @@ import type { GazeInteractionObjectSetSaccadeSettings } from './GazeInteractionO
 import type { GazeInteractionObjectSaccadeEvent, GazeInteractionObjectSaccadeEvents } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccadeEvent';
 
 export interface GazeInteractionObjectSetSaccadeEvents extends GazeInteractionObjectSaccadeEvents {
-    'saccadeIn': GazeInteractionObjectSetSaccadeEvent,
-	'saccadeInFrom': GazeInteractionObjectSetSaccadeToEvent,
-	'saccadeInTo': GazeInteractionObjectSetSaccadeFromEvent
+    'saccadeSet': GazeInteractionObjectSetSaccadeEvent,
+	'saccadeSetFrom': GazeInteractionObjectSetSaccadeToEvent,
+	'saccadeSetTo': GazeInteractionObjectSetSaccadeFromEvent
 }
 
 /**
@@ -16,15 +16,15 @@ export interface GazeInteractionObjectSetSaccadeEvents extends GazeInteractionOb
  * @property {GazeInteractionInSaccadeSettings} settings for the saccade event, including the saccade time and callbacks.
  */
 export interface GazeInteractionObjectSetSaccadeEvent extends GazeInteractionObjectSaccadeEvent {
-	type: 'saccadeTo' | 'saccadeFrom';
+	type: 'saccadeSetTo' | 'saccadeSetFrom';
 	target: Element[];
 	settings: GazeInteractionObjectSetSaccadeSettings[];
 }
 
 export interface GazeInteractionObjectSetSaccadeToEvent extends GazeInteractionObjectSetSaccadeEvent {
-	type: 'saccadeTo';
+	type: 'saccadeSetTo';
 }
 
 export interface GazeInteractionObjectSetSaccadeFromEvent extends GazeInteractionObjectSetSaccadeEvent {
-	type: 'saccadeFrom';
+	type: 'saccadeSetFrom';
 }

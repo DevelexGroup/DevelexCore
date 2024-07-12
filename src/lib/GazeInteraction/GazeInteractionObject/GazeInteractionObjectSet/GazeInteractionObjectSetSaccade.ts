@@ -17,8 +17,8 @@ export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccad
 
 	defaultSettings: GazeInteractionObjectSetSaccadeSettings = {
 		bufferSize: 100,
-		saccadeFrom: () => {},
-		saccadeTo: () => {}
+		saccadeSetTo: () => {},
+		saccadeSetFrom: () => {}
 	};
 
 	evaluateInputData(data: GazeInteractionScreenSaccadeEvent): void {
@@ -29,11 +29,11 @@ export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccad
 
 		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
 
-		const eventTo = this.createSaccadeEvent('saccadeTo', this.triggeredTargetsTo, this.triggeredSettingsTo, data);
-		const eventFrom = this.createSaccadeEvent('saccadeFrom', this.triggeredTargetsFrom, this.triggeredSettingsFrom, data);
+		const eventTo = this.createSaccadeEvent('saccadeSetTo', this.triggeredTargetsTo, this.triggeredSettingsTo, data);
+		const eventFrom = this.createSaccadeEvent('saccadeSetFrom', this.triggeredTargetsFrom, this.triggeredSettingsFrom, data);
 
-		this.triggeredSettingsFrom.forEach((settings) => settings.saccadeFrom(eventFrom));
-		this.triggeredSettingsTo.forEach((settings) => settings.saccadeTo(eventTo));
+		this.listeners.forEach((listener) => listener.settings.saccadeSetFrom(eventFrom));
+		this.listeners.forEach((listener) => listener.settings.saccadeSetTo(eventTo));
 
 		this.emit(eventTo.type, eventTo);
 		this.emit(eventFrom.type, eventFrom);

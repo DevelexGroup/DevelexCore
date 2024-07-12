@@ -25,7 +25,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 		if (!this.windowCalibrator) return Promise.reject('Window calibrator is not set.');
 
-		this.handleConnected({ sessionID: this.createSessionId() });
+		this.handleConnected({ sessionId: this.createSessionId() });
 
 		document.addEventListener('mousemove', this.updateMousePosition.bind(this));
 
@@ -36,13 +36,13 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		if (this.isEmitting) {
 			return Promise.reject('Already emitting.');
 		}
-		if (!this.sessionID) {
+		if (!this.sessionId) {
 			return Promise.reject('Session ID is not set. Connect first.');
 		}
 		if (!this.windowCalibrator) {
 			return Promise.reject('Window calibrator is not set.');
 		}
-		const gazePointGetter = createGazePointFactory(this.sessionID, this.windowCalibrator);
+		const gazePointGetter = createGazePointFactory(this.sessionId, this.windowCalibrator);
 		const interval = 1000 / this.config.frequency;
 		this.intervalId = setInterval(() => {
 			if (this.config && this.isConnected) {

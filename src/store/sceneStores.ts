@@ -46,6 +46,7 @@ export const addFixationEvent = (event: GazeInteractionObjectSetFixationEvent) =
 export const sceneObjectSaccadeStore = writable<GazeInteractionObjectSetSaccadeEvent[]>([]);
 
 export const addSaccadeEvent = (event: GazeInteractionObjectSetSaccadeEvent) => {
+    if (event.target.length > 0) event.target = event.target.map((element) => element.id).join(', ');
     sceneObjectSaccadeStore.update(events => {
         // Add the new event
         const updatedEvents = [event, ...events];

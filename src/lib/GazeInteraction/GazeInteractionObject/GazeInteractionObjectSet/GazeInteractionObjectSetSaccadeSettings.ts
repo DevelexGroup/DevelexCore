@@ -21,6 +21,6 @@ export interface GazeInteractionObjectSetSaccadePayload extends GazeInteractionO
  * @property {GazeInteractionInSaccadeCallbackType} onInSaccadeEnd The callback function to be called when the user starts saccadeing on an element.
  */
 export interface GazeInteractionObjectSetSaccadeSettings extends GazeInteractionSaccadeSettings {
-	saccadeFrom: (event: GazeInteractionObjectSetSaccadeEvent) => void;
-	saccadeTo: (event: GazeInteractionObjectSetSaccadeEvent) => void;
+	saccadeSetFrom: (event: GazeInteractionObjectSetSaccadeEvent) => void;
+	saccadeSetTo: (event: GazeInteractionObjectSetSaccadeEvent) => void;
 }

@@ -7,9 +7,8 @@
 
     const settings = {
         bufferSize: 10,
-        onFixationProgress: addFixationEvent,
-        onFixationEnd: addFixationEvent,
-        onFixationStart: addFixationEvent,
+        fixationSetEnd: addFixationEvent,
+        fixationSetStart: addFixationEvent,
     };
 
     const aoiLabels = ["fixation-a", "fixation-b", "fixation-c"];
@@ -32,7 +31,7 @@
         </div>
     </Group>
     <Group heading="Fixation Interaction Log">
-        <GenericTable data={$sceneObjectFixationStore} headers={["timestamp", "type", "duration", "target.id"]} />
+        <GenericTable data={$sceneObjectFixationStore} headers={["timestamp", "type", "duration", "target"]} />
     </Group>
 </div>
 
