@@ -1,5 +1,5 @@
-import type { GazeInteractionScreenSaccadeEvent } from './GazeInteractionScreenSaccadeEvent';
-import { GazeInteractionObjectSaccade } from './GazeInteractionObjectSaccade';
+import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccadeEvent';
+import { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccade';
 import type { GazeInteractionObjectInSaccadeEvent, GazeInteractionObjectInSaccadeEvents } from './GazeInteractionObjectInSaccadeEvent';
 import type { GazeInteractionObjectInSaccadeListener, GazeInteractionObjectInSaccadePayload, GazeInteractionObjectInSaccadeSettings } from './GazeInteractionObjectInSaccadeSettings';
 

@@ -1,6 +1,4 @@
-import type { GazeDataPointWithFixation } from '../GazeData/GazeData';
-import type { GazeInteractionObjectFixationEvent, GazeInteractionObjectFixationEvents } from './GazeInteractionObjectFixationEvent';
-import type { GazeInteractionFixationSettings } from './GazeInteractionObjectFixationSettings';
+import type { GazeInteractionObjectFixationEvent, GazeInteractionObjectFixationEvents } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationEvent';
 
 export interface GazeInteractionObjectFixationInEvents extends GazeInteractionObjectFixationEvents {
 	'fixationIn': GazeInteractionObjectFixationInEvent;

@@ -1,7 +1,7 @@
-import type { GazeInteractionObjectFixationListener } from './GazeInteractionObjectFixationSettings';
+import type { GazeInteractionObjectFixationListener } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationSettings';
 import type { GazeInteractionObjectFixationInEvents, GazeInteractionObjectFixationInEvent } from './GazeInteractionObjectInFixationEvent';
-import type { GazeInteractionScreenFixationEvent } from './GazeInteractionScreenFixationEvent';
-import { GazeInteractionObjectFixation } from './GazeInteractionObjectFixation';
+import type { GazeInteractionScreenFixationEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixationEvent';
+import { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixation';
 import type { GazeInteractionFixationInSettings, GazeInteractionObjectFixationInPayload } from './GazeInteractionObjectInFixationSettings';
 
 /**

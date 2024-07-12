@@ -1,5 +1,5 @@
 import type { GazeInteractionObjectFixationInEvent } from "./GazeInteractionObjectInFixationEvent";
-import type { GazeInteractionFixationSettings, GazeInteractionObjectFixationListener, GazeInteractionObjectFixationPayload } from "./GazeInteractionObjectFixationSettings";
+import type { GazeInteractionFixationSettings, GazeInteractionObjectFixationListener, GazeInteractionObjectFixationPayload } from "$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationSettings";
 
 /**
  * Listener object for GazeInteractionFixation.

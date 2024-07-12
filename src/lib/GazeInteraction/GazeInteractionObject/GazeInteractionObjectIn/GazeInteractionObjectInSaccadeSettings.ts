@@ -1,5 +1,5 @@
 import type { GazeInteractionObjectInSaccadeEvent } from "./GazeInteractionObjectInSaccadeEvent";
-import type { GazeInteractionObjectSaccadeListener, GazeInteractionObjectSaccadePayload, GazeInteractionSaccadeSettings } from "./GazeInteractionObjectSaccadeSettings";
+import type { GazeInteractionObjectSaccadeListener, GazeInteractionObjectSaccadePayload, GazeInteractionSaccadeSettings } from "$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccadeSettings";
 
 /**
  * Listener object for GazeInteractionInSaccade.

@@ -1,8 +1,8 @@
 import type { GazeInteractionObjectFixationPayload } from './GazeInteractionObjectFixationSettings';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectFixationEvents } from './GazeInteractionObjectFixationEvent';
-import type { GazeInteractionScreenFixationEvent } from './GazeInteractionScreenFixationEvent';
-import type { GazeInteractionScreenFixation } from './GazeInteractionScreenFixation';
+import type { GazeInteractionScreenFixationEvent } from '../GazeInteractionScreen/GazeInteractionScreenFixationEvent';
+import type { GazeInteractionScreenFixation } from '../GazeInteractionScreen/GazeInteractionScreenFixation';
 
 /**
  * Manages fixation events from the given eye-tracker input for elements,

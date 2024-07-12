@@ -1,4 +1,4 @@
-import type { GazeInteractionScreenFixationEvent } from "./GazeInteractionScreenFixationEvent";
+import type { GazeInteractionScreenFixationEvent } from "../GazeInteractionScreenFixationEvent";
 
 /**
  * Listener object for GazeInteractionFixation.

@@ -1,5 +1,4 @@
-import type { GazeInteractionObjectSaccadeEvent } from "./GazeInteractionObjectSaccadeEvent";
-import type { GazeInteractionScreenSaccadeEvent } from "./GazeInteractionScreenSaccadeEvent";
+import type { GazeInteractionScreenSaccadeEvent } from "$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccadeEvent";
 
 /**
  * Listener object for GazeInteractionSaccade.
