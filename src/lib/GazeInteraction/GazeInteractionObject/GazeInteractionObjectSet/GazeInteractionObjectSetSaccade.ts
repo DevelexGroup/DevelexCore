@@ -1,22 +1,22 @@
 import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccadeEvent';
 import { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccade';
-import type { GazeInteractionObjectInSaccadeEvent, GazeInteractionObjectInSaccadeEvents } from './GazeInteractionObjectSetSaccadeEvent';
-import type { GazeInteractionObjectInSaccadeListener, GazeInteractionObjectInSaccadePayload, GazeInteractionObjectInSaccadeSettings } from './GazeInteractionObjectSetSaccadeSettings';
+import type { GazeInteractionObjectSetSaccadeEvent, GazeInteractionObjectSetSaccadeEvents } from './GazeInteractionObjectSetSaccadeEvent';
+import type { GazeInteractionObjectSetSaccadeListener, GazeInteractionObjectSetSaccadePayload, GazeInteractionObjectSetSaccadeSettings } from './GazeInteractionObjectSetSaccadeSettings';
 
 /**
  * 
  * Manages fixation events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectInSaccade extends GazeInteractionObjectSaccade<GazeInteractionObjectInSaccadeEvents, GazeInteractionObjectInSaccadePayload> {
+export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccade<GazeInteractionObjectSetSaccadeEvents, GazeInteractionObjectSetSaccadePayload> {
 
-	defaultSettings: GazeInteractionObjectInSaccadeSettings = {
+	defaultSettings: GazeInteractionObjectSetSaccadeSettings = {
 		bufferSize: 100,
 		saccadeFrom: () => {},
 		saccadeTo: () => {}
 	};
 
-	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectInSaccadePayload['listener'], isTo: boolean) {
+	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSetSaccadePayload['listener'], isTo: boolean) {
 		const eventType = isTo ? 'saccadeTo' : 'saccadeFrom';
 		const event = this.createSaccadeEvent(eventType, listener, data);
 		this.emit(event.type, event);
@@ -33,10 +33,10 @@ export class GazeInteractionObjectInSaccade extends GazeInteractionObjectSaccade
 	 * @returns The created fixation event object.
 	 */
 	createSaccadeEvent(
-		type: GazeInteractionObjectInSaccadeEvent['type'],
-		listener: GazeInteractionObjectInSaccadeListener,
+		type: GazeInteractionObjectSetSaccadeEvent['type'],
+		listener: GazeInteractionObjectSetSaccadeListener,
 		data: GazeInteractionScreenSaccadeEvent,
-	): GazeInteractionObjectInSaccadeEvent {
+	): GazeInteractionObjectSetSaccadeEvent {
 		const { element, settings } = listener;
 		return {
             ...data,

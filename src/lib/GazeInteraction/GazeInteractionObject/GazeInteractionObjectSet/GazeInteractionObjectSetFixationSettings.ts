@@ -1,13 +1,13 @@
-import type { GazeInteractionObjectFixationInEvent } from "./GazeInteractionObjectSetFixationEvent";
+import type { GazeInteractionObjectInFixationEvent } from "./GazeInteractionObjectSetFixationEvent";
 import type { GazeInteractionFixationSettings, GazeInteractionObjectFixationListener, GazeInteractionObjectFixationPayload } from "$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationSettings";
 
 /**
  * Listener object for GazeInteractionFixation.
- * @property {GazeInteractionFixationInSettings} settings for the listener, including the fixation time and callbacks.
+ * @property {GazeInteractionInFixationSettings} settings for the listener, including the fixation time and callbacks.
  * @extends GazeInteractionObjectFixationListener
  */
-export interface GazeInteractionObjectFixationInListener extends GazeInteractionObjectFixationListener {
-	settings: GazeInteractionFixationInSettings;
+export interface GazeInteractionObjectInFixationListener extends GazeInteractionObjectFixationListener {
+	settings: GazeInteractionInFixationSettings;
 }
 
 /**
@@ -15,8 +15,8 @@ export interface GazeInteractionObjectFixationInListener extends GazeInteraction
  * @property {GazeInteractionScreenFixationEvent} listener The fixation event data.
  * @extends GazeInteractionObjectFixationPayload
  */
-export interface GazeInteractionObjectFixationInPayload extends GazeInteractionObjectFixationPayload {
-	listener: GazeInteractionObjectFixationInListener;
+export interface GazeInteractionObjectInFixationPayload extends GazeInteractionObjectFixationPayload {
+	listener: GazeInteractionObjectInFixationListener;
 }
 
 /**
@@ -26,8 +26,8 @@ export interface GazeInteractionObjectFixationInPayload extends GazeInteractionO
  * @property {GazeInteractionFixationCallbackType} onFixationEnd The callback function to be called when the user starts fixationing on an element.
  * @property {GazeInteractionFixationCallbackType} onFixationStart The callback function to be called when the user ends fixationing on an element.
  */
-export interface GazeInteractionFixationInSettings extends GazeInteractionFixationSettings {
-	fixationInProgress: (event: GazeInteractionObjectFixationInEvent) => void;
-	fixationInEnd: (event: GazeInteractionObjectFixationInEvent) => void;
-	fixationInStart: (event: GazeInteractionObjectFixationInEvent) => void;
+export interface GazeInteractionInFixationSettings extends GazeInteractionFixationSettings {
+	fixationSetProgress: (event: GazeInteractionObjectInFixationEvent) => void;
+	fixationSetEnd: (event: GazeInteractionObjectInFixationEvent) => void;
+	fixationSetStart: (event: GazeInteractionObjectInFixationEvent) => void;
 }

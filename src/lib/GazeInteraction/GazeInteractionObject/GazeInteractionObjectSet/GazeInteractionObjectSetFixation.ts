@@ -1,25 +1,25 @@
 import type { GazeInteractionObjectFixationListener } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationSettings';
-import type { GazeInteractionObjectFixationInEvents, GazeInteractionObjectFixationInEvent } from './GazeInteractionObjectSetFixationEvent';
+import type { GazeInteractionObjectInFixationEvents, GazeInteractionObjectInFixationEvent } from './GazeInteractionObjectSetFixationEvent';
 import type { GazeInteractionScreenFixationEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixationEvent';
 import { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixation';
-import type { GazeInteractionFixationInSettings, GazeInteractionObjectFixationInPayload } from './GazeInteractionObjectSetFixationSettings';
+import type { GazeInteractionInFixationSettings, GazeInteractionObjectInFixationPayload } from './GazeInteractionObjectSetFixationSettings';
 
 /**
  * 
  * Manages fixation events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectInFixation extends GazeInteractionObjectFixation<GazeInteractionObjectFixationInEvents, GazeInteractionObjectFixationInPayload> {
+export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixation<GazeInteractionObjectInFixationEvents, GazeInteractionObjectInFixationPayload> {
 
-	defaultSettings: GazeInteractionFixationInSettings = {
+	defaultSettings: GazeInteractionInFixationSettings = {
 		bufferSize: 100,
-		fixationInStart: () => {},
-		fixationInEnd: () => {},
-		fixationInProgress: () => {}
+		fixationSetStart: () => {},
+		fixationSetEnd: () => {},
+		fixationSetProgress: () => {}
 	};
 
-	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectFixationInPayload['listener']): void {
-		const eventType = data.type === 'fixationStart' ? 'fixationInStart' : data.type === 'fixationEnd' ? 'fixationInEnd' : 'fixationInProgress';
+	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectInFixationPayload['listener']): void {
+		const eventType = data.type === 'fixationStart' ? 'fixationSetStart' : data.type === 'fixationEnd' ? 'fixationSetEnd' : 'fixationSetProgress';
 		const event = this.createFixationEvent(eventType, listener, data);
 		this.emit(event.type, event);
 		listener.settings[event.type](event);
@@ -35,10 +35,10 @@ export class GazeInteractionObjectInFixation extends GazeInteractionObjectFixati
 	 * @returns The created fixation event object.
 	 */
 	createFixationEvent(
-		type: GazeInteractionObjectFixationInEvent['type'],
+		type: GazeInteractionObjectInFixationEvent['type'],
 		listener: GazeInteractionObjectFixationListener,
 		data: GazeInteractionScreenFixationEvent
-	): GazeInteractionObjectFixationInEvent {
+	): GazeInteractionObjectInFixationEvent {
 		const { element, settings } = listener;
 		return {
             ...data,

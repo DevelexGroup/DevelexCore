@@ -1,10 +1,10 @@
-import type { GazeInteractionObjectInSaccadeSettings } from './GazeInteractionObjectSetSaccadeSettings';
+import type { GazeInteractionObjectSetSaccadeSettings } from './GazeInteractionObjectSetSaccadeSettings';
 import type { GazeInteractionObjectSaccadeEvent, GazeInteractionObjectSaccadeEvents } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSaccadeEvent';
 
-export interface GazeInteractionObjectInSaccadeEvents extends GazeInteractionObjectSaccadeEvents {
-    'saccadeIn': GazeInteractionObjectInSaccadeEvent,
-	'saccadeInFrom': GazeInteractionObjectInSaccadeToEvent,
-	'saccadeInTo': GazeInteractionObjectInSaccadeFromEvent
+export interface GazeInteractionObjectSetSaccadeEvents extends GazeInteractionObjectSaccadeEvents {
+    'saccadeIn': GazeInteractionObjectSetSaccadeEvent,
+	'saccadeInFrom': GazeInteractionObjectSetSaccadeToEvent,
+	'saccadeInTo': GazeInteractionObjectSetSaccadeFromEvent
 }
 
 /**
@@ -15,16 +15,16 @@ export interface GazeInteractionObjectInSaccadeEvents extends GazeInteractionObj
  * @property {GazeDataPointWithFixation} originGazeData of the saccade event.
  * @property {GazeInteractionInSaccadeSettings} settings for the saccade event, including the saccade time and callbacks.
  */
-export interface GazeInteractionObjectInSaccadeEvent extends GazeInteractionObjectSaccadeEvent {
+export interface GazeInteractionObjectSetSaccadeEvent extends GazeInteractionObjectSaccadeEvent {
 	type: 'saccadeTo' | 'saccadeFrom';
 	target: Element;
-	settings: GazeInteractionObjectInSaccadeSettings;
+	settings: GazeInteractionObjectSetSaccadeSettings;
 }
 
-export interface GazeInteractionObjectInSaccadeToEvent extends GazeInteractionObjectInSaccadeEvent {
+export interface GazeInteractionObjectSetSaccadeToEvent extends GazeInteractionObjectSetSaccadeEvent {
 	type: 'saccadeTo';
 }
 
-export interface GazeInteractionObjectInSaccadeFromEvent extends GazeInteractionObjectInSaccadeEvent {
+export interface GazeInteractionObjectSetSaccadeFromEvent extends GazeInteractionObjectSetSaccadeEvent {
 	type: 'saccadeFrom';
 }
