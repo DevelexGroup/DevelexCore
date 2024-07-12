@@ -1,21 +1,9 @@
 <script lang="ts">
-    import { gazeInputStore } from "../store/gazeInputStore";
+    import { dwellObjectStore } from "../store/interactionStores";
     import { addDwellEvent, sceneObjectDwellStore } from "../store/sceneStores";
-    import { GazeInteractionObjectDwell } from "$lib";
-	import { onDestroy } from "svelte";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
-
-    const dwellHandler = new GazeInteractionObjectDwell();
-
-    $: if ($gazeInputStore !== null) {
-        dwellHandler.connectInput($gazeInputStore);
-    }
-
-    onDestroy(() => {
-        if ($gazeInputStore !== null) dwellHandler.disconnectInput($gazeInputStore);
-    });
 
     const settings = {
         bufferSize: 10,
@@ -32,7 +20,7 @@
     <Group heading="Dwell Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
-            <GenericTestElement aoi={aoi} settings={settings} register={dwellHandler.register.bind(dwellHandler)} unregister={dwellHandler.unregister.bind(dwellHandler)} />
+            <GenericTestElement aoi={aoi} settings={settings} register={$dwellObjectStore.register.bind($dwellObjectStore)} unregister={$dwellObjectStore.unregister.bind($dwellObjectStore)} />
         {/each}
         </div>
     </Group>

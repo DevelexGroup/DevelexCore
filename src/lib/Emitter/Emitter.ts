@@ -1,6 +1,6 @@
-type EventMap = Record<string, any>;
-type EventKey<T extends EventMap> = string & keyof T;
-type EventReceiver<T> = (params: T) => void;
+export type EventMap = Record<string, any>;
+export type EventKey<T extends EventMap> = string & keyof T;
+export type EventReceiver<T> = (params: T) => void;
 
 /**
  * Abstract class representing an event emitter with orderCategory support.

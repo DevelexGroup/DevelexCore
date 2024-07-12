@@ -16,3 +16,7 @@ export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteract
 export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObjectDwell.js';
 
 export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.js';
+
+export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreenFixation.js';
+
+export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.js';

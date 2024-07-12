@@ -4,41 +4,63 @@
 
 import type {GazeDataPoint} from "../GazeData/GazeData.js";
 
-export type GazeInputMessage = GazeInputStateBools | GazeInputStateMessage;
+export type GazeInputEventState = GazeInputEventStateBools | GazeInputEventStateMessage;
 
-export type GazeInputStateBools = {
+export interface GazeInputEventStateBools {
     type: "connect" | "emit" | "windowCalibrated" | "windowCalibrationContested" | "calibrated";
     timestamp: number;
     value: boolean;
 };
 
-export type GazeInputStateMessage = {
+export interface GazeInputEventStateBoolsConnect extends GazeInputEventStateBools {
+    type: "connect";
+};
+
+export interface GazeInputEventStateBoolsEmit extends GazeInputEventStateBools {
+    type: "emit";
+};
+
+export interface GazeInputEventStateBoolsWindowCalibrated extends GazeInputEventStateBools {
+    type: "windowCalibrated";
+};
+
+export interface GazeInputEventStateBoolsWindowCalibrationContested extends GazeInputEventStateBools {
+    type: "windowCalibrationContested";
+};
+
+export interface GazeInputEventStateBoolsCalibrated extends GazeInputEventStateBools {
+    type: "calibrated";
+};
+
+export interface GazeInputMessage {
+    type: string;
+    timestamp: number;
+    value: any;
+};
+
+export interface GazeInputEventStateMessage {
     type: "error" | "message";
     timestamp: number;
     value: string;
 };
 
-/**
- * GazeInputEventType is the TS type for the event types emitted by the classes that implement {@link ETAdapter} interface.
- * It is just a string literal type that can be used to check the type of the event.
- * @category Event
- */
-
-export type GazeInputEvent = typeof GAZE_INPUT_EVENT_DATA | typeof GAZE_INPUT_EVENT_MESSAGE;
-
-/**
- * Constant for the event type emitted when the eye tracker sends new data.
- * See
- */
-export const GAZE_INPUT_EVENT_DATA = "data";
-
-/**
- * Constant for the event type emitted when the eye tracker sends a message.
- */
-export const GAZE_INPUT_EVENT_MESSAGE = "message";
-
-export type ETHandlerMapping = {
-    [GAZE_INPUT_EVENT_DATA]: GazeDataPoint;
-    [GAZE_INPUT_EVENT_MESSAGE]: GazeInputMessage;
+export interface GazeInputEventStateMessageError extends GazeInputEventStateMessage {
+    type: "error";
 };
 
+export interface GazeInputEventStateMessageMessage extends GazeInputEventStateMessage {
+    type: "message";
+};
+
+
+export type ETHandlerMapping = {
+    "data": GazeDataPoint;
+    "state": GazeInputEventState;
+    "connect": GazeInputEventStateBoolsConnect;
+    "emit": GazeInputEventStateBoolsEmit;
+    "windowCalibrated": GazeInputEventStateBoolsWindowCalibrated;
+    "windowCalibrationContested": GazeInputEventStateBoolsWindowCalibrationContested;
+    "calibrated": GazeInputEventStateBoolsCalibrated;
+    "message": GazeInputEventStateMessage;
+    "error": GazeInputEventStateMessageError;
+};

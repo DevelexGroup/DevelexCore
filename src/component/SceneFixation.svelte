@@ -1,21 +1,9 @@
 <script lang="ts">
-    import { gazeInputStore } from "../store/gazeInputStore";
+    import { fixationObjectStore } from "../store/interactionStores";
     import { addFixationEvent, sceneObjectFixationStore } from "../store/sceneStores";
-    import { GazeInteractionObjectFixation } from "$lib";
-	import { onDestroy } from "svelte";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
-
-    const fixationHandler = new GazeInteractionObjectFixation();
-
-    $: if ($gazeInputStore !== null) {
-        fixationHandler.connectInput($gazeInputStore);
-    }
-
-    onDestroy(() => {
-        if ($gazeInputStore !== null) fixationHandler.disconnectInput($gazeInputStore);
-    });
 
     const settings = {
         bufferSize: 10,
@@ -31,7 +19,7 @@
     <Group heading="Fixation Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
-            <GenericTestElement aoi={aoi} settings={settings} register={fixationHandler.register.bind(fixationHandler)} unregister={fixationHandler.unregister.bind(fixationHandler)} />
+            <GenericTestElement aoi={aoi} settings={settings} register={$fixationObjectStore.register.bind($fixationObjectStore)} unregister={$fixationObjectStore.unregister.bind($fixationObjectStore)} />
         {/each}
         </div>
     </Group>
