@@ -1,3 +1,6 @@
+import type { GazeInteractionEvents } from './GazeInteraction/GazeInteraction';
+import type { GazeInteractionListenerPayload, GazeInteractionObject } from './GazeInteraction/GazeInteractionObject/GazeInteractionObject';
+
 /**
  * The main functionality of the library. Creating an instance of an eye tracking input. Immutable!
  */ 
@@ -24,3 +27,10 @@ export { GazeInteractionObjectSetSaccade } from '$lib/GazeInteraction/GazeIntera
 export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixation.js';
 
 export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccade.js';
+
+export interface GazeInteractionComponentProps<TInteractionEvents extends GazeInteractionEvents, TInputData extends { type: string}, TListenerPayload extends GazeInteractionListenerPayload> {
+    gazeInteractionObject: GazeInteractionObject<TInteractionEvents, TInputData, TListenerPayload>;
+    settings: Partial<TListenerPayload['listener']['settings']>;
+}
+
+export interface GazeInteractionComponentPropsDefault extends GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionListenerPayload> {} 

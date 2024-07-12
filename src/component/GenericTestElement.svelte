@@ -1,21 +1,18 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
 
-    type RegisterMethod<T> = (element: HTMLElement, settings: Partial<T>) => void;
-
     export let aoi: string;
-    export let settings: Partial<any>;
-    export let register: RegisterMethod<any>;
-    export let unregister: (element: HTMLElement) => void;
+    export let registerFn: (element: HTMLElement) => void;
+    export let unregisterFn: (element: HTMLElement) => void;
 
     let element: HTMLElement;
 
     onMount(() => {
-        register(element, settings);
+        registerFn(element);
     });
 
     onDestroy(() => {
-        unregister(element);
+        unregisterFn(element);
     });
 </script>
 

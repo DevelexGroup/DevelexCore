@@ -13,13 +13,21 @@
     };
 
     const aoiLabels = ["fixation-a", "fixation-b", "fixation-c"];
+
+    const registerFn = (element: HTMLElement) => {
+        $fixationObjectStore.register(element, settings);
+    };
+
+    const unregisterFn = (element: HTMLElement) => {
+        $fixationObjectStore.unregister(element);
+    };
 </script>
 
 <div class="holder">
     <Group heading="Fixation Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
-            <GenericTestElement aoi={aoi} settings={settings} register={$fixationObjectStore.register.bind($fixationObjectStore)} unregister={$fixationObjectStore.unregister.bind($fixationObjectStore)} />
+            <GenericTestElement aoi={aoi} {registerFn} {unregisterFn} />
         {/each}
         </div>
     </Group>

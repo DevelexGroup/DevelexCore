@@ -14,13 +14,21 @@
     };
 
     const aoiLabels = ["dwell-a", "dwell-b", "dwell-c"];
+
+    const registerFn = (element: HTMLElement) => {
+        $dwellObjectStore.register(element, settings);
+    };
+
+    const unregisterFn = (element: HTMLElement) => {
+        $dwellObjectStore.unregister(element);
+    };
 </script>
 
 <div class="holder">
     <Group heading="Dwell Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
-            <GenericTestElement aoi={aoi} settings={settings} register={$dwellObjectStore.register.bind($dwellObjectStore)} unregister={$dwellObjectStore.unregister.bind($dwellObjectStore)} />
+            <GenericTestElement aoi={aoi} {registerFn} {unregisterFn} />
         {/each}
         </div>
     </Group>

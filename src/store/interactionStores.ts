@@ -3,8 +3,8 @@ import {
   GazeInteractionScreenFixation,
   GazeInteractionScreenSaccade,
   GazeInteractionObjectDwell,
-  GazeInteractionObjectFixation,
-  GazeInteractionObjectSaccade,
+  GazeInteractionObjectSetFixation,
+  GazeInteractionObjectSetSaccade,
   type GazeInputConfig
 } from "$lib";
 import { gazeInputStore } from "./gazeInputStore";
@@ -19,8 +19,8 @@ const createReadableStore = <T>(Class: GazeInteractionClass<T>): Readable<T> => 
 // Initializing readable stores
 export const fixationInteractionStore = createReadableStore(GazeInteractionScreenFixation);
 export const saccadeInteractionStore = createReadableStore(GazeInteractionScreenSaccade);
-export const fixationObjectStore = createReadableStore(GazeInteractionObjectFixation);
-export const saccadeObjectStore = createReadableStore(GazeInteractionObjectSaccade);
+export const fixationObjectStore = createReadableStore(GazeInteractionObjectSetFixation);
+export const saccadeObjectStore = createReadableStore(GazeInteractionObjectSetSaccade);
 export const dwellObjectStore = createReadableStore(GazeInteractionObjectDwell);
 
 gazeInputStore.subscribe((gazeInput) => {

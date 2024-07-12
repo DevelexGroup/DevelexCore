@@ -1,11 +1,11 @@
 import type { GazeInteractionObjectFixationEvent, GazeInteractionObjectFixationEvents } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixationEvent';
-import type { GazeInteractionInFixationSettings } from './GazeInteractionObjectSetFixationSettings';
+import type { GazeInteractionObjectSetFixationSettings } from './GazeInteractionObjectSetFixationSettings';
 
-export interface GazeInteractionObjectInFixationEvents extends GazeInteractionObjectFixationEvents {
-	'fixationSet': GazeInteractionObjectInFixationEvent;
-	'fixationSetProgress': GazeInteractionObjectInFixationEvent;
-	'fixationSetEnd': GazeInteractionObjectInFixationEvent;
-	'fixationSetStart': GazeInteractionObjectInFixationEvent;
+export interface GazeInteractionObjectSetFixationEvents extends GazeInteractionObjectFixationEvents {
+	'fixationSet': GazeInteractionObjectSetFixationEvent;
+	'fixationSetProgress': GazeInteractionObjectSetFixationEvent;
+	'fixationSetEnd': GazeInteractionObjectSetFixationEvent;
+	'fixationSetStart': GazeInteractionObjectSetFixationEvent;
 }
 
 /**
@@ -14,21 +14,21 @@ export interface GazeInteractionObjectInFixationEvents extends GazeInteractionOb
  * @property {Element} target of the fixation event.
  * @extends GazeInteractionObjectFixationEvent
  */
-export interface GazeInteractionObjectInFixationEvent extends GazeInteractionObjectFixationEvent {
+export interface GazeInteractionObjectSetFixationEvent extends GazeInteractionObjectFixationEvent {
 	type: 'fixationSetProgress' | 'fixationSetEnd' | 'fixationSetStart';
 	target: Element[];
-	settings: GazeInteractionInFixationSettings[];
+	settings: GazeInteractionObjectSetFixationSettings[];
 }
 
-export interface GazeInteractionObjectInFixationProgressEvent extends GazeInteractionObjectInFixationEvent {
+export interface GazeInteractionObjectSetFixationProgressEvent extends GazeInteractionObjectSetFixationEvent {
 	type: 'fixationSetProgress';
 }
 
-export interface GazeInteractionObjectInFixationEndEvent extends GazeInteractionObjectInFixationEvent {
+export interface GazeInteractionObjectSetFixationEndEvent extends GazeInteractionObjectSetFixationEvent {
 	type: 'fixationSetEnd';
 }
 
-export interface GazeInteractionObjectInFixationStartEvent extends GazeInteractionObjectInFixationEvent {
+export interface GazeInteractionObjectSetFixationStartEvent extends GazeInteractionObjectSetFixationEvent {
 	type: 'fixationSetStart';
 }
 
