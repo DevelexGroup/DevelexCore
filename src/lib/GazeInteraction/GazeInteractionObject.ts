@@ -1,7 +1,6 @@
-import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import { GazeInteraction } from "./GazeInteraction";
+import { GazeInteraction, type GazeInteractionEvents } from "./GazeInteraction";
 
-export type GazeInteractionObjectPayload = {
+export type GazeInteractionListenerPayload = {
 	data: unknown;
 	listener: {
 		element: Element;
@@ -9,18 +8,21 @@ export type GazeInteractionObjectPayload = {
 	};
 };
 
-export abstract class GazeInteractionObject<T extends GazeInteractionObjectPayload> extends GazeInteraction {
+export abstract class GazeInteractionObject<
+	TInteractionEvents extends GazeInteractionEvents,
+	TInputData extends { type: string },
+	TListenerPayload extends GazeInteractionListenerPayload> extends GazeInteraction<TInteractionEvents, TInputData> {
     
-    abstract defaultSettings: T['listener']['settings'];
+    abstract defaultSettings: TListenerPayload['listener']['settings'];
 	
-	listeners: T['listener'][] = [];
+	listeners: TListenerPayload['listener'][] = [];
 
     /**
 	 * Registers an element for object events with the given settings.
      * @param element - Element to register for object events.
 	 * @param settings - Settings for the events, including callbacks when the event is activated, finished, or canceled.
 	 */
-    register(element: Element, settings: Partial<T['listener']['settings']>): void {
+    register(element: Element, settings: Partial<TListenerPayload['listener']['settings']>): void {
 		const mergedSettings = { ...this.defaultSettings, ...settings };
         this.listeners.push(this.generateListener(element, mergedSettings));
     }
@@ -38,13 +40,10 @@ export abstract class GazeInteractionObject<T extends GazeInteractionObjectPaylo
 	 * If there is a need for further action, method should be overridden with using the super method to call the listeners' callbacks first.
 	 * @param {GazeDataPoint} data - The eye-tracker data to evaluate.
 	 */
-    evaluateInputData(data: GazeDataPoint): void {
-		const dataToEvaluate = this.shouldEvaluateListeners(data);
-        if (dataToEvaluate) {
-			this.listeners.forEach((listener) => {
-				this.evaluateListener(dataToEvaluate, listener);
-			});
-		}
+    evaluateInputData(data: TInputData): void {
+		this.listeners.forEach((listener) => {
+			this.evaluateListener(data, listener);
+		});
     }
 
     /**
@@ -65,19 +64,12 @@ export abstract class GazeInteractionObject<T extends GazeInteractionObjectPaylo
 		);
 	}
 
-    abstract generateListener(element: Element, settings: T['listener']['settings']): T['listener'];
-
-    /**
-	 * Abstract method to determine if listeners should be evaluated based on input data.
-	 * @param {GazeDataPoint} data - The eye-tracker data to evaluate.
-	 * @returns {boolean} - Whether to evaluate the listeners or not.
-	 */
-    abstract shouldEvaluateListeners(data: GazeDataPoint): T['data'] | null;
+    abstract generateListener(element: Element, settings: TListenerPayload['listener']['settings']): TListenerPayload['listener'];
 
     /**
 	 * Abstract method to evaluate a listener for object events.
 	 * @param data - The eye-tracker data to evaluate.
 	 * @param listener - The listener object to evaluate.
 	 */
-    abstract evaluateListener(data: T['data'], listener: T['listener']): void;
+    abstract evaluateListener(data: TListenerPayload['data'], listener: TListenerPayload['listener']): void;
 }

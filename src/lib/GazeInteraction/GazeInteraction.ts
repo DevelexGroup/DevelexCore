@@ -1,18 +1,23 @@
-import { GazeInput } from '../GazeInput/GazeInput';
-import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
-import type { GazeDataPoint } from '$lib/GazeData/GazeData';
+import { Emitter, type EventMap } from '$lib/Emitter/Emitter';
 
-export abstract class GazeInteraction {
-    readonly eyetrackerCallback: (data: GazeDataPoint) => void = (data) =>
+export interface GazeInteractionEvents extends EventMap {
+    'connect': {
+        type: 'connect';
+        value: boolean;
+    }
+}
+
+export abstract class GazeInteraction<
+    TInteractionEvents extends GazeInteractionEvents,
+    TInputData extends { type: string; }
+> extends Emitter<TInteractionEvents> {
+
+    readonly inputCallback: (data: TInputData) => void = (data) =>
 		this.evaluateInputData(data);
 
-    connectInput(gazeInput: GazeInput<GazeInputConfig>): void {
-        gazeInput.on('data', this.eyetrackerCallback);
-    }
+    abstract connect(input: unknown): void;
 
-    disconnectInput(gazeInput: GazeInput<GazeInputConfig>): void {
-        gazeInput.off('data', this.eyetrackerCallback);
-    }
+    abstract disconnect(input: unknown): void;
 
-    abstract evaluateInputData(data: GazeDataPoint): void;
+    abstract evaluateInputData(data: TInputData): void;
 }

@@ -38,7 +38,7 @@
     };
 
     $: if ($gazeInputStore !== null) {
-        $gazeInputStore.on("message", (data) => {
+        $gazeInputStore.on("state", (data) => {
             handleGazeInputMessage(data);
         });
         $gazeInputStore.on("data", (data) => {

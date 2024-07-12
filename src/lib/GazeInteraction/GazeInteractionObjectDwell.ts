@@ -3,13 +3,16 @@ import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayl
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
+import type { GazeInteractionEvents } from './GazeInteraction';
+import type { GazeInput } from '$lib/GazeInput/GazeInput';
+import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 
 /**
  * Manages dwell events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  * TODO: Implement spatial indexing to improve performance!!! quadtree or something similar.
  */
-export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionObjectDwellPayload> {
+export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionEvents, GazeDataPoint, GazeInteractionObjectDwellPayload> {
 
 	defaultSettings: GazeInteractionDwellSettingsType = {
 		dwellTime: 1000,
@@ -18,6 +21,14 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 		onDwellFinish: () => {},
 		onDwellCancel: () => {}
 	};
+
+	connect(input: GazeInput<GazeInputConfig>): void {
+		input.on('data', this.inputCallback);
+	}
+
+	disconnect(input: GazeInput<GazeInputConfig>): void {
+		input.off('data', this.inputCallback);
+	}
 
 	/**
 	 * Evaluates the listener for dwell events and calls the callbacks if valid.

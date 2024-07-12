@@ -1,21 +1,9 @@
 <script lang="ts">
-    import { gazeInputStore } from "../store/gazeInputStore";
+    import { saccadeObjectStore } from "../store/interactionStores";
     import { addSaccadeEvent, sceneObjectSaccadeStore } from "../store/sceneStores";
-    import { GazeInteractionObjectSaccade } from "$lib";
-	import { onDestroy } from "svelte";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
-
-    const saccadeHandler = new GazeInteractionObjectSaccade();
-
-    $: if ($gazeInputStore !== null) {
-        saccadeHandler.connectInput($gazeInputStore);
-    }
-
-    onDestroy(() => {
-        if ($gazeInputStore !== null) saccadeHandler.disconnectInput($gazeInputStore);
-    });
 
     const settings = {
         bufferSize: 10,
@@ -30,7 +18,7 @@
     <Group heading="Saccade Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
-            <GenericTestElement aoi={aoi} settings={settings} register={saccadeHandler.register.bind(saccadeHandler)} unregister={saccadeHandler.unregister.bind(saccadeHandler)} />
+            <GenericTestElement aoi={aoi} settings={settings} register={$saccadeObjectStore.register.bind($saccadeObjectStore)} unregister={$saccadeObjectStore.unregister.bind($saccadeObjectStore)} />
         {/each}
         </div>
     </Group>
