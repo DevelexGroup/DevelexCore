@@ -10,6 +10,8 @@ import type { Fixation } from '../database/models/Fixation';
 import fixationRepository from '../database/repositories/fixation.repository';
 import type { Saccade } from '../database/models/Saccade';
 import saccadeRepository from '../database/repositories/saccade.repository';
+import type { GazeDataPoint } from '$lib';
+import pointRepository from '../database/repositories/point.repository';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -118,4 +120,8 @@ export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSetSaccad
         
         return updatedEvents;
     });
+}
+
+export const addPointEvent = (e: GazeDataPoint) => {
+    void pointRepository.create(e);
 }

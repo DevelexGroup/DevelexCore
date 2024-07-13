@@ -51,6 +51,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 					data
 				);
 				onDwellProgress(startDwellEvent);
+				this.emit('dwellStart', startDwellEvent);
+				this.emit('dwell', startDwellEvent);
 				listener.timestamp = Date.now();
 				return;
 			}
@@ -67,6 +69,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 					data
 				);
 				onDwellFinish(finishDwellEvent);
+				this.emit('dwellFinish', finishDwellEvent);
+				this.emit('dwell', finishDwellEvent);
 				listener.timestamp = null;
 				return;
 			}
@@ -79,6 +83,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 				data
 			);
 			onDwellProgress(progressDwellEvent);
+			this.emit('dwellProgress', progressDwellEvent);
+			this.emit('dwell', progressDwellEvent);
 			return;
 		}
 
@@ -92,6 +98,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 				data
 			);
 			onDwellCancel(cancelDwellEvent);
+			this.emit('dwellCancel', cancelDwellEvent);
+			this.emit('dwell', cancelDwellEvent);
 			listener.timestamp = null;
 		}
 	}
