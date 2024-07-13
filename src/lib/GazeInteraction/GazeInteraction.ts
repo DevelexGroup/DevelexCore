@@ -18,9 +18,9 @@ export abstract class GazeInteraction<
     /**
      * Unknown arguments to connect.
      */
-    abstract connect(...args: any[]): void;
+    abstract connect(...args: unknown[]): void;
 
-    abstract disconnect(...args: any[]): void;
+    abstract disconnect(...args: unknown[]): void;
 
     abstract evaluateInputData(data: TInputData): void;
 }

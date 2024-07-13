@@ -19,12 +19,13 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
     evaluateInputData(data: GazeDataPoint): void {
         const { fixationPhase, fixationPoint, lastFixationPoint } = this.decideFixationPhase(data, this.currentFixationLastPoint);
         switch (fixationPhase) {
-            case "start":
+            case "start": {
                 const eventStart = this.createFixationEvent("fixationStart", fixationPoint.timestamp, fixationPoint.fixationDuration, fixationPoint);
                 this.emit("fixationStart", eventStart);
                 this.emit("fixation", eventStart);
                 break;
-            case "start-end":
+            }
+            case "start-end": {
                 const eventStartEndEnd = this.createFixationEvent("fixationEnd", lastFixationPoint.timestamp, lastFixationPoint.fixationDuration, lastFixationPoint);
                 const eventStartEndStart = this.createFixationEvent("fixationStart", fixationPoint.timestamp, fixationPoint.fixationDuration, fixationPoint);
                 this.emit("fixationEnd", eventStartEndEnd);
@@ -32,16 +33,19 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
                 this.emit("fixation", eventStartEndEnd);
                 this.emit("fixation", eventStartEndStart);
                 break;
-            case "progress":
+            }
+            case "progress": {
                 const eventProgress = this.createFixationEvent("fixationProgress", fixationPoint.timestamp, fixationPoint.fixationDuration, fixationPoint);
                 this.emit("fixationProgress", eventProgress);
                 this.emit("fixation", eventProgress);
                 break;
-            case "end":
+            }
+            case "end": {
                 const eventEnd = this.createFixationEvent("fixationEnd", lastFixationPoint.timestamp, lastFixationPoint.fixationDuration, lastFixationPoint);
                 this.emit("fixationEnd", eventEnd);
                 this.emit("fixation", eventEnd);
                 break;
+            }
         }
         this.currentFixationLastPoint = fixationPoint;
     }
@@ -101,7 +105,7 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
 	 * Creates an event object for the fixation event.
 	 * @param type - The type of the fixation event ('fixationProgress', 'fixationFinish', 'fixationCancel').
 	 * @param timestamp - The timestamp of the fixation event.
-	 * @param duration - The elapsed time of the fixation event.
+	 * @param duration - The duration time of the fixation event.
 	 * @param data - The gaze data associated with the fixation event.
 	 * @returns The created fixation event object.
 	 */
@@ -113,6 +117,7 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
 	) {
 		return {
 			type,
+            sessionId: data.sessionId,
 			timestamp,
 			duration,
 			gazeData: data

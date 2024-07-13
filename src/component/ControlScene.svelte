@@ -1,4 +1,5 @@
 <script>
+	import SceneDownload from "./SceneDownload.svelte";
 	import SceneDwell from "./SceneDwell.svelte";
 	import SceneFixation from "./SceneFixation.svelte";
     import SceneInputState from "./SceneInputState.svelte";
@@ -29,6 +30,11 @@
             label: "Saccade",
             value: 5,
             component: SceneSaccade
+        },
+        {
+            label: "Download",
+            value: 6,
+            component: SceneDownload
         }
     ];
 </script>

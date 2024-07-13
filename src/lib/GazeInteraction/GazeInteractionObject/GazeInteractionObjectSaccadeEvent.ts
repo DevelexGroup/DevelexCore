@@ -1,8 +1,8 @@
 import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
-import type { GazeInteractionSaccadeSettings } from './GazeInteractionObjectSaccadeSettings';
 import type { GazeInteractionEvents } from '../GazeInteraction';
+import type { GazeInteractionEvent } from '../GazeInteractionEvent';
 
-export interface GazeInteractionObjectSaccadeEvents extends GazeInteractionEvents {}
+export type GazeInteractionObjectSaccadeEvents = GazeInteractionEvents
 
 /**
  * Fired when a saccade event occurs.
@@ -18,9 +18,7 @@ export interface GazeInteractionObjectSaccadeEvents extends GazeInteractionEvent
  * @property {GazeDataPointWithFixation} originGazeData of the saccade event.
  * @property {GazeInteractionSaccadeSettings} settings for the saccade event, including the saccade time and callbacks.
  */
-export interface GazeInteractionObjectSaccadeEvent {
-	type: string;
-	timestamp: number;
+export interface GazeInteractionObjectSaccadeEvent extends GazeInteractionEvent {
 	duration: number;
 	distance: number;
     angleToScreen: number;

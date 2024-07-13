@@ -1,7 +1,7 @@
 import type { GazeInteractionObjectSetFixationEvents, GazeInteractionObjectSetFixationEvent } from './GazeInteractionObjectSetFixationEvent';
 import type { GazeInteractionScreenFixationEvent } from '$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenFixationEvent';
 import { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectFixation';
-import type { GazeInteractionObjectSetFixationSettings, GazeInteractionObjectSetFixationPayload } from './GazeInteractionObjectSetFixationSettings';
+import type { GazeInteractionObjectSetFixationPayload } from './GazeInteractionObjectSetFixationSettings';
 
 /**
  * 
@@ -27,9 +27,9 @@ export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixat
 		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
 
 		const eventType = data.type === 'fixationStart' ? 'fixationSetStart' : data.type === 'fixationEnd' ? 'fixationSetEnd' : 'fixationSetProgress' as const;
-		if (eventType === 'fixationSetEnd')	console.log('fixationSetEnd');
 		const event = this.createFixationEvent(eventType, this.triggeredTargets, this.triggeredSettings, data);
 		this.listeners.forEach((listener) => listener.settings[event.type](event));
+		this.emit(eventType, event);
 	}
 
 	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectSetFixationPayload['listener']): void {
@@ -42,7 +42,7 @@ export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixat
 	 * @param type - The type of the fixation event ('fixationProgress', 'fixationFinish', 'fixationCancel').
 	 * @param listener - The listener object for the fixation event.
 	 * @param timestamp - The timestamp of the fixation event.
-	 * @param elapsed - The elapsed time of the fixation event.
+	 * @param duration - The duration time of the fixation event.
 	 * @param data - The gaze data associated with the fixation event.
 	 * @returns The created fixation event object.
 	 */

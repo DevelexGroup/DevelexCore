@@ -4,7 +4,7 @@
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
-	import { scenePointDataStore, sceneStateStore } from "../store/sceneStores";
+	import { sceneStateStore } from "../store/sceneStores";
 
     let isGazeIndicatorVisible = true;
     const indicator = new GazeIndicator();
@@ -40,12 +40,6 @@
     $: if ($gazeInputStore !== null) {
         $gazeInputStore.on("state", (data) => {
             handleGazeInputMessage(data);
-        });
-        $gazeInputStore.on("data", (data) => {
-            scenePointDataStore.update((store) => {
-                store.push(data);
-                return store;
-            });
         });
     }
 

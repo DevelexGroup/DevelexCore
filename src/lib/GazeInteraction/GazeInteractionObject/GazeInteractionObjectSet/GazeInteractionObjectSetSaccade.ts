@@ -37,6 +37,7 @@ export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccad
 
 		this.emit(eventTo.type, eventTo);
 		this.emit(eventFrom.type, eventFrom);
+		
 	}
 
 	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSetSaccadePayload['listener'], isTo: boolean) {
@@ -54,7 +55,7 @@ export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccad
 	 * @param type - The type of the fixation event ('fixationProgress', 'fixationFinish', 'fixationCancel').
 	 * @param listener - The listener object for the fixation event.
 	 * @param timestamp - The timestamp of the fixation event.
-	 * @param elapsed - The elapsed time of the fixation event.
+	 * @param duration - The duration time of the fixation event.
 	 * @param data - The gaze data associated with the fixation event.
 	 * @returns The created fixation event object.
 	 */

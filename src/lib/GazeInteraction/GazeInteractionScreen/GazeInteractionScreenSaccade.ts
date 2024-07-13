@@ -78,6 +78,7 @@ export class GazeInteractionScreenSaccade extends GazeInteractionScreen<GazeInte
         if (this.lastSaccadeData === null) {
             return {
                 type,
+                sessionId: fixationTwo.sessionId,
                 timestamp,
                 duration,
                 distance,
@@ -92,6 +93,7 @@ export class GazeInteractionScreenSaccade extends GazeInteractionScreen<GazeInte
 
         return {
             type,
+            sessionId: fixationTwo.sessionId,
             timestamp,
             duration,
             distance,

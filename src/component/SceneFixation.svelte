@@ -1,14 +1,12 @@
 <script lang="ts">
     import { fixationObjectStore } from "../store/interactionStores";
-    import { addFixationEvent, sceneObjectFixationStore } from "../store/sceneStores";
+    import { sceneObjectFixationStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
 
     const settings = {
-        bufferSize: 10,
-        fixationSetEnd: addFixationEvent,
-        fixationSetStart: addFixationEvent,
+        bufferSize: 10
     };
 
     const aoiLabels = ["fixation-a", "fixation-b", "fixation-c"];
@@ -31,7 +29,7 @@
         </div>
     </Group>
     <Group heading="Fixation Interaction Log">
-        <GenericTable data={$sceneObjectFixationStore} headers={["timestamp", "type", "duration", "target"]} />
+        <GenericTable data={$sceneObjectFixationStore} headers={["timestamp", "type", "duration", "aoi"]} />
     </Group>
 </div>
 

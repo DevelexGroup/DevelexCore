@@ -51,6 +51,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 					data
 				);
 				onDwellProgress(startDwellEvent);
+				this.emit('dwellStart', startDwellEvent);
+				this.emit('dwell', startDwellEvent);
 				listener.timestamp = Date.now();
 				return;
 			}
@@ -67,6 +69,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 					data
 				);
 				onDwellFinish(finishDwellEvent);
+				this.emit('dwellFinish', finishDwellEvent);
+				this.emit('dwell', finishDwellEvent);
 				listener.timestamp = null;
 				return;
 			}
@@ -79,6 +83,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 				data
 			);
 			onDwellProgress(progressDwellEvent);
+			this.emit('dwellProgress', progressDwellEvent);
+			this.emit('dwell', progressDwellEvent);
 			return;
 		}
 
@@ -92,6 +98,8 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 				data
 			);
 			onDwellCancel(cancelDwellEvent);
+			this.emit('dwellCancel', cancelDwellEvent);
+			this.emit('dwell', cancelDwellEvent);
 			listener.timestamp = null;
 		}
 	}
@@ -101,7 +109,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 	 * @param type - The type of the dwell event ('dwellProgress', 'dwellFinish', 'dwellCancel').
 	 * @param listener - The listener object for the dwell event.
 	 * @param timestamp - The timestamp of the dwell event.
-	 * @param elapsed - The elapsed time of the dwell event.
+	 * @param duration - The duration time of the dwell event.
 	 * @param data - The gaze data associated with the dwell event.
 	 * @returns The created dwell event object.
 	 */
@@ -109,14 +117,15 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 		type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel',
 		listener: GazeInteractionObjectDwellListener,
 		timestamp: number,
-		elapsed: number,
+		duration: number,
 		data: GazeDataPoint
 	): GazeInteractionObjectDwellEvent {
 		const { element, settings } = listener;
 		return {
 			type,
 			timestamp,
-			elapsed,
+			sessionId: data.sessionId,
+			duration,
 			target: element,
 			settings,
 			gazeData: data
