@@ -1,14 +1,12 @@
 <script lang="ts">
     import { saccadeObjectStore } from "../store/interactionStores";
-    import { addSaccadeEvent, sceneObjectSaccadeStore } from "../store/sceneStores";
+    import { sceneObjectSaccadeStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
 
     const settings = {
-        bufferSize: 10,
-        saccadeSetFrom: addSaccadeEvent,
-        saccadeSetTo: addSaccadeEvent,
+        bufferSize: 10
     };
 
     const aoiLabels = ["saccade-a", "saccade-b", "saccade-c"];

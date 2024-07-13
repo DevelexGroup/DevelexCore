@@ -9,6 +9,7 @@ import {
 } from "$lib";
 import { gazeInputStore } from "./gazeInputStore";
 import { isGazeInputWithFixations, type GazeInput } from "$lib/GazeInput/GazeInput";
+import { addDwellEvent, addFixationEvent, addSaccadeEvent } from "./sceneStores";
 
 // Type for the classes used to create stores
 type GazeInteractionClass<T> = new () => T;
@@ -42,3 +43,6 @@ const manageConnect = (gazeInput: GazeInput<GazeInputConfig>, isConnect: boolean
     get(dwellObjectStore)[phase](gazeInput);
 }
 
+get(dwellObjectStore).on("dwell", (event) => addDwellEvent(event));
+get(fixationObjectStore).on("fixation", (event) => addFixationEvent(event));
+get(saccadeObjectStore).on("saccade", (event) => addSaccadeEvent(event));

@@ -1,16 +1,13 @@
 <script lang="ts">
     import { dwellObjectStore } from "../store/interactionStores";
-    import { addDwellEvent, sceneObjectDwellStore } from "../store/sceneStores";
+    import { sceneObjectDwellStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
 
     const settings = {
         bufferSize: 10,
-        dwellTime: 500,
-        onDwellProgress: addDwellEvent,
-        onDwellCancel: addDwellEvent,
-        onDwellFinish: addDwellEvent,
+        dwellTime: 500
     };
 
     const aoiLabels = ["dwell-a", "dwell-b", "dwell-c"];
