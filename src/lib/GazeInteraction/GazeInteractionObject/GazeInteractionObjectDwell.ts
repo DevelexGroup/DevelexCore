@@ -116,6 +116,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 		return {
 			type,
 			timestamp,
+			sessionId: data.sessionId,
 			duration,
 			target: element,
 			settings,
