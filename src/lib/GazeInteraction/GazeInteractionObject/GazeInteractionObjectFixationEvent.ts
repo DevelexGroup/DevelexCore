@@ -1,5 +1,6 @@
 import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
 import type { GazeInteractionEvents } from '../GazeInteraction';
+import type { GazeInteractionEvent } from '../GazeInteractionEvent';
 
 export type GazeInteractionObjectFixationEvents = GazeInteractionEvents
 
@@ -11,9 +12,7 @@ export type GazeInteractionObjectFixationEvents = GazeInteractionEvents
  * @property {Element} target of the fixation event.
  * @property {GazeInteractionFixationSettings} settings for the fixation event, including the fixation time and callbacks.
  */
-export interface GazeInteractionObjectFixationEvent {
-	type: string;
-	timestamp: number;
+export interface GazeInteractionObjectFixationEvent extends GazeInteractionEvent {
 	duration: number;
 	gazeData: GazeDataPointWithFixation;
 	target: unknown;
