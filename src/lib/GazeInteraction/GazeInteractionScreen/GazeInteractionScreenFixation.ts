@@ -101,7 +101,7 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
 	 * Creates an event object for the fixation event.
 	 * @param type - The type of the fixation event ('fixationProgress', 'fixationFinish', 'fixationCancel').
 	 * @param timestamp - The timestamp of the fixation event.
-	 * @param duration - The elapsed time of the fixation event.
+	 * @param duration - The duration time of the fixation event.
 	 * @param data - The gaze data associated with the fixation event.
 	 * @returns The created fixation event object.
 	 */

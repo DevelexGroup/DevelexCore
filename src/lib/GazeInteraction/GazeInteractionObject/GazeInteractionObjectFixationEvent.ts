@@ -1,8 +1,7 @@
 import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
 import type { GazeInteractionEvents } from '../GazeInteraction';
-import type { GazeInteractionFixationSettings } from './GazeInteractionObjectFixationSettings';
 
-export interface GazeInteractionObjectFixationEvents extends GazeInteractionEvents {}
+export type GazeInteractionObjectFixationEvents = GazeInteractionEvents
 
 /**
  * Fired when a fixation event occurs.

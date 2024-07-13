@@ -1,6 +1,4 @@
-export type GazeDataPoint = GazeDataPointWithoutFixation | GazeDataPointWithFixation;
-
-export type GazeDataPointWithoutFixation = {
+export interface GazeDataPoint {
     type: 'point';
 
     x: number;
@@ -22,9 +20,12 @@ export type GazeDataPointWithoutFixation = {
     validityR: boolean;
 
     parseValidity: boolean;
+
+    fixationDuration?: number;
+    fixationId?: number;
 }
 
-export type GazeDataPointWithFixation = GazeDataPointWithoutFixation & {
+export interface GazeDataPointWithFixation extends GazeDataPoint {
     fixationDuration: number;
     fixationId: number;
 }

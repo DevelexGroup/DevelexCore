@@ -1,8 +1,7 @@
 import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
-import type { GazeInteractionSaccadeSettings } from './GazeInteractionObjectSaccadeSettings';
 import type { GazeInteractionEvents } from '../GazeInteraction';
 
-export interface GazeInteractionObjectSaccadeEvents extends GazeInteractionEvents {}
+export type GazeInteractionObjectSaccadeEvents = GazeInteractionEvents
 
 /**
  * Fired when a saccade event occurs.

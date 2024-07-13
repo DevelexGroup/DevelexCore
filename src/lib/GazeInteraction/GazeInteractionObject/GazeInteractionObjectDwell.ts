@@ -101,7 +101,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 	 * @param type - The type of the dwell event ('dwellProgress', 'dwellFinish', 'dwellCancel').
 	 * @param listener - The listener object for the dwell event.
 	 * @param timestamp - The timestamp of the dwell event.
-	 * @param elapsed - The elapsed time of the dwell event.
+	 * @param duration - The duration time of the dwell event.
 	 * @param data - The gaze data associated with the dwell event.
 	 * @returns The created dwell event object.
 	 */
@@ -109,14 +109,14 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 		type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel',
 		listener: GazeInteractionObjectDwellListener,
 		timestamp: number,
-		elapsed: number,
+		duration: number,
 		data: GazeDataPoint
 	): GazeInteractionObjectDwellEvent {
 		const { element, settings } = listener;
 		return {
 			type,
 			timestamp,
-			elapsed,
+			duration,
 			target: element,
 			settings,
 			gazeData: data
