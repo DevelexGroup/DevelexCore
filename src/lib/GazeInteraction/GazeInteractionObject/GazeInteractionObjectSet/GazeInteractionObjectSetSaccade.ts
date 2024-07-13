@@ -37,6 +37,7 @@ export class GazeInteractionObjectSetSaccade extends GazeInteractionObjectSaccad
 
 		this.emit(eventTo.type, eventTo);
 		this.emit(eventFrom.type, eventFrom);
+		
 	}
 
 	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSetSaccadePayload['listener'], isTo: boolean) {

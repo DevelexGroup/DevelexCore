@@ -19,7 +19,7 @@ const saveCsvString = (csv: string, filename: string) => {
 
 const downloadPoints = () => {
     pointRepository.getAll().then((points) => {
-        const csv = pointRepository.csvHeader + "\n" +
+        const csv = pointRepository.csvHeader() + "\n" +
         points.map((point) => {
             console.log(point);
             return pointRepository.toCsv(point);
@@ -30,7 +30,7 @@ const downloadPoints = () => {
 
 const downloadFixations = () => {
     fixationRepository.getAll().then((fixations) => {
-        const csv = fixationRepository.csvHeader + "\n" +
+        const csv = fixationRepository.csvHeader() + "\n" +
         fixations.map((fixation) => {
             return fixationRepository.toCsv(fixation);
         }).join("\n");
@@ -40,7 +40,7 @@ const downloadFixations = () => {
 
 const downloadSaccades = () => {
     saccadeRepository.getAll().then((saccades) => {
-        const csv = saccadeRepository.csvHeader + "\n" +
+        const csv = saccadeRepository.csvHeader() + "\n" +
         saccades.map((saccade) => {
             return saccadeRepository.toCsv(saccade);
         }).join("\n");
@@ -50,7 +50,7 @@ const downloadSaccades = () => {
 
 const downloadDwells = () => {
     dwellRepository.getAll().then((dwells) => {
-        const csv = dwellRepository.csvHeader + "\n" +
+        const csv = dwellRepository.csvHeader() + "\n" +
         dwells.map((dwell) => {
             return dwellRepository.toCsv(dwell);
         }).join("\n");

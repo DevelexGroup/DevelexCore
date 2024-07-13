@@ -50,6 +50,7 @@ const manageConnect = (gazeInput: GazeInput<GazeInputConfig>, isConnect: boolean
 }
 
 get(dwellObjectStore).on("dwell", (event) => addDwellEvent(event));
-get(fixationObjectStore).on("fixationEnd", (event) => addFixationEvent(event));
-get(fixationObjectStore).on("fixationStart", (event) => addFixationEvent(event));
-get(saccadeObjectStore).on("saccade", (event) => addSaccadeEvent(event));
+get(fixationObjectStore).on("fixationSetEnd", (event) => addFixationEvent(event));
+get(fixationObjectStore).on("fixationSetStart", (event) => addFixationEvent(event));
+get(saccadeObjectStore).on("saccadeSetTo", (event) => addSaccadeEvent(event));
+get(saccadeObjectStore).on("saccadeSetFrom", (event) => addSaccadeEvent(event));

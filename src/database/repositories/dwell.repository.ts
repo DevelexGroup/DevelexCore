@@ -29,7 +29,7 @@ const dwellRepository = {
   csvHeader(): string {
     return 'sessionId, timestamp, type, duration, aoi, gazeData.x, gazeData.y, gazeData.xL, gazeData.yL, gazeData.xR, gazeData.yR, gazeData.fixationId, gazeData.fixationDuration';
   },
-  async toCsv(data: Dwell): Promise<string> {
+  toCsv(data: Dwell): string {
     return `${data.sessionId},${data.timestamp},${data.type},${data.duration},${data.aoi},${data.gazeData.x},${data.gazeData.y},${data.gazeData.xL},${data.gazeData.yL},${data.gazeData.xR},${data.gazeData.yR},${data.gazeData.fixationId},${data.gazeData.fixationDuration}`;
   },
 };

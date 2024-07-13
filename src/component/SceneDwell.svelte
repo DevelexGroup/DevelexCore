@@ -30,7 +30,7 @@
         </div>
     </Group>
     <Group heading="Dwell Interaction Log">
-        <GenericTable data={$sceneObjectDwellStore} headers={["timestamp", "type", "duration", "target"]} />
+        <GenericTable data={$sceneObjectDwellStore} headers={["timestamp", "type", "duration", "aoi"]} />
     </Group>
 </div>
 
