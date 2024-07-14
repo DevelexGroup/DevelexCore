@@ -27,8 +27,7 @@ build:
 pages:
   stage: deploy
   script:
-    - npm run build
-    - mkdir public
+    - mkdir -p public
     - cp -r build/* public/
   artifacts:
     paths:
