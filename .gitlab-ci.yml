@@ -4,7 +4,6 @@ image: node:lts
 # The stages of the pipeline
 stages:
   - build
-  - deploy
 
 # Cache configuration to store node_modules between builds
 cache:
@@ -17,35 +16,24 @@ before_script:
   - npm install
 
 # The job for building the project
-build:
+pages:
   stage: build
   script:
-    - npm run build # The build script should generate the build folder
-    - npm run package # The package script should generate the dist folder
+    - npm run build
     - mkdir -p public
     - cp -r build/* public/
-    - cp -r dist/* public/
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-
-# The job for deploying GitLab Pages
-pages:
-  stage: deploy
-  script:
-    - cp -r build/* public/ # Copy the build folder to the public folder
-  dependencies:
-    - build
+  artifacts:
+    paths:
+      - public/  
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
 # The job for publishing the npm package
 publish-npm:
-  stage: deploy
+  stage: build
   script:
     - echo "@scope:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
     - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
     - npm publish
-  dependencies:
-    - build
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
