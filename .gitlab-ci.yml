@@ -3,17 +3,18 @@ image: node:lts
 
 # The stages of the pipeline
 stages:
-  - prepare
   - build
   - deploy
 
+# Cache configuration to store node_modules between builds
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
 # Functions that should be executed before the build script is run
-prepare:
-  stage: prepare
-  script:
-    - npm install
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+before_script:
+  - npm install
 
 # The job for building the project
 build:
@@ -24,11 +25,6 @@ build:
     - mkdir -p public
     - cp -r build/* public/
     - cp -r dist/* public/
-  artifacts:
-    paths:
-      - public
-      - build
-      - dist
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
@@ -36,11 +32,7 @@ build:
 pages:
   stage: deploy
   script:
-    - mkdir -p public
     - cp -r build/* public/ # Copy the build folder to the public folder
-  artifacts:
-    paths:
-      - public
   dependencies:
     - build
   rules:
