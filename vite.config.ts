@@ -6,25 +6,31 @@ import { sveltekit } from '@sveltejs/kit/vite';
 export default defineConfig(({ command, mode }) => {
   if (command === 'build' && mode === 'lib') {
     return {
+      base: './',
       resolve: {
-      alias: {
-        $lib: resolve(__dirname, 'src/lib'),
-      },
+        alias: {
+          $lib: resolve(__dirname, 'src/lib'),
+        },
     },
     build: {
       lib: {
         entry: resolve(__dirname, 'src/lib/index.ts'),
-        name: 'develex-core', // Replace with your library name
+        name: 'develex-core',
       formats: ['es', 'umd'],
       },
-      rollupOptions: {},
+      rollupOptions: {
+        moduleContext: {
+          [resolve(__dirname, 'src/lib/GazeInput/GazeInputBridge.ts')]: 'window',
+        },
+      },
     },
     plugins: [
       dtsPlugin({
         include: ['src/lib'],
         insertTypesEntry: true,
       }),
-    ],};
+    ],
+  };
   }
     // Default configuration (for building a page)
     return {
