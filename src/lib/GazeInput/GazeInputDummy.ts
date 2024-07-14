@@ -1,7 +1,7 @@
-import type { GazeDataPointWithoutFixation } from '$lib/GazeData/GazeData';
+import type { GazeDataPoint } from '$lib/GazeData/GazeData';
 import { GazeInput } from '$lib/GazeInput/GazeInput';
 import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
-import { createETWindowCalibrator, type ETWindowCalibratorConfig, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
+import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
 import type { GazeInputConfigDummy } from './GazeInputConfig';
 
 /**
@@ -44,7 +44,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		}
 		const gazePointGetter = createGazePointFactory(this.sessionId, this.windowCalibrator);
 		const interval = 1000 / this.config.frequency;
-		this.intervalId = setInterval(() => {
+		this.intervalId = window.setInterval(() => {
 			if (this.config && this.isConnected) {
 				const { x, y } = this.calculateCoordinates();
 				this.emit('data', gazePointGetter(x, y));
@@ -120,7 +120,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 export const createGazePointFactory = (
 	sessionId: string,
 	windowCalibrator: ETWindowCalibrator
-): (x: number, y: number) => GazeDataPointWithoutFixation => {
+): (x: number, y: number) => GazeDataPoint => {
 	return (x: number, y: number) => {
 		const xScreenRelative = windowCalibrator.toScreenRelativeX(x);
 		const yScreenRelative = windowCalibrator.toScreenRelativeY(y);

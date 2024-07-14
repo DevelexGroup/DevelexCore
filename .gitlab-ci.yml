@@ -3,24 +3,32 @@ image: node:lts
 
 # The stages of the pipeline
 stages:
+  - prepare
   - build
   - deploy
 
 # Functions that should be executed before the build script is run
-before_script:
-  - npm install
+prepare:
+  stage: prepare
+  script:
+    - npm install
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
 # The job for building the project
 build:
   stage: build
   script:
-    - npm run build
+    - npm run build # The build script should generate the build folder
+    - npm run package # The package script should generate the dist folder
     - mkdir -p public
     - cp -r build/* public/
+    - cp -r dist/* public/
   artifacts:
     paths:
       - public
       - build
+      - dist
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
@@ -29,7 +37,7 @@ pages:
   stage: deploy
   script:
     - mkdir -p public
-    - cp -r build/* public/
+    - cp -r build/* public/ # Copy the build folder to the public folder
   artifacts:
     paths:
       - public

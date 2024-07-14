@@ -1,4 +1,4 @@
-import type { GazeInteractionDwellCallbackType } from './GazeInteractionObjectDwellCallback';
+import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
 
 /**
  * Needed for the dwell event listener setup.
@@ -11,7 +11,7 @@ import type { GazeInteractionDwellCallbackType } from './GazeInteractionObjectDw
 export interface GazeInteractionDwellSettingsType {
 	dwellTime: number;
 	bufferSize: number;
-	onDwellProgress: GazeInteractionDwellCallbackType;
-	onDwellFinish: GazeInteractionDwellCallbackType;
-	onDwellCancel: GazeInteractionDwellCallbackType;
+	onDwellProgress: (event: GazeInteractionObjectDwellEvent) => void;
+	onDwellFinish: (event: GazeInteractionObjectDwellEvent) => void;
+	onDwellCancel: (event: GazeInteractionObjectDwellEvent) => void;
 }

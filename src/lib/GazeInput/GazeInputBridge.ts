@@ -3,6 +3,9 @@ import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields
 import { GazeInput } from "./GazeInput";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
+// This is necessary for the worker to be created by Vite.
+import BridgeWebWorker from '$lib/GazeInput/GazeInputBridgeWorker.ts?worker';
+
 /**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
  * Gaze data is received from the worker from WebSocket server and emitted here as messages.
@@ -16,9 +19,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     constructor(config: GazeInputConfigBridge) {
         super(config);
-        this.worker = new Worker(new URL('GazeInputBridgeWorker.ts', import.meta.url).toString(), {
-            type: 'module'
-        });
+        this.worker = new BridgeWebWorker();
         this.worker.onmessage = (event) => {
             const { type, data } = event.data;
             const handler = this.messageHandlers[type];
