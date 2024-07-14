@@ -16,7 +16,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     constructor(config: GazeInputConfigBridge) {
         super(config);
-        this.worker = new Worker(new URL('GazeInputBridgeWorker.ts', import.meta.url), {
+        this.worker = new Worker(new URL('GazeInputBridgeWorker.ts', import.meta.url).toString(), {
             type: 'module'
         });
         this.worker.onmessage = (event) => {
@@ -136,22 +136,22 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         );
     }
 
-    createCommand = (
+    createCommand = <T>(
         messageType: string,
-        data: Object,
+        data: T,
         successMessage: string, 
-        updateState: Function
+        updateState: (data: T) => void
     ): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
             this.worker.postMessage({
                 messageType,
                 data
             });
-            const successHandler = (data: any) => {
+            const successHandler = (data: T) => {
                 updateState(data);
                 resolve();
             };
-            this.addMessageHandler(successMessage, (data: any) => successHandler(data));
+            this.addMessageHandler(successMessage, (data: T) => successHandler(data));
             this.addMessageHandler('error', (data: { type: string, message: string }) => {
                 this.handleError(data);
                 reject(data.message);

@@ -121,7 +121,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 	abstract stop(): Promise<void>;
 }
 
-export const isGazeInputWithFixations = (input: GazeInput<any>): input is GazeInput<GazeInputConfigWithFixations> => {
+export const isGazeInputWithFixations = (input: GazeInput<GazeInputConfig>): input is GazeInput<GazeInputConfigWithFixations> => {
 	return input.config.fixationDetection !== 'none';
 }
 

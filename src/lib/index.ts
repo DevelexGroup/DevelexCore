@@ -34,4 +34,4 @@ export interface GazeInteractionComponentProps<TInteractionEvents extends GazeIn
     settings: Partial<TListenerPayload['listener']['settings']>;
 }
 
-export interface GazeInteractionComponentPropsDefault extends GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionListenerPayload> {} 
+export type GazeInteractionComponentPropsDefault = GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionListenerPayload>
