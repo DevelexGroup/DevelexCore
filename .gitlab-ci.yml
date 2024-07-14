@@ -15,13 +15,14 @@ build:
   stage: build
   script:
     - npm run build
-    - mkdir public
+    - mkdir -p public
     - cp -r build/* public/
   artifacts:
     paths:
       - public
+      - build
   rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH    
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
 # The job for deploying GitLab Pages
 pages:
@@ -32,6 +33,8 @@ pages:
   artifacts:
     paths:
       - public
+  dependencies:
+    - build
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
@@ -42,5 +45,7 @@ publish-npm:
     - echo "@scope:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
     - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
     - npm publish
+  dependencies:
+    - build
   rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH  
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
