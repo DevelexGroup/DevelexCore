@@ -4,7 +4,7 @@ import { GazeInput } from "./GazeInput";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // This is necessary for the worker to be created by Vite.
-import BridgeWebWorker from '$lib/GazeInput/GazeInputBridgeWorker.ts?worker';
+import BridgeWebWorkerURL from '$lib/GazeInput/GazeInputBridgeWorker.ts?worker&url';
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
@@ -19,7 +19,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     constructor(config: GazeInputConfigBridge) {
         super(config);
-        this.worker = new BridgeWebWorker();
+        this.worker = new Worker(new URL(BridgeWebWorkerURL, import.meta.url), { type: 'module' });
         this.worker.onmessage = (event) => {
             const { type, data } = event.data;
             const handler = this.messageHandlers[type];
