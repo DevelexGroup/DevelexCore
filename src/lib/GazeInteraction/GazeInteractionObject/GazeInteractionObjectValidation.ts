@@ -40,7 +40,6 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
         this.listeners.push(this.generateListener(element, mergedSettings));
         setTimeout(() => {
             const listener = this.listeners.find((l) => l.element === element);
-            console.log('Validation ended', listener);
             if (listener) {
                 const accuracy = calculateAccuracy(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })), getElementCenter(element));
                 const precision = calculatePrecision(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
