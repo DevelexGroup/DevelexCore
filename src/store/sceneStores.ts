@@ -4,6 +4,7 @@ import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
 import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectDwellEvent';
 import type { GazeInteractionObjectSetFixationEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetFixationEvent';
 import type { GazeInteractionObjectSetSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetSaccadeEvent';
+
 import type { Dwell } from '../database/models/Dwell';
 import dwellRepository from '../database/repositories/dwell.repository';
 import type { Fixation } from '../database/models/Fixation';
@@ -12,6 +13,9 @@ import type { Saccade } from '../database/models/Saccade';
 import saccadeRepository from '../database/repositories/saccade.repository';
 import type { GazeDataPoint } from '$lib';
 import pointRepository from '../database/repositories/point.repository';
+import type { Validation } from '../database/models/Validation';
+import validationRepository from '../database/repositories/validation.repository';
+import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectValidationEvent';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -124,4 +128,24 @@ export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSetSaccad
 
 export const addPointEvent = (e: GazeDataPoint) => {
     void pointRepository.create(e);
+}
+
+export const sceneObjectValidationStore = writable<Validation[]>([]);
+
+export const addValidationEvent = (event: GazeInteractionObjectValidationEvent) => {
+    // erase gazeDataPoints from the event
+    const { gazeDataPoints, ...rest } = event;
+    void validationRepository.create(rest);
+
+    sceneObjectValidationStore.update(events => {
+        // Add the new event
+        const updatedEvents = [event, ...events];
+        
+        // If there are more than 100 events, remove the oldest one
+        if (updatedEvents.length > 100) {
+            updatedEvents.pop();
+        }
+        
+        return updatedEvents;
+    });
 }

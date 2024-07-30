@@ -2,7 +2,7 @@ import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import { GazeInteractionObject } from "./GazeInteractionObject";
-import type { GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidationEvent";
+import type { GazeInteractionObjectValidationEvent, GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidationEvent";
 import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidationSettings";
 
 /**
@@ -36,19 +36,21 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
     };
 
     register(element: Element, settings: Partial<GazeInteractionObjectValidationSettings>): void {
-        super.register(element, settings);
+        const mergedSettings = { ...this.defaultSettings, ...settings };
+        this.listeners.push(this.generateListener(element, mergedSettings));
         setTimeout(() => {
             const listener = this.listeners.find((l) => l.element === element);
+            console.log('Validation ended', listener);
             if (listener) {
                 const accuracy = calculateAccuracy(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
                 const precision = calculatePrecision(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
-                const sessionId = listener.gazeDataPoints[0].sessionId ?? 'INVALID_SESSION_ID';
+                const sessionId = listener.gazeDataPoints[0]?.sessionId ?? 'INVALID_SESSION_ID';
                 const timestamp = Date.now();
                 const allDataPointsCount = listener.gazeDataPoints.length;
                 const validDataPointsCount = listener.gazeDataPoints.filter((d) => d.validityL || d.validityR).length;
                 const validDataPointsPercentage = validDataPointsCount / allDataPointsCount;
                 const isValid = accuracy <= listener.settings.accuracyTolerance;
-                listener.settings.onValidation({ 
+                const validationEvent: GazeInteractionObjectValidationEvent = { 
                     type: 'validation',
                     accuracy,
                     precision,
@@ -60,10 +62,12 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
                     sessionId,
                     timestamp,
                     gazeDataPoints: listener.gazeDataPoints
-                });
+                };
+                listener.settings.onValidation(validationEvent);
+                this.emit('validation', validationEvent);
             }
             this.unregister(element);
-        }, settings.validationDuration);
+        }, mergedSettings.validationDuration);
     }
 
     /**
@@ -92,6 +96,7 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
     }
 
     evaluateListener(data: GazeDataPoint, listener: GazeInteractionObjectValidationListener): void {
+        console.log('Validation data', data);
         listener.gazeDataPoints.push(data);
     }
 }
