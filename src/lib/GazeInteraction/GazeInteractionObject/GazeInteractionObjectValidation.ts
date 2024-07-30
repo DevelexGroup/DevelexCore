@@ -42,7 +42,7 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
             const listener = this.listeners.find((l) => l.element === element);
             console.log('Validation ended', listener);
             if (listener) {
-                const accuracy = calculateAccuracy(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
+                const accuracy = calculateAccuracy(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })), getElementCenter(element));
                 const precision = calculatePrecision(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
                 const sessionId = listener.gazeDataPoints[0]?.sessionId ?? 'INVALID_SESSION_ID';
                 const timestamp = Date.now();
@@ -96,7 +96,6 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
     }
 
     evaluateListener(data: GazeDataPoint, listener: GazeInteractionObjectValidationListener): void {
-        console.log('Validation data', data);
         listener.gazeDataPoints.push(data);
     }
 }
@@ -118,10 +117,10 @@ export const distance = (p1: Point, p2: Point): number => {
 /**
  * Calculates the average distance of points from the origin (0, 0), representing accuracy.
  * @param points - Array of points.
+ * @param origin - The origin point.
  * @returns The average distance from the origin.
  */
-export const calculateAccuracy = (points: Point[]): number => {
-  const origin: Point = { x: 0, y: 0 };
+export const calculateAccuracy = (points: Point[], origin: Point = { x: 0, y: 0 }): number => {
   const totalDistance = points.reduce((sum, point) => sum + distance(point, origin), 0);
   return totalDistance / points.length;
 };
@@ -140,4 +139,9 @@ export const calculatePrecision = (points: Point[]): number => {
   const meanDistance = distances.reduce((sum, d) => sum + d, 0) / distances.length;
   const variance = distances.reduce((sum, d) => sum + Math.pow(d - meanDistance, 2), 0) / distances.length;
   return Math.sqrt(variance);
+};
+
+export const getElementCenter = (element: Element): Point => {
+  const { left, top, width, height } = element.getBoundingClientRect();
+  return { x: left + width / 2, y: top + height / 2 };
 };
