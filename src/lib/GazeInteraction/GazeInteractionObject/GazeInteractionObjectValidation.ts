@@ -1,14 +1,78 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+import type { GazeInput } from "$lib/GazeInput/GazeInput";
+import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import { GazeInteractionObject } from "./GazeInteractionObject";
 import type { GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidationEvent";
-import type { GazeInteractionObjectValidationPayload } from "./GazeInteractionObjectValidationSettings";
+import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidationSettings";
 
 export class GazeInteractionObjectValidation extends GazeInteractionObject<
     GazeInteractionObjectValidationEvents,
     GazeDataPoint,
     GazeInteractionObjectValidationPayload
 > {
-    
+
+    defaultSettings: GazeInteractionObjectValidationSettings = {
+        accuracyTolerance: 50,
+        validationDuration: 1000,
+        onValidationStart: () => {},
+        onValidationProgress: () => {},
+        onValidationEnd: () => {}
+    };
+
+    connect(input: GazeInput<GazeInputConfig>): void {
+        input.on('data', this.inputCallback);
+    }
+
+    disconnect(input: GazeInput<GazeInputConfig>): void {
+        input.off('data', this.inputCallback);
+    }
+
+    generateListener(element: Element, settings: GazeInteractionObjectValidationSettings): GazeInteractionObjectValidationListener {
+        return {
+            element,
+            settings
+        };
+    }
+
+    evaluateActiveListener(data: GazeDataPoint, listener: GazeInteractionObjectValidationListener): void {
+        const { settings, element } = listener;
+        const { x, y, sessionId, timestamp } = data;
+        const { accuracyTolerance, validationDuration, onValidationStart, onValidationProgress, onValidationEnd } = settings;
+
+        // TODO NOT FINISHED - currently non-functional
+        if (!this.isInside(element, x, y, accuracyTolerance)) {
+            onValidationEnd({ 
+                type: 'validationEnd',
+                progress: 1,
+                isValid: false,
+                accuracy: 0,
+                precision: 0,
+                sessionId,
+                timestamp,
+                validationDuration
+            });
+            return;
+        }
+
+        const points: { x: number, y: number }[] = [];
+        const startTime = data.timestamp;
+        const endTime = startTime + validationDuration;
+
+        const interval = setInterval(() => {
+            if (data.timestamp > endTime) {
+                clearInterval(interval);
+                const accuracy = calculateAccuracy(points);
+                const precision = calculatePrecision(points);
+                onValidationEnd({ type: 'validationEnd', progress: 1, isValid: true, accuracy, precision });
+                return;
+            }
+
+            points.push({ x, y });
+            onValidationProgress({ type: 'validationProgress', progress: (data.timestamp - startTime) / validationDuration });
+        }, 1000 / 60);
+
+        onValidationStart({ type: 'validationStart', progress: 0 });
+    }
 }
 
 

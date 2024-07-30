@@ -1,5 +1,5 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import type { GazeInteractionObjectValidationEventStart } from "./GazeInteractionObjectValidationEvent";
+import type { GazeInteractionObjectValidationEventEnd, GazeInteractionObjectValidationEventProgress, GazeInteractionObjectValidationEventStart } from "./GazeInteractionObjectValidationEvent";
 
 /**
  * Listener object for GazeInteractionObjectValidation
@@ -23,6 +23,6 @@ export interface GazeInteractionObjectValidationSettings {
     accuracyTolerance: number;
     validationDuration: number;
     onValidationStart: (event: GazeInteractionObjectValidationEventStart) => void;
-    onValidationProgress: (event: GazeInteractionObjectValidationEventStart) => void;
-    onValidationEnd: (event: GazeInteractionObjectValidationEventStart) => void;
+    onValidationProgress: (event: GazeInteractionObjectValidationEventProgress) => void;
+    onValidationEnd: (event: GazeInteractionObjectValidationEventEnd) => void;
 }
