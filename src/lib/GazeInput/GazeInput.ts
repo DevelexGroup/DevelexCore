@@ -68,7 +68,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 		this.emit('state', event)
 	}
 
-	protected handleConnected(data: any) {
+	protected handleConnected(data: { sessionId: string }) {
 		this.sessionId = data.sessionId;
         this.isConnected = true;
     }
