@@ -25,15 +25,16 @@
     };
 
     const handleClick = (e: MouseEvent) => {
+        const centerCoordinates = {
+            x: e.clientX + window.scrollX,
+            y: e.clientY + window.scrollY
+        };
         validationCircleElement = new ValidationCircle({
             target: document.body,
             props: {
                 validationSettings,
                 validator,
-                centerScreenCoordinates: {
-                    x: e.clientX,
-                    y: e.clientY
-                },
+                centerCoordinates,
                 animation,
                 color
             }

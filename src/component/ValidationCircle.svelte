@@ -5,7 +5,7 @@
 
     export let validationSettings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number };
     export let validator: GazeInteractionObjectValidation;
-    export let centerScreenCoordinates: { x: number, y: number };
+    export let centerCoordinates: { x: number, y: number };
     export let animation: 'smaller' | 'bigger' | 'pulse' = 'smaller';
     export let color: string = 'red';
 
@@ -13,7 +13,6 @@
     let duration = validationSettings.validationDuration; // ms
 
     onMount(() => {
-        console.log("ValidationCircle mounted", element, duration, animation, color);
         validator.register(element, validationSettings);
     });
 
@@ -23,7 +22,7 @@
 </script>
 
 
-<div bind:this={element} class="validation-circle {animation}" style="left: {centerScreenCoordinates.x}px; top: {centerScreenCoordinates.y}px; background-color: {color};">
+<div bind:this={element} class="validation-circle {animation}" style="left: {centerCoordinates.x}px; top: {centerCoordinates.y}px; background-color: {color};">
 </div>
 
 <style>

@@ -7,7 +7,6 @@
     import { validationObjectStore } from "../store/interactionStores";
 
     const settings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number } = {
-        accuracyTolerance: 100,
         validationDuration: 1000,
     };
 
