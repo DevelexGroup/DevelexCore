@@ -5,6 +5,7 @@
     import SceneInputState from "./SceneInputState.svelte";
 	import ScenePointData from "./ScenePointData.svelte";
 	import SceneSaccade from "./SceneSaccade.svelte";
+	import SceneValidation from "./SceneValidation.svelte";
     import Tabs from "./Tabs.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -32,8 +33,13 @@
             component: SceneSaccade
         },
         {
-            label: "Download",
+            label: "Validation",
             value: 6,
+            component: SceneValidation
+        },
+        {
+            label: "Download",
+            value: 7,
             component: SceneDownload
         }
     ];

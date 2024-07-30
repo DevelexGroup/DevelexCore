@@ -35,3 +35,6 @@ export interface GazeInteractionComponentProps<TInteractionEvents extends GazeIn
 }
 
 export type GazeInteractionComponentPropsDefault = GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionListenerPayload>
+
+export { GazeInteractionObjectValidation } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectValidation.js';
+export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectValidationSettings.js';

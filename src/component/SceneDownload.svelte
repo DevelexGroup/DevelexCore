@@ -4,6 +4,7 @@
 	import fixationRepository from "../database/repositories/fixation.repository";
 	import pointRepository from "../database/repositories/point.repository";
 	import saccadeRepository from "../database/repositories/saccade.repository";
+	import validationRepository from "../database/repositories/validation.repository";
 	import Button from "./Button.svelte";
 import GenericGroup from "./GenericGroup.svelte";
 
@@ -58,6 +59,16 @@ const downloadDwells = () => {
     });
 };
 
+const downloadValidations = () => {
+    validationRepository.getAll().then((validations) => {
+        const csv = validationRepository.csvHeader() + "\n" +
+        validations.map((validation) => {
+            return validationRepository.toCsv(validation);
+        }).join("\n");
+        saveCsvString(csv, "gaze-validations.csv");
+    });
+};
+
 </script>
 
 <div class="holder">
@@ -77,6 +88,7 @@ const downloadDwells = () => {
         <Button text={"Download fixations"} on:click={downloadFixations} />
         <Button text={"Download saccades"} on:click={downloadSaccades} />
         <Button text={"Download dwells"} on:click={downloadDwells} />
+        <Button text={"Download validations"} on:click={downloadValidations} />
     </GenericGroup>
 </div>
 
