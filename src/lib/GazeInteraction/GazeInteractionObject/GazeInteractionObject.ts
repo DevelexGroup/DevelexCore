@@ -1,10 +1,10 @@
 import { GazeInteraction, type GazeInteractionEvents } from "../GazeInteraction";
 
-export type GazeInteractionListenerPayload = {
+export interface GazeInteractionListenerPayload {
 	data: unknown;
 	listener: {
 		element: Element;
-		settings: Object;
+		settings: object;
 	};
 };
 

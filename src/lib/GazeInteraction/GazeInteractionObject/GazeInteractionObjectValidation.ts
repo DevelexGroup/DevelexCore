@@ -5,6 +5,24 @@ import { GazeInteractionObject } from "./GazeInteractionObject";
 import type { GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidationEvent";
 import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidationSettings";
 
+/**
+ * Beware! Registering an element for validation events will start the validation process immediately.
+ * After the end, it will unregister itself immediately.
+ * 
+ * To signify the difference to other InteractionObjects, the register method is aliased to validate.
+ * Thus, you can use the validate method to start the validation process.
+ * However, the register method is still available to be used.
+ * 
+ * @example
+ * const validation = new GazeInteractionObjectValidation();
+ * validation.validate(element, {
+ *    accuracyTolerance: 50,
+ *    validationDuration: 1000,
+ *    onValidation: (event) => {
+ *       console.log(event.accuracy, event.precision);
+ *    }
+ * });
+ */
 export class GazeInteractionObjectValidation extends GazeInteractionObject<
     GazeInteractionObjectValidationEvents,
     GazeDataPoint,
@@ -14,10 +32,48 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
     defaultSettings: GazeInteractionObjectValidationSettings = {
         accuracyTolerance: 50,
         validationDuration: 1000,
-        onValidationStart: () => {},
-        onValidationProgress: () => {},
-        onValidationEnd: () => {}
+        onValidation: () => {}
     };
+
+    register(element: Element, settings: GazeInteractionObjectValidationSettings): void {
+        super.register(element, settings);
+        setTimeout(() => {
+            const listener = this.listeners.find((l) => l.element === element);
+            if (listener) {
+                const accuracy = calculateAccuracy(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
+                const precision = calculatePrecision(listener.gazeDataPoints.map((d) => ({ x: d.x, y: d.y })));
+                const sessionId = listener.gazeDataPoints[0].sessionId ?? 'INVALID_SESSION_ID';
+                const timestamp = Date.now();
+                const allDataPointsCount = listener.gazeDataPoints.length;
+                const validDataPointsCount = listener.gazeDataPoints.filter((d) => d.validityL || d.validityR).length;
+                const validDataPointsPercentage = validDataPointsCount / allDataPointsCount;
+                const isValid = accuracy <= settings.accuracyTolerance;
+                settings.onValidation({ 
+                    type: 'validation',
+                    accuracy,
+                    precision,
+                    isValid,
+                    validationDuration: settings.validationDuration,
+                    allDataPointsCount,
+                    validDataPointsCount,
+                    validDataPointsPercentage,
+                    sessionId,
+                    timestamp,
+                    gazeDataPoints: listener.gazeDataPoints
+                });
+            }
+            this.unregister(element);
+        }, settings.validationDuration);
+    }
+
+    /**
+     * Alias for register.
+     * @param element 
+     * @param settings 
+     */
+    validate(element: Element, settings: GazeInteractionObjectValidationSettings): void {
+        this.register(element, settings);
+    }
 
     connect(input: GazeInput<GazeInputConfig>): void {
         input.on('data', this.inputCallback);
@@ -30,48 +86,13 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
     generateListener(element: Element, settings: GazeInteractionObjectValidationSettings): GazeInteractionObjectValidationListener {
         return {
             element,
-            settings
+            settings,
+            gazeDataPoints: []
         };
     }
 
-    evaluateActiveListener(data: GazeDataPoint, listener: GazeInteractionObjectValidationListener): void {
-        const { settings, element } = listener;
-        const { x, y, sessionId, timestamp } = data;
-        const { accuracyTolerance, validationDuration, onValidationStart, onValidationProgress, onValidationEnd } = settings;
-
-        // TODO NOT FINISHED - currently non-functional
-        if (!this.isInside(element, x, y, accuracyTolerance)) {
-            onValidationEnd({ 
-                type: 'validationEnd',
-                progress: 1,
-                isValid: false,
-                accuracy: 0,
-                precision: 0,
-                sessionId,
-                timestamp,
-                validationDuration
-            });
-            return;
-        }
-
-        const points: { x: number, y: number }[] = [];
-        const startTime = data.timestamp;
-        const endTime = startTime + validationDuration;
-
-        const interval = setInterval(() => {
-            if (data.timestamp > endTime) {
-                clearInterval(interval);
-                const accuracy = calculateAccuracy(points);
-                const precision = calculatePrecision(points);
-                onValidationEnd({ type: 'validationEnd', progress: 1, isValid: true, accuracy, precision });
-                return;
-            }
-
-            points.push({ x, y });
-            onValidationProgress({ type: 'validationProgress', progress: (data.timestamp - startTime) / validationDuration });
-        }, 1000 / 60);
-
-        onValidationStart({ type: 'validationStart', progress: 0 });
+    evaluateListener(data: GazeDataPoint, listener: GazeInteractionObjectValidationListener): void {
+        listener.gazeDataPoints.push(data);
     }
 }
 
