@@ -35,7 +35,7 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
         onValidation: () => {}
     };
 
-    register(element: Element, settings: GazeInteractionObjectValidationSettings): void {
+    register(element: Element, settings: Partial<GazeInteractionObjectValidationSettings>): void {
         super.register(element, settings);
         setTimeout(() => {
             const listener = this.listeners.find((l) => l.element === element);
@@ -47,13 +47,13 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
                 const allDataPointsCount = listener.gazeDataPoints.length;
                 const validDataPointsCount = listener.gazeDataPoints.filter((d) => d.validityL || d.validityR).length;
                 const validDataPointsPercentage = validDataPointsCount / allDataPointsCount;
-                const isValid = accuracy <= settings.accuracyTolerance;
-                settings.onValidation({ 
+                const isValid = accuracy <= listener.settings.accuracyTolerance;
+                listener.settings.onValidation({ 
                     type: 'validation',
                     accuracy,
                     precision,
                     isValid,
-                    validationDuration: settings.validationDuration,
+                    validationDuration: listener.settings.validationDuration,
                     allDataPointsCount,
                     validDataPointsCount,
                     validDataPointsPercentage,
@@ -71,7 +71,7 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
      * @param element 
      * @param settings 
      */
-    validate(element: Element, settings: GazeInteractionObjectValidationSettings): void {
+    validate(element: Element, settings: Partial<GazeInteractionObjectValidationSettings>): void {
         this.register(element, settings);
     }
 
