@@ -1,4 +1,6 @@
 import type { GazeDataPoint } from '$lib/GazeData/GazeData';
+import { createGazeFixationDetector } from '$lib/GazeFixationDetector';
+import type { GazeFixationDetector } from '$lib/GazeFixationDetector/GazeFixationDetector';
 import { GazeInput } from '$lib/GazeInput/GazeInput';
 import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
 import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
@@ -42,7 +44,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		if (!this.windowCalibrator) {
 			return Promise.reject('Window calibrator is not set.');
 		}
-		const gazePointGetter = createGazePointFactory(this.sessionId, this.windowCalibrator);
+		const gazePointGetter = createGazePointFactory(this.sessionId, this.windowCalibrator, createGazeFixationDetector(this.config.fixationDetection));
 		const interval = 1000 / this.config.frequency;
 		this.intervalId = window.setInterval(() => {
 			if (this.config && this.isConnected) {
@@ -119,12 +121,13 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 export const createGazePointFactory = (
 	sessionId: string,
-	windowCalibrator: ETWindowCalibrator
+	windowCalibrator: ETWindowCalibrator,
+	fixationDetector: GazeFixationDetector
 ): (x: number, y: number) => GazeDataPoint => {
 	return (x: number, y: number) => {
 		const xScreenRelative = windowCalibrator.toScreenRelativeX(x);
 		const yScreenRelative = windowCalibrator.toScreenRelativeY(y);
-		return {
+		const point: GazeDataPoint = {
 			x,
 			xL: x,
 			xR: x,
@@ -140,8 +143,8 @@ export const createGazePointFactory = (
 			validityL: true,
 			validityR: true,
 			parseValidity: true, // todo: implement validity check on window coordinates decorrelation
-			parseTimestamp: Date.now(),
 			type: 'point'
 		};
+		return fixationDetector.processGazePoint(point);
 	};
 }

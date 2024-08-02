@@ -16,4 +16,8 @@ export class GazeFixationDetectorDevice extends GazeFixationDetector {
     processGazePoint(gazePoint: GazeDataPoint): GazeDataPoint {
         return gazePoint;
     }
+
+    reset(): void {
+        // nothing to reset
+    }
 }

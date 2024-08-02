@@ -120,7 +120,8 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
             sessionId: data.sessionId,
 			timestamp,
 			duration,
-			gazeData: data
+			gazeData: data,
+            fixationId: data.fixationId
 		};
 	}
 }

@@ -13,6 +13,7 @@ export type GazeInteractionObjectFixationEvents = GazeInteractionEvents
  * @property {GazeInteractionFixationSettings} settings for the fixation event, including the fixation time and callbacks.
  */
 export interface GazeInteractionObjectFixationEvent extends GazeInteractionEvent {
+	fixationId: number;
 	duration: number;
 	gazeData: GazeDataPointWithFixation;
 	target: unknown;

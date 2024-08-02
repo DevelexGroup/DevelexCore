@@ -59,7 +59,7 @@ export const sceneObjectFixationStore = writable<Fixation[]>([]);
 
 export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectSetFixationEvent) => {
     // Extract the relevant information from the event
-    const { type, sessionId, timestamp, duration, gazeData, target } = unprocessedEvent;
+    const { type, sessionId, timestamp, duration, gazeData, target, fixationId } = unprocessedEvent;
     // convert target, which is array of Elements, id to string delimited by ;
     // check if Array.isArray(target) is true
     const aoi = Array.isArray(target) ? target.map((t) => t.id.toString()).join(';') : '';
@@ -70,7 +70,8 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectSetFixat
         timestamp,
         aoi,
         duration,
-        gazeData
+        gazeData,
+        fixationId
     };
 
     void fixationRepository.create(event);
@@ -135,6 +136,7 @@ export const sceneObjectValidationStore = writable<Validation[]>([]);
 export const addValidationEvent = (event: GazeInteractionObjectValidationEvent) => {
     // erase gazeDataPoints from the event
     const { gazeDataPoints, ...rest } = event;
+    void gazeDataPoints;
     void validationRepository.create(rest);
 
     sceneObjectValidationStore.update(events => {

@@ -20,6 +20,7 @@ export interface GazeInteractionScreenFixationEvent extends GazeInteractionEvent
 	type: 'fixationProgress' | 'fixationEnd' | 'fixationStart';
 	duration: number;
 	gazeData: GazeDataPointWithFixation;
+    fixationId: number;
 }
 
 export interface GazeInteractionScreenFixationStartEvent extends GazeInteractionScreenFixationEvent {

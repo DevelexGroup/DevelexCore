@@ -31,5 +31,5 @@ export interface GazeDataPointWithFixation extends GazeDataPoint {
 }
 
 export const isGazeDataPointWithFixation = (point: GazeDataPoint): point is GazeDataPointWithFixation => {
-    return (point as GazeDataPointWithFixation).fixationDuration !== undefined;
+    return (point as GazeDataPointWithFixation)?.fixationDuration !== undefined;
 }

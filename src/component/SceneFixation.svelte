@@ -29,7 +29,7 @@
         </div>
     </Group>
     <Group heading="Fixation Interaction Log">
-        <GenericTable data={$sceneObjectFixationStore} headers={["timestamp", "type", "duration", "aoi"]} />
+        <GenericTable data={$sceneObjectFixationStore} headers={["timestamp", "type", "duration", "aoi", "fixationId"]} />
     </Group>
 </div>
 

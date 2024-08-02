@@ -24,7 +24,7 @@
 <form>
     <div class="container">
         <InputText label="URI" bind:value={config.uri} />
-        <InputSelect label="Fixation Detection" bind:value={config.fixationDetection} options={["device", "none"]} />
+        <InputSelect label="Fixation Detection" bind:value={config.fixationDetection} options={["device", "none", "idt"]} />
     </div>
     <InputSubmit text="Start new input instance" on:click={submit} />
 </form>
