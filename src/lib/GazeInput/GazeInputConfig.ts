@@ -4,7 +4,7 @@ export type GazeInputConfig = GazeInputConfigBridge | GazeInputConfigDummy;
  * An eye tracker input that emits fixations.
  * This is a type alias for an instance of {@link GazeInput} with a configuration that emits fixations.
  */
-export type GazeInputConfigWithFixations = GazeInputConfigGazePoint & { fixationDetection: 'device' };
+export type GazeInputConfigWithFixations = GazeInputConfigGazePoint & { fixationDetection: 'device' | 'idt' };
 
 export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigSMI | GazeInputConfigEyelogic;
 
@@ -17,7 +17,7 @@ export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigSM
 export type GazeInputConfigGazePoint = {
     tracker: 'opengaze';
     uri: string;
-    fixationDetection: 'none' | 'device';
+    fixationDetection: 'none' | 'device' | 'idt';
 };
 
 /**
@@ -29,7 +29,7 @@ export type GazeInputConfigGazePoint = {
 export type GazeInputConfigSMI = {
     tracker: 'smi';
     uri: string;
-    fixationDetection: 'none';
+    fixationDetection: 'none' | 'idt';
 };
 
 /**
@@ -41,7 +41,7 @@ export type GazeInputConfigSMI = {
 export type GazeInputConfigEyelogic = {
     tracker: 'eyelogic';
     uri: string;
-    fixationDetection: 'none';
+    fixationDetection: 'none' | 'idt';
 };
 
 /**
@@ -54,7 +54,7 @@ export type GazeInputConfigEyelogic = {
  */
 export type GazeInputConfigDummy = {
     tracker: 'dummy';
-    fixationDetection: 'none' | 'device';
+    fixationDetection: 'none' | 'idt';
     frequency: number;
     precisionMinimalError: number;
     precisionDecayRate: number;

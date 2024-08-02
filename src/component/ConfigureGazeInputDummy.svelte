@@ -31,7 +31,7 @@
         <InputNumber label="Precision Minimal Error" bind:value={config.precisionMinimalError} step={0.001} />
         <InputNumber label="Precision Maximum Error" bind:value={config.precisionMaximumError} step={0.001} />
         <InputNumber label="Precision Decay Rate" bind:value={config.precisionDecayRate} step={0.001} />
-        <InputSelect label="Fixation Detection" bind:value={config.fixationDetection} options={["none"]} />
+        <InputSelect label="Fixation Detection" bind:value={config.fixationDetection} options={["none", "idt"]} />
     </div>
     <InputSubmit text="Start new input instance" on:click={submit} />
 </form>

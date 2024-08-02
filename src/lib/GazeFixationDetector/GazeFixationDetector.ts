@@ -7,4 +7,5 @@ import type { GazeDataPoint } from "../GazeData/GazeData";
  */
 export abstract class GazeFixationDetector {
     abstract processGazePoint(gazePoint: GazeDataPoint): GazeDataPoint;
+    abstract reset(): void;
 }

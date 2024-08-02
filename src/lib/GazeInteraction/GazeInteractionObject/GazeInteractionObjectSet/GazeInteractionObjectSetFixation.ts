@@ -56,7 +56,8 @@ export class GazeInteractionObjectSetFixation extends GazeInteractionObjectFixat
             ...data,
 			type,
 			target: elements,
-			settings
+			settings,
+			fixationId: data.fixationId,
 		};
 	}
 }
