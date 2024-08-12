@@ -2,8 +2,8 @@ import type { GazeDataPoint } from '$lib/GazeData/GazeData';
 import { createGazeFixationDetector } from '$lib/GazeFixationDetector';
 import type { GazeFixationDetector } from '$lib/GazeFixationDetector/GazeFixationDetector';
 import { GazeInput } from '$lib/GazeInput/GazeInput';
-import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
-import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
+import { GazeWindowCalibrator } from '../GazeWindowCalibrator/GazeWindowCalibrator';
+import { createGazeWindowCalibrator, type GazeWindowCalibratorConfigMouseEventFields, type GazeWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig';
 import type { GazeInputConfigDummy } from './GazeInputConfig';
 
 /**
@@ -16,7 +16,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	lastMouseCoordinates: { x: number; y: number } = { x: 0, y: 0 };
 	intervalId: number | null = null;
 	precisionError: number | null = null;
-	windowCalibrator: ETWindowCalibrator | null = null;
+	windowCalibrator: GazeWindowCalibrator | null = null;
 
 	constructor(config: GazeInputConfigDummy) {
 		super(config);
@@ -89,8 +89,8 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		this.lastMouseCoordinates = { x: event.clientX, y: event.clientY };
 	}
 
-	setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, windowConfig: ETWindowCalibratorConfigWindowFields): Promise<void> {
-		this.windowCalibrator = new ETWindowCalibrator(createETWindowCalibrator(mouseEvent, windowConfig));
+	setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, windowConfig: GazeWindowCalibratorConfigWindowFields): Promise<void> {
+		this.windowCalibrator = new GazeWindowCalibrator(createGazeWindowCalibrator(mouseEvent, windowConfig));
 		this.isWindowCalibrated = true;
 		return Promise.resolve();
 	}
@@ -121,7 +121,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 export const createGazePointFactory = (
 	sessionId: string,
-	windowCalibrator: ETWindowCalibrator,
+	windowCalibrator: GazeWindowCalibrator,
 	fixationDetector: GazeFixationDetector
 ): (x: number, y: number) => GazeDataPoint => {
 	return (x: number, y: number) => {

@@ -3,8 +3,8 @@
  */
 
 import type { GazeInputConfigBridge } from './GazeInputConfig';
-import type { ETWindowCalibratorConfig } from '../GazeWindowCalibrator/ETWindowCalibratorConfig';
-import { ETWindowCalibrator } from '../GazeWindowCalibrator/ETWindowCalibrator';
+import type { GazeWindowCalibratorConfig } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig';
+import { GazeWindowCalibrator } from '../GazeWindowCalibrator/GazeWindowCalibrator';
 import type { GazeDataPoint } from '../GazeData/GazeData';
 import type { GazeInputBridgeWebsocketIncomer, GazeInputBridgeWebsocketIncomerDisconnected, GazeInputBridgeWebsocketIncomerPoint } from "./GazeInputBridgeWebsocketIncomer";
 import type { GazeFixationDetector } from '../GazeFixationDetector/GazeFixationDetector';
@@ -15,7 +15,7 @@ import type {GazeInputBridgeWebsocketOutcomerConnect } from './GazeInputBridgeWe
 let config: GazeInputConfigBridge | null = null;
 let sessionId: string | null = null;
 let socket: GazeInputBridgeWebsocket | null = null;
-let windowCalibrator: ETWindowCalibrator | null = null;
+let windowCalibrator: GazeWindowCalibrator | null = null;
 let fixationDetector: GazeFixationDetector | null = null;
 
 /**
@@ -51,7 +51,7 @@ self.onmessage = (event) => {
             break;
         case 'setWindowCalibration':
             handleSetWindowCalibration(data as {
-                windowConfig: ETWindowCalibratorConfig,
+                windowConfig: GazeWindowCalibratorConfig,
                 config: GazeInputConfigBridge
             });
             break;
@@ -105,8 +105,8 @@ const handleDisconnect = () => {
  * It will set up the gazePointProcessor function with the correct window calibration and configuration.
  * @param config for the window calibration.
  */
-const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCalibratorConfig }) => {
-    windowCalibrator = new ETWindowCalibrator(windowConfig);
+const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: GazeWindowCalibratorConfig }) => {
+    windowCalibrator = new GazeWindowCalibrator(windowConfig);
     if (socket && sessionId && fixationDetector) {
         socket.onPointCallback = generateBridgeProcessor(windowCalibrator, fixationDetector, sessionId);
     }
@@ -114,7 +114,7 @@ const handleSetWindowCalibration = ({ windowConfig }: { windowConfig: ETWindowCa
 }
 
 const generateBridgeProcessor = (
-    windowCalibrator: ETWindowCalibrator,
+    windowCalibrator: GazeWindowCalibrator,
     fixationDetector: GazeFixationDetector,
     sessionId: string,
     postMessage: (data: GazeDataPoint) => void = generatePointMessage
