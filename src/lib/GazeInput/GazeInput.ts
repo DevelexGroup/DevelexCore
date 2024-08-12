@@ -1,5 +1,5 @@
 import type { ETHandlerMapping } from './GazeInputEvent.js';
-import type { ETWindowCalibratorConfigMouseEventFields, ETWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/ETWindowCalibratorConfig.js';
+import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
 import type { GazeInputConfig, GazeInputConfigWithFixations } from './GazeInputConfig.js';
 import { Emitter } from '$lib/Emitter/Emitter.js';
 
@@ -116,7 +116,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 	abstract disconnect(): Promise<void>;
 	abstract calibrate(): Promise<void>;
 	abstract send(msg: string): void;
-	abstract setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, window: ETWindowCalibratorConfigWindowFields): Promise<void>;
+	abstract setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<void>;
 	abstract start(): Promise<void>;
 	abstract stop(): Promise<void>;
 }

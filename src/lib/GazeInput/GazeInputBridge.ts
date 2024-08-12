@@ -1,5 +1,5 @@
 import type { GazeInputConfigBridge } from "./GazeInputConfig";
-import { createETWindowCalibrator, type ETWindowCalibratorConfigMouseEventFields, type ETWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/ETWindowCalibratorConfig";
+import { createGazeWindowCalibrator, type GazeWindowCalibratorConfigMouseEventFields, type GazeWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/GazeWindowCalibratorConfig";
 import { GazeInput } from "./GazeInput";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
@@ -99,10 +99,10 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         console.log(msg);
     }
 
-    async setWindowCalibration(mouseEvent: ETWindowCalibratorConfigMouseEventFields, window: ETWindowCalibratorConfigWindowFields): Promise<void> {
+    async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<void> {
         return this.createCommand(
             'setWindowCalibration',
-            { windowConfig: createETWindowCalibrator(mouseEvent, window), config: this.config },
+            { windowConfig: createGazeWindowCalibrator(mouseEvent, window), config: this.config },
             'windowCalibrated',
             this.handleWindowCalibrated.bind(this)
         );

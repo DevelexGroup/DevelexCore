@@ -1,4 +1,4 @@
-import type { ETWindowCalibratorConfig } from "./ETWindowCalibratorConfig";
+import type { GazeWindowCalibratorConfig } from "./GazeWindowCalibratorConfig";
 
 /**
  * Class that calibrates the window coordinates to screen coordinates and vice versa.
@@ -11,14 +11,14 @@ import type { ETWindowCalibratorConfig } from "./ETWindowCalibratorConfig";
  * 
  * @category Core
  */
-export class ETWindowCalibrator {
+export class GazeWindowCalibrator {
     xCoeff: number;
 	yCoeff: number;
 	windowScreenWidth: number;
 	windowScreenHeight: number;
 	isListenerAttached: boolean = false;
 
-	constructor(config: ETWindowCalibratorConfig) {
+	constructor(config: GazeWindowCalibratorConfig) {
 		const { xCoeff, yCoeff } = this.processPointerEvent(config);
 		this.xCoeff = xCoeff;
 		this.yCoeff = yCoeff;
@@ -30,7 +30,7 @@ export class ETWindowCalibrator {
 	 * Pointer move event is used to calculate the difference between screen and window coordinates.
 	 * @param event - The pointer move event.
 	 */
-	processPointerEvent(config: ETWindowCalibratorConfig): { xCoeff: number; yCoeff: number } {
+	processPointerEvent(config: GazeWindowCalibratorConfig): { xCoeff: number; yCoeff: number } {
 		const x = config.clientX;
 		const y = config.clientY;
 		const screenX = config.screenX;
