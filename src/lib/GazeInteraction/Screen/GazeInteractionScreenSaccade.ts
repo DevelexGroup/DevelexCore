@@ -1,7 +1,7 @@
 import type { GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
 import { GazeInteractionScreen } from "./GazeInteractionScreen";
 import type { GazeInteractionScreenFixation } from "./GazeInteractionScreenFixation";
-import type { GazeInteractionScreenFixationEndEvent, GazeInteractionScreenFixationStartEvent } from "./GazeInteractionScreenFixationEvent";
+import type { GazeInteractionScreenFixationEndEvent, GazeInteractionScreenFixationStartEvent } from "./GazeInteractionScreenFixation.event";
 import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccadeEvent";
 
 export class GazeInteractionScreenSaccade extends GazeInteractionScreen<GazeInteractionScreenSaccadeEvents, (GazeInteractionScreenFixationStartEvent | GazeInteractionScreenFixationEndEvent)> {

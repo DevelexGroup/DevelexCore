@@ -167,7 +167,7 @@ const generateDisconnectMessage = (data: GazeInputBridgeWebsocketIncomerDisconne
 }
 
 const generateConnectMessage = (sessionId: string) => {
-    return (data: GazeInputBridgeWebsocketIncomer) => {
+    return () => {
         self.postMessage({ type: 'connected', data: { sessionId } });
     }
 }

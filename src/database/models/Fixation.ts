@@ -1,6 +1,6 @@
-import type { GazeInteractionObjectSetFixationEvent } from "$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetFixationEvent";
+import type { GazeInteractionObjectFixationEvent } from "$lib/GazeInteraction/Object/GazeInteractionObjectFixation.event";
 
-export type Fixation = Omit<GazeInteractionObjectSetFixationEvent, 'target' | 'settings'> & {
+export type Fixation = Omit<GazeInteractionObjectFixationEvent, 'target' | 'settings'> & {
     aoi: string; // stringified Array of AOI labels, split by ';' (e.g. 'AOI1;AOI2')
     id?: number;
 }

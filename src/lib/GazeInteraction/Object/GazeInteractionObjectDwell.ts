@@ -1,9 +1,8 @@
 import type { GazeDataPoint } from '$lib/GazeData/GazeData';
-import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayload } from './GazeInteractionObjectDwellListener';
+import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayload } from './GazeInteractionObjectDwell.settings';
 import { GazeInteractionObject } from './GazeInteractionObject';
-import type { GazeInteractionObjectDwellEvent } from './GazeInteractionObjectDwellEvent';
-import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwellSettings';
-import type { GazeInteractionEvents } from '../GazeInteraction';
+import type { GazeInteractionObjectDwellEvent, GazeInteractionObjectDwellEvents } from './GazeInteractionObjectDwell.event';
+import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwell.settings';
 import type { GazeInput } from '$lib/GazeInput/GazeInput';
 import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 
@@ -12,7 +11,7 @@ import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
  * that have been registered with the given settings.
  * TODO: Implement spatial indexing to improve performance!!! quadtree or something similar.
  */
-export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionEvents, GazeDataPoint, GazeInteractionObjectDwellPayload> {
+export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeInteractionObjectDwellEvents, GazeDataPoint, GazeInteractionObjectDwellPayload> {
 
 	defaultSettings: GazeInteractionDwellSettingsType = {
 		dwellTime: 1000,
@@ -51,7 +50,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 					data
 				);
 				onDwellProgress(startDwellEvent);
-				this.emit('dwellStart', startDwellEvent);
+				this.emit('dwellProgress', startDwellEvent);
 				this.emit('dwell', startDwellEvent);
 				listener.timestamp = Date.now();
 				return;
@@ -126,7 +125,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 			timestamp,
 			sessionId: data.sessionId,
 			duration,
-			target: element,
+			target: [element],
 			settings,
 			gazeData: data
 		};

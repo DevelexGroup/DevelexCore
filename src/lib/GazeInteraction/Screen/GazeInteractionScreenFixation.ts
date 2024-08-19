@@ -2,7 +2,7 @@ import { isGazeDataPointWithFixation, type GazeDataPoint, type GazeDataPointWith
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfigWithFixations } from "$lib/GazeInput/GazeInputConfig";
 import { GazeInteractionScreen } from "./GazeInteractionScreen";
-import { type GazeInteractionScreenFixationEvents } from "./GazeInteractionScreenFixationEvent";
+import { type GazeInteractionScreenFixationEvent, type GazeInteractionScreenFixationEvents } from "./GazeInteractionScreenFixation.event";
 
 export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInteractionScreenFixationEvents, GazeDataPoint> {
 
@@ -110,11 +110,11 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
 	 * @returns The created fixation event object.
 	 */
 	createFixationEvent(
-		type: GazeInteractionScreenFixationEvents['type'],
+		type: GazeInteractionScreenFixationEvent["type"],
 		timestamp: number,
 		duration: number,
 		data: GazeDataPointWithFixation
-	) {
+	): GazeInteractionScreenFixationEvent {
 		return {
 			type,
             sessionId: data.sessionId,
@@ -122,6 +122,6 @@ export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInt
 			duration,
 			gazeData: data,
             fixationId: data.fixationId
-		};
+		}
 	}
 }

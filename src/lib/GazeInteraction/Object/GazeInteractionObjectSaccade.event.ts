@@ -1,8 +1,12 @@
 import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
 import type { GazeInteractionEvents } from '../GazeInteraction';
 import type { GazeInteractionEvent } from '../GazeInteractionEvent';
+import type { GazeInteractionObjectSaccadeSettings } from './GazeInteractionObjectSaccade.settings';
 
-export type GazeInteractionObjectSaccadeEvents = GazeInteractionEvents
+export type GazeInteractionObjectSaccadeEvents = {
+	'saccadeObjectFrom': GazeInteractionObjectSaccadeEvent,
+	'saccadeObjectTo': GazeInteractionObjectSaccadeEvent
+} & GazeInteractionEvents;
 
 /**
  * Fired when a saccade event occurs.
@@ -26,14 +30,7 @@ export interface GazeInteractionObjectSaccadeEvent extends GazeInteractionEvent 
     angleToPreviousInvalidityTime?: number;
 	gazeData: GazeDataPointWithFixation;
     originGazeData: GazeDataPointWithFixation;
-	target: unknown;
-	settings: unknown;
-}
-
-export interface GazeInteractionObjectSaccadeToEvent extends GazeInteractionObjectSaccadeEvent {
-	type: 'saccadeTo';
-}
-
-export interface GazeInteractionObjectSaccadeFromEvent extends GazeInteractionObjectSaccadeEvent {
-	type: 'saccadeFrom';
+	type: 'saccadeObjectTo' | 'saccadeObjectFrom';
+	target: Element[];
+	settings: GazeInteractionObjectSaccadeSettings[];
 }

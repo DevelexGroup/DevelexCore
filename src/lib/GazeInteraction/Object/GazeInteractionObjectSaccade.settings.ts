@@ -1,4 +1,5 @@
-import type { GazeInteractionScreenSaccadeEvent } from "$lib/GazeInteraction/GazeInteractionScreen/GazeInteractionScreenSaccadeEvent";
+import type { GazeInteractionScreenSaccadeEvent } from "$lib/GazeInteraction/Screen/GazeInteractionScreenSaccadeEvent";
+import type { GazeInteractionObjectSaccadeEvent } from "./GazeInteractionObjectSaccade.event";
 
 /**
  * Listener object for GazeInteractionSaccade.
@@ -7,7 +8,7 @@ import type { GazeInteractionScreenSaccadeEvent } from "$lib/GazeInteraction/Gaz
  */
 
 export interface GazeInteractionObjectSaccadeListener {
-	settings: GazeInteractionSaccadeSettings;
+	settings: GazeInteractionObjectSaccadeSettings;
 	element: Element;
 }
 
@@ -21,6 +22,8 @@ export interface GazeInteractionObjectSaccadePayload {
  * @property {number} bufferSize The time in milliseconds that the user must saccade on an element to trigger the event.
  * @property {GazeInteractionSaccadeCallbackType} onSaccadeEnd The callback function to be called when the user starts saccadeing on an element.
  */
-export interface GazeInteractionSaccadeSettings {
+export interface GazeInteractionObjectSaccadeSettings {
 	bufferSize: number;
+	saccadeObjectFrom: (event: GazeInteractionObjectSaccadeEvent) => void;
+	saccadeObjectTo: (event: GazeInteractionObjectSaccadeEvent) => void;
 }

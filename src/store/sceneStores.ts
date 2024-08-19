@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
 import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
-import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectDwellEvent';
-import type { GazeInteractionObjectSetFixationEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetFixationEvent';
-import type { GazeInteractionObjectSetSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetSaccadeEvent';
+import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.event';
+import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.event';
+import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.event';
 
 import type { Dwell } from '../database/models/Dwell';
 import dwellRepository from '../database/repositories/dwell.repository';
@@ -15,7 +15,7 @@ import type { GazeDataPoint } from '$lib';
 import pointRepository from '../database/repositories/point.repository';
 import type { Validation } from '../database/models/Validation';
 import validationRepository from '../database/repositories/validation.repository';
-import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectValidationEvent';
+import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.event';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -29,7 +29,7 @@ export const addDwellEvent = (unprocessedEvent: GazeInteractionObjectDwellEvent)
     // Extract the relevant information from the event
     const { type, sessionId, timestamp, duration, gazeData, target } = unprocessedEvent;
     // convert target id to string
-    const aoi = target?.id.toString();
+    const aoi = target[0]?.id.toString();
 
     const event: Dwell = {
         sessionId,
@@ -57,7 +57,7 @@ export const addDwellEvent = (unprocessedEvent: GazeInteractionObjectDwellEvent)
 
 export const sceneObjectFixationStore = writable<Fixation[]>([]);
 
-export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectSetFixationEvent) => {
+export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixationEvent) => {
     // Extract the relevant information from the event
     const { type, sessionId, timestamp, duration, gazeData, target, fixationId } = unprocessedEvent;
     // convert target, which is array of Elements, id to string delimited by ;
@@ -91,7 +91,7 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectSetFixat
 
 export const sceneObjectSaccadeStore = writable<Saccade[]>([]);
 
-export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSetSaccadeEvent) => {
+export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEvent) => {
     // Extract the relevant information from the event
     const { type, sessionId, timestamp, duration, distance, gazeData, target, originGazeData, angleToScreen, angleToPrevious, angleToPreviousInvalidityTime } = unprocessedEvent;
     // convert target, which is array of Elements, id to string delimited by ;

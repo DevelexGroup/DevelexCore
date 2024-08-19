@@ -1,6 +1,6 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import type { GazeInteractionListenerPayload } from "./GazeInteractionObject";
-import type { GazeInteractionObjectValidationEvent} from "./GazeInteractionObjectValidationEvent";
+import type { GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings";
+import type { GazeInteractionObjectValidationEvent} from "./GazeInteractionObjectValidation.event";
 
 /**
  * Listener object for GazeInteractionObjectValidation
@@ -13,7 +13,7 @@ export interface GazeInteractionObjectValidationListener {
     gazeDataPoints: GazeDataPoint[];
 }
 
-export interface GazeInteractionObjectValidationPayload extends GazeInteractionListenerPayload {
+export interface GazeInteractionObjectValidationPayload extends GazeInteractionObjectListenerPayload {
 	data: GazeDataPoint;
 	listener: GazeInteractionObjectValidationListener;
 }

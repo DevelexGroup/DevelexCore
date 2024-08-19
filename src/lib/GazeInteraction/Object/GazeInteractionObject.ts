@@ -1,17 +1,10 @@
 import { GazeInteraction, type GazeInteractionEvents } from "../GazeInteraction";
-
-export interface GazeInteractionListenerPayload {
-	data: unknown;
-	listener: {
-		element: Element;
-		settings: object;
-	};
-};
+import type { GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings";
 
 export abstract class GazeInteractionObject<
 	TInteractionEvents extends GazeInteractionEvents,
 	TInputData extends { type: string },
-	TListenerPayload extends GazeInteractionListenerPayload> extends GazeInteraction<TInteractionEvents, TInputData> {
+	TListenerPayload extends GazeInteractionObjectListenerPayload> extends GazeInteraction<TInteractionEvents, TInputData> {
     
     abstract defaultSettings: TListenerPayload['listener']['settings'];
 	

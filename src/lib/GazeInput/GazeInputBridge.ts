@@ -69,7 +69,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         if (!this.isConnected) return Promise.resolve()
         if (this.isEmitting) {
             try {
-                await this.stop();
+                void this.stop(); // no await on purpose, as we want to disconnect even if stop fails - bridge will handle it
             } catch (error) {
                 return Promise.reject(error);
             }
