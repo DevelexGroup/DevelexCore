@@ -3,7 +3,7 @@
     import type { GazeInteractionObjectValidationSettings } from "$lib";
     import { type GazeInteractionObjectValidation } from "$lib";
 	import ValidationCircle from "./ValidationCircle.svelte";
-	import type { GazeInteractionObjectValidationEvent } from "$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectValidationEvent";
+	import type { GazeInteractionObjectValidationEvent } from "$lib/GazeInteraction/Object/GazeInteractionObjectValidation.event";
 
     export let validationSettings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number };
     export let validator: GazeInteractionObjectValidation;

@@ -1,12 +1,17 @@
 import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
 import type { GazeInteractionEvents } from '../GazeInteraction';
 import type { GazeInteractionEvent } from '../GazeInteractionEvent';
+import type { GazeInteractionObjectFixationSettings } from './GazeInteractionObjectFixation.settings';
 
-export type GazeInteractionObjectFixationEvents = GazeInteractionEvents
+export type GazeInteractionObjectFixationEvents = {
+	'fixationObjectProgress': GazeInteractionObjectFixationEvent;
+	'fixationObjectEnd': GazeInteractionObjectFixationEvent;
+	'fixationObjectStart': GazeInteractionObjectFixationEvent;
+} & GazeInteractionEvents;
 
 /**
  * Fired when a fixation event occurs.
- * @property {'fixationProgress' | 'fixationFinish' | 'fixationCancel'} type of the event.
+ * @property {'fixationObjectProgress' | 'fixationObjectEnd' | 'fixationObjectStart'} type of the event.
  * @property {number} timestamp of the event.
  * @property {number} duration time since the fixation started.
  * @property {Element} target of the fixation event.
@@ -16,7 +21,7 @@ export interface GazeInteractionObjectFixationEvent extends GazeInteractionEvent
 	fixationId: number;
 	duration: number;
 	gazeData: GazeDataPointWithFixation;
-	target: unknown;
-	settings: unknown;
+	target: Element[];
+	settings: GazeInteractionObjectFixationSettings[];
+	type: 'fixationObjectProgress' | 'fixationObjectEnd' | 'fixationObjectStart'
 }
-

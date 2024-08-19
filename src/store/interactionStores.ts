@@ -3,8 +3,8 @@ import {
   GazeInteractionScreenFixation,
   GazeInteractionScreenSaccade,
   GazeInteractionObjectDwell,
-  GazeInteractionObjectSetFixation,
-  GazeInteractionObjectSetSaccade,
+  GazeInteractionObjectFixation,
+  GazeInteractionObjectSaccade,
   type GazeInputConfig,
   GazeInteractionObjectValidation
 } from "$lib";
@@ -21,8 +21,8 @@ const createReadableStore = <T>(Class: GazeInteractionClass<T>): Readable<T> => 
 // Initializing readable stores
 export const fixationInteractionStore = createReadableStore(GazeInteractionScreenFixation);
 export const saccadeInteractionStore = createReadableStore(GazeInteractionScreenSaccade);
-export const fixationObjectStore = createReadableStore(GazeInteractionObjectSetFixation);
-export const saccadeObjectStore = createReadableStore(GazeInteractionObjectSetSaccade);
+export const fixationObjectStore = createReadableStore(GazeInteractionObjectFixation);
+export const saccadeObjectStore = createReadableStore(GazeInteractionObjectSaccade);
 export const dwellObjectStore = createReadableStore(GazeInteractionObjectDwell);
 export const validationObjectStore = createReadableStore(GazeInteractionObjectValidation);
 
@@ -53,8 +53,8 @@ const manageConnect = (gazeInput: GazeInput<GazeInputConfig>, isConnect: boolean
 }
 
 get(dwellObjectStore).on("dwell", (event) => addDwellEvent(event));
-get(fixationObjectStore).on("fixationSetEnd", (event) => addFixationEvent(event));
-get(fixationObjectStore).on("fixationSetStart", (event) => addFixationEvent(event));
-get(saccadeObjectStore).on("saccadeSetTo", (event) => addSaccadeEvent(event));
-get(saccadeObjectStore).on("saccadeSetFrom", (event) => addSaccadeEvent(event));
+get(fixationObjectStore).on("fixationObjectEnd", (event) => addFixationEvent(event));
+get(fixationObjectStore).on("fixationObjectStart", (event) => addFixationEvent(event));
+get(saccadeObjectStore).on("saccadeObjectTo", (event) => addSaccadeEvent(event));
+get(saccadeObjectStore).on("saccadeObjectFrom", (event) => addSaccadeEvent(event));
 get(validationObjectStore).on("validation", (event) => addValidationEvent(event));

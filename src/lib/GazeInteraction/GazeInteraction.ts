@@ -1,6 +1,6 @@
-import { Emitter, type EventMap } from '$lib/Emitter/Emitter';
+import { Emitter } from '$lib/Emitter/Emitter';
 
-export interface GazeInteractionEvents extends EventMap {
+export type GazeInteractionEvents = {
     'connect': {
         type: 'connect';
         value: boolean;

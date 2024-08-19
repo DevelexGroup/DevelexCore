@@ -1,6 +1,6 @@
-import type { GazeInteractionObjectSetSaccadeEvent } from "$lib/GazeInteraction/GazeInteractionObject/GazeInteractionObjectSet/GazeInteractionObjectSetSaccadeEvent";
+import type { GazeInteractionObjectSaccadeEvent } from "$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.event";
 
-export type Saccade = Omit<GazeInteractionObjectSetSaccadeEvent, 'target' | 'settings'> & {
+export type Saccade = Omit<GazeInteractionObjectSaccadeEvent, 'target' | 'settings'> & {
     aoi: string; // stringified Array of AOI labels, split by ';' (e.g. 'AOI1;AOI2')
     id?: number;
 }

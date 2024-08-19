@@ -2,8 +2,8 @@ import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import { GazeInteractionObject } from "./GazeInteractionObject";
-import type { GazeInteractionObjectValidationEvent, GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidationEvent";
-import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidationSettings";
+import type { GazeInteractionObjectValidationEvent, GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidation.event";
+import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidation.settings";
 
 /**
  * Beware! Registering an element for validation events will start the validation process immediately.
