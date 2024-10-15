@@ -7,10 +7,7 @@ import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/Gaz
  * Manages saccade events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectSaccade<
-	TInteractionEvents extends GazeInteractionObjectSaccadeEvents,
-	TListenerPayload extends GazeInteractionObjectSaccadePayload
-> extends GazeInteractionObject<TInteractionEvents, GazeInteractionScreenSaccadeEvent, TListenerPayload> {
+export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInteractionObjectSaccadeEvents, GazeInteractionScreenSaccadeEvent, GazeInteractionObjectSaccadePayload> {
 
 	triggeredTargetsTo: Element[] = [];
 	triggeredSettingsTo: GazeInteractionObjectSaccadeSettings[] = [];
@@ -30,7 +27,7 @@ export class GazeInteractionObjectSaccade<
 	 * @param settings for the saccade events.
 	 * @returns the generated listener object.
 	 */
-	generateListener(element: Element, settings: TListenerPayload['listener']['settings']): TListenerPayload['listener'] {
+	generateListener(element: Element, settings: GazeInteractionObjectSaccadePayload['listener']['settings']): GazeInteractionObjectSaccadePayload['listener'] {
 		return {
 			element,
 			settings
@@ -42,7 +39,7 @@ export class GazeInteractionObjectSaccade<
 	 * @param data The eye-tracker data to evaluate.
 	 * @param listener The listener to evaluate for saccade events.
 	 */
-	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: TListenerPayload['listener']) {
+	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSaccadePayload['listener']) {
 		const isTo = this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize);
 		const isFrom = this.isInside(listener.element, data.originGazeData.x, data.originGazeData.y, listener.settings.bufferSize);
 		if (!isTo && !isFrom) return;
