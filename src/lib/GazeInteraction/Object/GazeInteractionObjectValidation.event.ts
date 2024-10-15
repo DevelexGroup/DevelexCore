@@ -1,6 +1,6 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInteractionEvents } from "../GazeInteraction";
-import type { GazeInteractionEvent } from "../GazeInteractionEvent";
+import type { GazeInteractionEvent } from "../GazeInteraction.event";
 
 export type GazeInteractionObjectValidationEvents = {
     'validation': GazeInteractionObjectValidationEvent,

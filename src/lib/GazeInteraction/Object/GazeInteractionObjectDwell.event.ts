@@ -1,6 +1,6 @@
 import type { GazeDataPoint } from '../../GazeData/GazeData';
 import type { GazeInteractionEvents } from '../GazeInteraction';
-import type { GazeInteractionEvent } from '../GazeInteractionEvent';
+import type { GazeInteractionEvent } from '../GazeInteraction.event';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwell.settings';
 
 export type GazeInteractionObjectDwellEvents = {

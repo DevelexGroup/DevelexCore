@@ -1,6 +1,6 @@
 import type { GazeDataPointWithFixation } from '$lib/GazeData/GazeData';
 import type { GazeInteractionEvents } from '$lib/GazeInteraction/GazeInteraction';
-import type { GazeInteractionEvent } from '../GazeInteractionEvent';
+import type { GazeInteractionEvent } from '../GazeInteraction.event';
 
 export type GazeInteractionScreenFixationEvents = {
     'fixation': GazeInteractionScreenFixationEvent,
