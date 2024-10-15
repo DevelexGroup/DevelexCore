@@ -4,7 +4,7 @@
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import Validation from "./Validation.svelte";
-    import { validationObjectStore } from "../store/interactionStores";
+    import { gazeManagerStore } from "../store/gazeInputStore";
 
     const settings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number } = {
         validationDuration: 1000,
@@ -28,7 +28,7 @@
     <Group heading="Validation Circles">
         <div class="grouping">
         {#each validations as setting}
-            <Validation aoi={setting.aoi} validationSettings={settings} validator={$validationObjectStore} animation={setting.animation} color={setting.color} />
+            <Validation aoi={setting.aoi} validationSettings={settings} validator={$gazeManagerStore} animation={setting.animation} color={setting.color} />
         {/each}
         </div>
     </Group>

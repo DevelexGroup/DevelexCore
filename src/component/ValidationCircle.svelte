@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from "svelte";
     import type { GazeInteractionObjectValidationSettings } from "$lib";
-    import { GazeInteractionObjectValidation } from "$lib";
+	import type { GazeManager } from "$lib/GazeManager/GazeManager";
 
     export let validationSettings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number };
-    export let validator: GazeInteractionObjectValidation;
+    export let validator: GazeManager | null;
     export let centerCoordinates: { x: number, y: number };
     export let animation: 'smaller' | 'bigger' | 'pulse' = 'smaller';
     export let color: string = 'red';
@@ -13,11 +13,20 @@
     let duration = validationSettings.validationDuration; // ms
 
     onMount(() => {
-        validator.register(element, validationSettings);
+        if (!validator) return;
+        validator.register({
+            interaction: "validation",
+            element,
+            settings: validationSettings,
+        });
     });
 
     onDestroy(() => {
-        validator.unregister(element);
+        if (!validator) return;
+        validator.unregister({
+            interaction: "validation",
+            element,
+        });
     });
 </script>
 

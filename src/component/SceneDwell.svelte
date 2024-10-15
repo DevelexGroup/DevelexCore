@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { dwellObjectStore } from "../store/interactionStores";
+	import { gazeManagerStore } from "../store/gazeInputStore";
     import { sceneObjectDwellStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
@@ -13,11 +13,20 @@
     const aoiLabels = ["dwell-a", "dwell-b", "dwell-c"];
 
     const registerFn = (element: HTMLElement) => {
-        $dwellObjectStore.register(element, settings);
+        if (!$gazeManagerStore) return;
+        $gazeManagerStore.register({
+            interaction: "dwell",
+            element,
+            settings,
+        });
     };
 
     const unregisterFn = (element: HTMLElement) => {
-        $dwellObjectStore.unregister(element);
+        if (!$gazeManagerStore) return;
+        $gazeManagerStore.unregister({
+            interaction: "dwell",
+            element,
+        });
     };
 </script>
 

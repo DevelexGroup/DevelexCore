@@ -17,6 +17,7 @@ import type { GazeInteractionScreenFixationEvent, GazeInteractionScreenFixationE
 import { GazeInteractionScreenSaccade } from "$lib/GazeInteraction/GazeInteractionScreenSaccade";
 
 import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent";
+import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig";
 
 // Manager class that routes event registration to the correct Emitter
 export class EmitterGroup<T extends EventMap> {
@@ -101,7 +102,7 @@ export class GazeManager extends EmitterGroup<
     GazeInteractionObjectDwellEvents &
     GazeInteractionObjectValidationEvents
 > {
-    input: GazeInput<GazeInputConfig> | null = null;
+    input: GazeInput<GazeInputConfig>;
     fixation: GazeInteractionScreenFixation;
     fixationObject: GazeInteractionObjectFixation;
     saccade: GazeInteractionScreenSaccade;
@@ -125,17 +126,28 @@ export class GazeManager extends EmitterGroup<
     }
 
 
-    constructor() {
+    constructor(config: GazeInputConfig) {
         const dwell = new GazeInteractionObjectDwell();
         const fixation = new GazeInteractionScreenFixation();
         const fixationObject = new GazeInteractionObjectFixation();
         const saccade = new GazeInteractionScreenSaccade();
         const saccadeObject = new GazeInteractionObjectSaccade();
         const validation = new GazeInteractionObjectValidation();
+        const input = createGazeInput(config);
         super({
-            fixationObjectStart: fixation,
+            data: input,
+            connect: input,
+            state: input,
+            emit: input,
+            dwell: dwell,
             dwellProgress: dwell,
+            fixationObjectEnd: fixationObject,
+            fixationObjectStart: fixationObject,
+            saccadeObjectTo: saccadeObject,
+            saccadeObjectFrom: saccadeObject,
+            validation: validation,
         });
+        this.input = input;
         this.fixation = fixation;
         this.fixationObject = fixationObject;
         this.saccade = saccade;
@@ -145,19 +157,14 @@ export class GazeManager extends EmitterGroup<
     }
 
     connect() {
-       if (!this.input) {
-            throw new Error('No input device connected');
-         }
        this.input.on('data', this.linkData.bind(this));
+       this.fixation.on('fixationStart', this.linkFixation.bind(this));
        this.fixation.on('fixationEnd', this.linkFixation.bind(this));
        this.saccade.on('saccade', this.linkSaccade.bind(this));
        this.input.connect();
     }
 
     disconnect() {
-        if (!this.input) {
-            throw new Error('No input device connected');
-        }
         this.input.off('data', this.linkData);
         this.fixation.off('fixationEnd', this.linkFixation);
         this.saccade.off('saccade', this.linkSaccade);
@@ -165,17 +172,19 @@ export class GazeManager extends EmitterGroup<
     }
 
     start() {
-        if (!this.input) {
-            throw new Error('No input device connected');
-        }
         this.input.start();
     }
 
     stop() {
-        if (!this.input) {
-            throw new Error('No input device connected');
-        }
         this.input.stop();
+    }
+
+    calibrate() {
+        this.input.calibrate();
+    }
+
+    setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields) {
+        this.input.setWindowCalibration(mouseEvent, window);
     }
 
     createInput(input: GazeInputConfig) {
@@ -202,7 +211,7 @@ export class GazeManager extends EmitterGroup<
         }
     }
 
-    unregister({interaction, element}: GazeManagerRegistration) {
+    unregister({interaction, element}: Omit<GazeManagerRegistration, 'settings'>) {
         switch (interaction) {
             case 'fixation':
                 this.fixationObject.unregister(element);

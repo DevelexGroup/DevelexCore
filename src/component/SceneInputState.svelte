@@ -1,22 +1,22 @@
 <script lang="ts">
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
-    import { gazeInputStore } from "../store/gazeInputStore";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
     import { sceneStateStore } from "../store/sceneStores";
+	import { gazeManagerStore } from "../store/gazeInputStore";
 
     const getGazeInputStates = () => {
         return [
-            { variable: "Connected", value: $gazeInputStore !== null ? $gazeInputStore.isConnected : null },
-            { variable: "Emitting", value: $gazeInputStore !== null ? $gazeInputStore.isEmitting : null },
-            { variable: "Calibrated", value: $gazeInputStore !== null ? $gazeInputStore.isDeviceCalibrated : null },
-            { variable: "WindowCalibrated", value: $gazeInputStore !== null ? $gazeInputStore.isWindowCalibrated : null }
+            { variable: "Connected", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isConnected : null },
+            { variable: "Emitting", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isEmitting : null },
+            { variable: "Calibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isDeviceCalibrated : null },
+            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isWindowCalibrated : null }
         ]   
     };
 
     const getGazeInputConfig = () => {
-        if ($gazeInputStore === null) return [];
-        return Object.entries($gazeInputStore.config).map(([key, value]) => ({ variable: key, value }));
+        if ($gazeManagerStore === null) return [];
+        return Object.entries($gazeManagerStore.input.config).map(([key, value]) => ({ variable: key, value }));
     };
 
     let gazeInputStates = getGazeInputStates();
@@ -27,8 +27,8 @@
     };
 
     // if gazeInputState, listen for messages
-    $: if ($gazeInputStore !== null) {
-        $gazeInputStore.on("state", handleGazeInputMessage);
+    $: if ($gazeManagerStore !== null) {
+        $gazeManagerStore.on("state", handleGazeInputMessage);
         gazeInputStates = getGazeInputStates();
         gazeInputConfig = getGazeInputConfig();
     } else {

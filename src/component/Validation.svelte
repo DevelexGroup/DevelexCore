@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onDestroy, SvelteComponent } from "svelte";
     import type { GazeInteractionObjectValidationSettings } from "$lib";
-    import { type GazeInteractionObjectValidation } from "$lib";
 	import ValidationCircle from "./ValidationCircle.svelte";
-	import type { GazeInteractionObjectValidationEvent } from "$lib/GazeInteraction/Object/GazeInteractionObjectValidation.event";
+	import type { GazeInteractionObjectValidationEvent } from "$lib/GazeInteraction/GazeInteractionObjectValidation.event";
+	import type { GazeManager } from "$lib/GazeManager/GazeManager";
 
     export let validationSettings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number };
-    export let validator: GazeInteractionObjectValidation;
+    export let validator: GazeManager | null = null;
     export let aoi: string;
     export let animation: 'smaller' | 'bigger' | 'pulse' = 'smaller';
     export let color: string = 'red';

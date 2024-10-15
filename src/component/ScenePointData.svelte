@@ -1,9 +1,9 @@
 <script lang="ts">
     import Group from "./GenericGroup.svelte";
     import GenericTable from "./GenericTable.svelte";
-    import { gazeInputStore } from "../store/gazeInputStore";
     import pointRepository from "../database/repositories/point.repository";
     import type { Point } from "../database/models/Point";
+    import { gazeManagerStore } from "../store/gazeInputStore";
 
     let interval: number | null = null;
     let data: Point[] = [];
@@ -20,7 +20,7 @@
     const startInterval = () => {
         interval = setInterval(() => {
             obtainPoints();
-        }, 300);
+        }, 300) as unknown as number;
     };
 
     const cancelInterval = () => {
@@ -29,13 +29,13 @@
         interval = null;
     };
 
-    if ($gazeInputStore === null) {
+    if ($gazeManagerStore === null) {
         // Handle the case when $gazeInputStore is null
     } else {
-        if ($gazeInputStore.isEmitting) {
+        if ($gazeManagerStore.input.isEmitting) {
             startInterval();
         }
-        $gazeInputStore.on("emit", (data) => {
+        $gazeManagerStore.on("emit", (data) => {
             data.value ? startInterval() : cancelInterval();
         });
     }
