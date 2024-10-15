@@ -1,5 +1,6 @@
 import type { Emitter, EventKey, EventMap, EventReceiver } from "$lib/Emitter/Emitter";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+import { createGazeInput } from "$lib/GazeInput";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import type { ETHandlerMapping } from "$lib/GazeInput/GazeInputEvent";
@@ -75,6 +76,7 @@ export class EmitterGroup<T extends EventMap> {
  * 
  * @example
  * const gazeManager = new GazeManager();
+ * gazeManager.createInput({ type: 'webgazer' });
  * gazeManager.connect();
  * gazeManager.register({
  *    interaction: 'fixation',
@@ -99,7 +101,7 @@ export class GazeManager extends EmitterGroup<
     GazeInteractionObjectDwellEvents &
     GazeInteractionObjectValidationEvents
 > {
-    input: GazeInput<GazeInputConfig>;
+    input: GazeInput<GazeInputConfig> | null = null;
     fixation: GazeInteractionScreenFixation;
     fixationObject: GazeInteractionObjectFixation;
     saccade: GazeInteractionScreenSaccade;
@@ -123,7 +125,7 @@ export class GazeManager extends EmitterGroup<
     }
 
 
-    constructor(input: GazeInput<GazeInputConfig>) {
+    constructor() {
         const dwell = new GazeInteractionObjectDwell();
         const fixation = new GazeInteractionScreenFixation();
         const fixationObject = new GazeInteractionObjectFixation();
@@ -134,7 +136,6 @@ export class GazeManager extends EmitterGroup<
             fixationObjectStart: fixation,
             dwellProgress: dwell,
         });
-        this.input = input;
         this.fixation = fixation;
         this.fixationObject = fixationObject;
         this.saccade = saccade;
@@ -144,6 +145,9 @@ export class GazeManager extends EmitterGroup<
     }
 
     connect() {
+       if (!this.input) {
+            throw new Error('No input device connected');
+         }
        this.input.on('data', this.linkData.bind(this));
        this.fixation.on('fixationEnd', this.linkFixation.bind(this));
        this.saccade.on('saccade', this.linkSaccade.bind(this));
@@ -151,10 +155,34 @@ export class GazeManager extends EmitterGroup<
     }
 
     disconnect() {
+        if (!this.input) {
+            throw new Error('No input device connected');
+        }
         this.input.off('data', this.linkData);
         this.fixation.off('fixationEnd', this.linkFixation);
         this.saccade.off('saccade', this.linkSaccade);
         this.input.disconnect();
+    }
+
+    start() {
+        if (!this.input) {
+            throw new Error('No input device connected');
+        }
+        this.input.start();
+    }
+
+    stop() {
+        if (!this.input) {
+            throw new Error('No input device connected');
+        }
+        this.input.stop();
+    }
+
+    createInput(input: GazeInputConfig) {
+        if (this.input?.isConnected) {
+            throw new Error('Cannot create input while another input is connected');
+        }
+        this.input = createGazeInput(input);
     }
 
     register({interaction, element, settings}: GazeManagerRegistration) {
