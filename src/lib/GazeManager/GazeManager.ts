@@ -16,7 +16,6 @@ import type { GazeInteractionScreenFixationEvent, GazeInteractionScreenFixationE
 import { GazeInteractionScreenSaccade } from "$lib/GazeInteraction/GazeInteractionScreenSaccade";
 
 import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent";
-import { parseArgs } from "util";
 
 // Manager class that routes event registration to the correct Emitter
 export class EmitterGroup<T extends EventMap> {
