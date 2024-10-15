@@ -28,7 +28,7 @@ export class EmitterGroup<T extends EventMap> {
     }
 
     /**
-     * Registers an event handler for the specified event, automatically routing
+     * links an event handler for the specified event, automatically routing
      * to the correct emitter.
      * @param eventName - The name of the event (e.g., 'fixationEnd', 'dwell').
      * @param fn - The event handler function.
@@ -44,7 +44,7 @@ export class EmitterGroup<T extends EventMap> {
     }
 
     /**
-     * Unregisters an event handler for the specified event.
+     * Unlinks an event handler for the specified event.
      * @param eventName - The name of the event.
      * @param fn - The event handler function to remove.
      */
@@ -84,18 +84,18 @@ export class GazeManager extends EmitterGroup<
     dwellEmitter: GazeInteractionObjectDwell;
     validationEmitter: GazeInteractionObjectValidation;
 
-    registerData: (data: GazeDataPoint) => void = (data) => {
+    linkData: (data: GazeDataPoint) => void = (data) => {
         this.fixationEmitter.evaluate(data);
         this.dwellEmitter.evaluate(data);
         this.validationEmitter.evaluate(data);
     }
 
-    registerOnFixation: (data: GazeInteractionScreenFixationEvent) => void = (data) => {
+    linkFixation: (data: GazeInteractionScreenFixationEvent) => void = (data) => {
         this.saccadeEmitter.evaluate(data);
         this.fixationObjectEmitter.evaluate(data);
     }
 
-    registerOnSaccade: (data: GazeInteractionScreenSaccadeEvent) => void = (data) => {
+    linkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void = (data) => {
         this.saccadeObjectEmitter.evaluate(data);
     }
 
@@ -121,14 +121,16 @@ export class GazeManager extends EmitterGroup<
     }
 
     connect() {
-       this.input.on('data', this.registerData.bind(this));
-       this.fixationEmitter.on('fixationEnd', this.registerOnFixation.bind(this));
-       this.saccadeEmitter.on('saccade', this.registerOnSaccade.bind(this));
+       this.input.on('data', this.linkData.bind(this));
+       this.fixationEmitter.on('fixationEnd', this.linkFixation.bind(this));
+       this.saccadeEmitter.on('saccade', this.linkSaccade.bind(this));
+       this.input.connect();
     }
 
     disconnect() {
-        this.input.off('data', this.registerData);
-        this.fixationEmitter.off('fixationEnd', this.registerOnFixation);
-        this.saccadeEmitter.off('saccade', this.registerOnSaccade);
+        this.input.off('data', this.linkData);
+        this.fixationEmitter.off('fixationEnd', this.linkFixation);
+        this.saccadeEmitter.off('saccade', this.linkSaccade);
+        this.input.disconnect();
     }
 }
