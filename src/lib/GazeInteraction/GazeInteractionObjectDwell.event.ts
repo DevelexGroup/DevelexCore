@@ -1,6 +1,5 @@
-import type { GazeDataPoint } from '../../GazeData/GazeData';
-import type { GazeInteractionEvents } from '../GazeInteraction';
-import type { GazeInteractionEvent } from '../GazeInteraction.event';
+import type { GazeDataPoint } from '../GazeData/GazeData';
+import type { GazeInteractionEvent } from './GazeInteraction.event';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwell.settings';
 
 export type GazeInteractionObjectDwellEvents = {
@@ -8,7 +7,7 @@ export type GazeInteractionObjectDwellEvents = {
 	'dwellProgress': GazeInteractionObjectDwellEvent;
 	'dwellFinish': GazeInteractionObjectDwellEvent;
 	'dwellCancel': GazeInteractionObjectDwellEvent;
-} & GazeInteractionEvents; // it must be a type otherwise it won't be recognized by the Emitter
+}; // it must be a type otherwise it won't be recognized by the Emitter
 
 /**
  * Fired when a dwell event occurs.

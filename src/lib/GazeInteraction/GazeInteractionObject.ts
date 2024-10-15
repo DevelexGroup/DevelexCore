@@ -1,8 +1,9 @@
-import { GazeInteraction, type GazeInteractionEvents } from "../GazeInteraction";
+import type { EventMap } from "$lib/Emitter/Emitter";
+import { GazeInteraction } from "./GazeInteraction";
 import type { GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings";
 
 export abstract class GazeInteractionObject<
-	TInteractionEvents extends GazeInteractionEvents,
+	TInteractionEvents extends EventMap,
 	TInputData extends { type: string },
 	TListenerPayload extends GazeInteractionObjectListenerPayload> extends GazeInteraction<TInteractionEvents, TInputData> {
     
@@ -33,7 +34,7 @@ export abstract class GazeInteractionObject<
 	 * If there is a need for further action, method should be overridden with using the super method to call the listeners' callbacks first.
 	 * @param {GazeDataPoint} data - The eye-tracker data to evaluate.
 	 */
-    evaluateInputData(data: TInputData): void {
+    evaluate(data: TInputData): void {
 		this.listeners.forEach((listener) => {
 			this.evaluateListener(data, listener);
 		});
@@ -41,6 +42,10 @@ export abstract class GazeInteractionObject<
 
     /**
 	 * Checks if the given coordinates are inside the given element's bounding box.
+	 * 
+	 * This should not be decoupled, yet, to a separate InteractionObject class, as
+	 * every registered object in every interaction type can have different parameters.
+	 * 
 	 * @param element to check if the given coordinates are inside.
 	 * @param x in pixels in the viewport.
 	 * @param y in pixels in the viewport.

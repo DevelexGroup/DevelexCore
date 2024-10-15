@@ -1,4 +1,4 @@
-import type { GazeInteractionScreenFixationEvent } from "$lib/GazeInteraction/Screen/GazeInteractionScreenFixation.event.js";
+import type { GazeInteractionScreenFixationEvent } from "$lib/GazeInteraction/GazeInteractionScreenFixation.event.js";
 import type { GazeInteractionObjecListener, GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings.js";
 import type { GazeInteractionObjectFixationEvent } from "./GazeInteractionObjectFixation.event.js";
 

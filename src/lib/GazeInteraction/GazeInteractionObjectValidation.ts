@@ -1,6 +1,4 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import type { GazeInput } from "$lib/GazeInput/GazeInput";
-import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import { GazeInteractionObject } from "./GazeInteractionObject";
 import type { GazeInteractionObjectValidationEvent, GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidation.event";
 import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidation.settings";
@@ -76,14 +74,6 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
      */
     validate(element: Element, settings: Partial<GazeInteractionObjectValidationSettings>): void {
         this.register(element, settings);
-    }
-
-    connect(input: GazeInput<GazeInputConfig>): void {
-        input.on('data', this.inputCallback);
-    }
-
-    disconnect(input: GazeInput<GazeInputConfig>): void {
-        input.off('data', this.inputCallback);
     }
 
     generateListener(element: Element, settings: GazeInteractionObjectValidationSettings): GazeInteractionObjectValidationListener {

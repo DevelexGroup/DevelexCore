@@ -1,25 +1,14 @@
 import type { GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
-import { GazeInteractionScreen } from "./GazeInteractionScreen";
-import type { GazeInteractionScreenFixation } from "./GazeInteractionScreenFixation";
-import type { GazeInteractionScreenFixationEndEvent, GazeInteractionScreenFixationStartEvent } from "./GazeInteractionScreenFixation.event";
+import { GazeInteraction } from "./GazeInteraction";
+import type { GazeInteractionScreenFixationEvent } from "./GazeInteractionScreenFixation.event";
 import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccadeEvent";
 
-export class GazeInteractionScreenSaccade extends GazeInteractionScreen<GazeInteractionScreenSaccadeEvents, (GazeInteractionScreenFixationStartEvent | GazeInteractionScreenFixationEndEvent)> {
+export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractionScreenSaccadeEvents, GazeInteractionScreenFixationEvent> {
     
     endOfFirstFixation: GazeDataPointWithFixation | null = null;
     lastSaccadeData: GazeInteractionScreenSaccadeEvents["saccade"] | null = null;
 
-    connect(input: GazeInteractionScreenFixation): void {
-        input.on("fixationStart", this.inputCallback);
-        input.on("fixationEnd", this.inputCallback);
-    }
- 
-    disconnect(input: GazeInteractionScreenFixation): void {
-        input.off("fixationStart", this.inputCallback);
-        input.off("fixationEnd", this.inputCallback);
-    }
-
-    evaluateInputData(data: (GazeInteractionScreenFixationStartEvent | GazeInteractionScreenFixationEndEvent)): void {
+    evaluate(data: (GazeInteractionScreenFixationEvent)): void {
         // TODO: Implement saccade invalidation on invalid data.
         if (data.type === "fixationEnd") {
             this.endOfFirstFixation = data.gazeData;

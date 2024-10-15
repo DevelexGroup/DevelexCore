@@ -4,8 +4,8 @@
  */
 
 import type { GazeInteractionEvents, GazeInteraction } from './GazeInteraction/GazeInteraction';
-import type { GazeInteractionObject } from './GazeInteraction/Object/GazeInteractionObject';
-import type { GazeInteractionObjectListenerPayload } from "./GazeInteraction/Object/GazeInteractionObject.settings";
+import type { GazeInteractionObject } from './GazeInteraction/GazeInteractionObject';
+import type { GazeInteractionObjectListenerPayload } from "./GazeInteraction/GazeInteractionObject.settings";
 
 /**
  * @module GazeInput
@@ -46,9 +46,9 @@ export type GazeInteractionComponentPropsDefault = GazeInteractionComponentProps
  * -------------------------------
  */
 
-export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.js';
-export type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.event.js';
-export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.settings.js';
+export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObjectDwell.js';
+export type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event.js';
+export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/GazeInteractionObjectDwell.settings.js';
 
 /**
  * 2.3. Fixation interaction.
@@ -60,19 +60,19 @@ export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/Obje
  * -------------------------------
  */
 
-export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.js';
+export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObjectFixation.js';
 export type { GazeInteractionObjectFixationEvents,
-    GazeInteractionObjectFixationEvent} from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.event.js';
-export type { GazeInteractionObjectFixationSettings } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.settings.js';
+    GazeInteractionObjectFixationEvent} from '$lib/GazeInteraction/GazeInteractionObjectFixation.event.js';
+export type { GazeInteractionObjectFixationSettings } from '$lib/GazeInteraction/GazeInteractionObjectFixation.settings.js';
 
 /**
  * 2.3.2. Fixation screen.
  * -------------------------------
  */
 
-export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/Screen/GazeInteractionScreenFixation.js';
+export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreenFixation.js';
 export type { GazeInteractionScreenFixationEvents,
-    GazeInteractionScreenFixationEvent} from '$lib/GazeInteraction/Screen/GazeInteractionScreenFixation.event.js';
+    GazeInteractionScreenFixationEvent} from '$lib/GazeInteraction/GazeInteractionScreenFixation.event.js';
 
 /**
  * 2.4. Saccade interaction.
@@ -81,19 +81,19 @@ export type { GazeInteractionScreenFixationEvents,
  * -------------------------------
  */
 
-export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.js';
+export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.js';
 export type { GazeInteractionObjectSaccadeEvents,
-    GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.event.js';
-export type { GazeInteractionObjectSaccadeSettings } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.settings.js';
+    GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.event.js';
+export type { GazeInteractionObjectSaccadeSettings } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.settings.js';
 
 /**
  * 2.4.2. Saccade screen.
  * -------------------------------
  */
 
-export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/Screen/GazeInteractionScreenSaccade.js';
+export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.js';
 export type { GazeInteractionScreenSaccadeEvents,
-    GazeInteractionScreenSaccadeEvent} from '$lib/GazeInteraction/Screen/GazeInteractionScreenSaccadeEvent.js';
+    GazeInteractionScreenSaccadeEvent} from '$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent.js';
 
 
 /**
@@ -101,8 +101,8 @@ export type { GazeInteractionScreenSaccadeEvents,
  * -------------------------------
  */
 
-export { GazeInteractionObjectValidation } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.js';
-export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.settings.js';
+export { GazeInteractionObjectValidation } from '$lib/GazeInteraction/GazeInteractionObjectValidation.js';
+export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteraction/GazeInteractionObjectValidation.settings.js';
 
 /**
  * @module GazeIndicator

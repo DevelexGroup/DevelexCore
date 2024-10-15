@@ -1,8 +1,7 @@
 import type { GazeInteractionObjectFixationPayload } from './GazeInteractionObjectFixation.settings';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectFixationEvent, GazeInteractionObjectFixationEvents} from './GazeInteractionObjectFixation.event';
-import type { GazeInteractionScreenFixationEvent } from '../Screen/GazeInteractionScreenFixation.event';
-import type { GazeInteractionScreenFixation } from '../Screen/GazeInteractionScreenFixation';
+import type { GazeInteractionScreenFixationEvent } from './GazeInteractionScreenFixation.event';
 
 /**
  * Manages fixation events from the given eye-tracker input for elements,
@@ -19,14 +18,6 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
 		fixationObjectEnd: () => {},
 		fixationObjectProgress: () => {}
 	};
-
-    connect(input: GazeInteractionScreenFixation): void {
-        input.on('fixation', this.inputCallback);
-    }
-
-    disconnect(input: GazeInteractionScreenFixation): void {
-        input.off('fixation', this.inputCallback);
-    }
 
 	/**
 	 * Generates a listener object for fixation events.
@@ -52,11 +43,11 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
 		this.evaluateActiveListener(data, listener);
 	}
 
-	evaluateInputData(data: GazeInteractionScreenFixationEvent): void {
+	evaluate(data: GazeInteractionScreenFixationEvent): void {
 		this.triggeredTargets = [];
 		this.triggeredSettings = [];
 
-		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
+		super.evaluate(data); // This is the original code from the parent class evaluating each listener for activation
 
 		const eventType = data.type === 'fixationStart' ? 'fixationObjectStart' : data.type === 'fixationEnd' ? 'fixationObjectEnd' : 'fixationObjectProgress' as const;
 		const event = this.createFixationEvent(eventType, this.triggeredTargets, this.triggeredSettings, data);

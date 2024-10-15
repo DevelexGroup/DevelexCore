@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
 import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
-import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.event';
-import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.event';
-import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.event';
+import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event';
+import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/GazeInteractionObjectFixation.event';
+import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.event';
 
 import type { Dwell } from '../database/models/Dwell';
 import dwellRepository from '../database/repositories/dwell.repository';
@@ -15,7 +15,7 @@ import type { GazeDataPoint } from '$lib';
 import pointRepository from '../database/repositories/point.repository';
 import type { Validation } from '../database/models/Validation';
 import validationRepository from '../database/repositories/validation.repository';
-import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.event';
+import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/GazeInteractionObjectValidation.event';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
