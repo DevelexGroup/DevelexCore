@@ -1,10 +1,9 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import type { GazeInteractionEvents } from "./GazeInteraction";
 import type { GazeInteractionEvent } from "./GazeInteraction.event";
 
 export type GazeInteractionObjectValidationEvents = {
     'validation': GazeInteractionObjectValidationEvent,
-} & GazeInteractionEvents;
+};
 
 export interface GazeInteractionObjectValidationEvent extends GazeInteractionEvent {
     validationDuration: number;
