@@ -16,6 +16,7 @@ import type { GazeInteractionScreenFixationEvent, GazeInteractionScreenFixationE
 import { GazeInteractionScreenSaccade } from "$lib/GazeInteraction/GazeInteractionScreenSaccade";
 
 import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent";
+import { parseArgs } from "util";
 
 // Manager class that routes event registration to the correct Emitter
 export class EmitterGroup<T extends EventMap> {
@@ -67,6 +68,29 @@ export class EmitterGroup<T extends EventMap> {
     }
 }
 
+/**
+ * Manager class for gaze interaction.
+ * This class connects the input generator (e.g., eye-tracker) with the gaze interaction logic.
+ * It routes gaze data to the correct interaction logic, such as fixation, saccade, dwell, or validation.
+ * It also manages the registration and unregistration of elements for gaze interaction.
+ * 
+ * @example
+ * const gazeManager = new GazeManager();
+ * gazeManager.connect();
+ * gazeManager.register({
+ *    interaction: 'fixation',
+ *    element: document.body,
+ *    settings: {
+ *      bufferSize: 1000,
+ *      fixationObjectStart: () => {},
+ *      fixationObjectEnd: () => {},
+ *      fixationObjectProgress: () => {}
+ * }
+ * });
+ * gazeManager.on('fixationObjectEnd', (event) => {
+ *   console.log(event);
+ * });
+ */
 export class GazeManager extends EmitterGroup<
     ETHandlerMapping &
     GazeInteractionScreenFixationEvents &
@@ -77,60 +101,112 @@ export class GazeManager extends EmitterGroup<
     GazeInteractionObjectValidationEvents
 > {
     input: GazeInput<GazeInputConfig>;
-    fixationEmitter: GazeInteractionScreenFixation;
-    fixationObjectEmitter: GazeInteractionObjectFixation;
-    saccadeEmitter: GazeInteractionScreenSaccade;
-    saccadeObjectEmitter: GazeInteractionObjectSaccade;
-    dwellEmitter: GazeInteractionObjectDwell;
-    validationEmitter: GazeInteractionObjectValidation;
+    fixation: GazeInteractionScreenFixation;
+    fixationObject: GazeInteractionObjectFixation;
+    saccade: GazeInteractionScreenSaccade;
+    saccadeObject: GazeInteractionObjectSaccade;
+    dwell: GazeInteractionObjectDwell;
+    validation: GazeInteractionObjectValidation;
 
     linkData: (data: GazeDataPoint) => void = (data) => {
-        this.fixationEmitter.evaluate(data);
-        this.dwellEmitter.evaluate(data);
-        this.validationEmitter.evaluate(data);
+        this.fixation.evaluate(data);
+        this.dwell.evaluate(data);
+        this.validation.evaluate(data);
     }
 
     linkFixation: (data: GazeInteractionScreenFixationEvent) => void = (data) => {
-        this.saccadeEmitter.evaluate(data);
-        this.fixationObjectEmitter.evaluate(data);
+        this.saccade.evaluate(data);
+        this.fixationObject.evaluate(data);
     }
 
     linkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void = (data) => {
-        this.saccadeObjectEmitter.evaluate(data);
+        this.saccadeObject.evaluate(data);
     }
 
 
     constructor(input: GazeInput<GazeInputConfig>) {
-        const dwellEmitter = new GazeInteractionObjectDwell();
-        const fixationEmitter = new GazeInteractionScreenFixation();
-        const fixationObjectEmitter = new GazeInteractionObjectFixation();
-        const saccadeEmitter = new GazeInteractionScreenSaccade();
-        const saccadeObjectEmitter = new GazeInteractionObjectSaccade();
-        const validationEmitter = new GazeInteractionObjectValidation();
+        const dwell = new GazeInteractionObjectDwell();
+        const fixation = new GazeInteractionScreenFixation();
+        const fixationObject = new GazeInteractionObjectFixation();
+        const saccade = new GazeInteractionScreenSaccade();
+        const saccadeObject = new GazeInteractionObjectSaccade();
+        const validation = new GazeInteractionObjectValidation();
         super({
-            fixationObjectStart: fixationEmitter,
-            dwellProgress: dwellEmitter,
+            fixationObjectStart: fixation,
+            dwellProgress: dwell,
         });
         this.input = input;
-        this.fixationEmitter = fixationEmitter;
-        this.fixationObjectEmitter = fixationObjectEmitter;
-        this.saccadeEmitter = saccadeEmitter;
-        this.saccadeObjectEmitter = saccadeObjectEmitter;
-        this.dwellEmitter = dwellEmitter;
-        this.validationEmitter = validationEmitter;
+        this.fixation = fixation;
+        this.fixationObject = fixationObject;
+        this.saccade = saccade;
+        this.saccadeObject = saccadeObject;
+        this.dwell = dwell;
+        this.validation = validation;
     }
 
     connect() {
        this.input.on('data', this.linkData.bind(this));
-       this.fixationEmitter.on('fixationEnd', this.linkFixation.bind(this));
-       this.saccadeEmitter.on('saccade', this.linkSaccade.bind(this));
+       this.fixation.on('fixationEnd', this.linkFixation.bind(this));
+       this.saccade.on('saccade', this.linkSaccade.bind(this));
        this.input.connect();
     }
 
     disconnect() {
         this.input.off('data', this.linkData);
-        this.fixationEmitter.off('fixationEnd', this.linkFixation);
-        this.saccadeEmitter.off('saccade', this.linkSaccade);
+        this.fixation.off('fixationEnd', this.linkFixation);
+        this.saccade.off('saccade', this.linkSaccade);
         this.input.disconnect();
     }
+
+    register({interaction, element, settings}: GazeManagerRegistration) {
+        switch (interaction) {
+            case 'fixation':
+                this.fixationObject.register(element, settings);
+                break;
+            case 'saccade':
+                this.saccadeObject.register(element, settings);
+                break;
+            case 'dwell':
+                this.dwell.register(element, settings);
+                break;
+            case 'validation':
+                this.validation.register(element, settings);
+                break;
+        }
+    }
+
+    unregister({interaction, element}: GazeManagerRegistration) {
+        switch (interaction) {
+            case 'fixation':
+                this.fixationObject.unregister(element);
+                break;
+            case 'saccade':
+                this.saccadeObject.unregister(element);
+                break;
+            case 'dwell':
+                this.dwell.unregister(element);
+                break;
+            case 'validation':
+                this.validation.unregister(element);
+                break;
+        }
+    }
+}
+
+export type GazeManagerRegistration = {
+    interaction: 'fixation',
+    element: Element,
+    settings: Partial<GazeInteractionObjectFixation['defaultSettings']>
+} | {
+    interaction: 'saccade',
+    element: Element,
+    settings: Partial<GazeInteractionObjectSaccade['defaultSettings']>
+} | {
+    interaction: 'dwell',
+    element: Element,
+    settings: Partial<GazeInteractionObjectDwell['defaultSettings']>
+} | {
+    interaction: 'validation',
+    element: Element,
+    settings: Partial<GazeInteractionObjectValidation['defaultSettings']>
 }
