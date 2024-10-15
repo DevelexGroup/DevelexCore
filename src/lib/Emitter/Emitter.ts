@@ -20,6 +20,15 @@ export abstract class Emitter<T extends EventMap> {
     } = {};
 
     /**
+     * Checks if the gaze interaction has any listeners.
+     * It can be used for optimization purposes.
+     * @returns True if the gaze interaction has listeners, false otherwise.
+     */
+    hasListeners(): boolean {
+        return Object.keys(this.handlers).length > 0;
+    }
+
+    /**
      * Registers an event handler for the specified event.
      * @param eventName - The name of the event.
      * @param fn - The event handler function.
