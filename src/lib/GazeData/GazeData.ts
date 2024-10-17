@@ -21,6 +21,9 @@ export interface GazeDataPoint {
 
     parseValidity: boolean;
 
+    pupilDiameterL: number;
+    pupilDiameterR: number;
+
     fixationDuration?: number;
     fixationId?: number;
 }

@@ -17,6 +17,8 @@ export type GazeInputBridgeWebsocketIncomerPointBase = {
     validityL: boolean;
     validityR: boolean;
     deviceValidity: boolean;
+    pupilDiameterL: number;
+    pupilDiameterR: number;
 };
 
 export type GazeInputBridgeWebsocketIncomerFixation = GazeInputBridgeWebsocketIncomerPointBase & {
