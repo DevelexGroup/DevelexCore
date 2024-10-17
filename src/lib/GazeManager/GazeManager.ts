@@ -1,9 +1,8 @@
-import type { Emitter, EventKey, EventMap, EventReceiver } from "$lib/Emitter/Emitter";
+import { Emitter, EmitterWithFacade, type EventKey, type EventMap, type EventReceiver } from "$lib/Emitter/Emitter";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-import { createGazeInput } from "$lib/GazeInput";
-import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import type { ETHandlerMapping } from "$lib/GazeInput/GazeInputEvent";
+import { GazeInputFacade } from "$lib/GazeInput/GazeInputFacade";
 import { GazeInteractionObjectDwell } from "$lib/GazeInteraction/GazeInteractionObjectDwell";
 import type { GazeInteractionObjectDwellEvents } from "$lib/GazeInteraction/GazeInteractionObjectDwell.event";
 import { GazeInteractionObjectFixation } from "$lib/GazeInteraction/GazeInteractionObjectFixation";
@@ -23,10 +22,10 @@ import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorCo
 // Manager class that routes event registration to the correct Emitter
 export class EmitterGroup<T extends EventMap> {
     // A mapping of event names to their respective emitters
-    private emitterMap: Record<string, Emitter<T>> = {};
+    private emitterMap: Record<EventKey<T>, Emitter<T> | EmitterWithFacade<T>>;
 
     // Initialize the manager with emitters and their associated events
-    constructor(emitterMap: Record<string, Emitter<T>>) {
+    constructor(emitterMap: Record<string, Emitter<T> | EmitterWithFacade<T>>) {
         this.emitterMap = emitterMap;
     }
 
@@ -95,15 +94,15 @@ export class EmitterGroup<T extends EventMap> {
  * });
  */
 export class GazeManager extends EmitterGroup<
-    ETHandlerMapping &
     GazeInteractionScreenFixationEvents &
     GazeInteractionScreenSaccadeEvents &
     GazeInteractionObjectSaccadeEvents &
     GazeInteractionObjectFixationEvents &
     GazeInteractionObjectDwellEvents &
-    GazeInteractionObjectValidationEvents
+    GazeInteractionObjectValidationEvents &
+    ETHandlerMapping
 > {
-    input: GazeInput<GazeInputConfig>;
+    input: GazeInputFacade;
     fixation: GazeInteractionScreenFixation;
     fixationObject: GazeInteractionObjectFixation;
     saccade: GazeInteractionScreenSaccade;
@@ -140,7 +139,7 @@ export class GazeManager extends EmitterGroup<
     }
 
 
-    constructor(config: GazeInputConfig) {
+    constructor() {
         const dwell = new GazeInteractionObjectDwell();
         const fixation = new GazeInteractionScreenFixation();
         const fixationObject = new GazeInteractionObjectFixation();
@@ -148,17 +147,13 @@ export class GazeManager extends EmitterGroup<
         const saccadeObject = new GazeInteractionObjectSaccade();
         const validation = new GazeInteractionObjectValidation();
         const intersect = new GazeInteractionObjectIntersect();
-        const input = createGazeInput(config);
+        const input = new GazeInputFacade();
 
         /**
          * Mapping of event names to their respective emitters.
          * This is used to route events to the correct emitter.
          */
         const eventMapping = {
-            data: input,
-            connect: input,
-            state: input,
-            emit: input,
             dwell: dwell,
             dwellProgress: dwell,
             fixationObjectEnd: fixationObject,
@@ -166,7 +161,8 @@ export class GazeManager extends EmitterGroup<
             saccadeObjectTo: saccadeObject,
             saccadeObjectFrom: saccadeObject,
             validation: validation,
-            intersect: intersect
+            intersect: intersect,
+            data: input as EmitterWithFacade<ETHandlerMapping>,
         };
 
         /**
@@ -177,7 +173,6 @@ export class GazeManager extends EmitterGroup<
         /**
          * Store the input and interaction objects for later use.
          */
-        this.input = input;
         this.fixation = fixation;
         this.fixationObject = fixationObject;
         this.saccade = saccade;
@@ -185,6 +180,7 @@ export class GazeManager extends EmitterGroup<
         this.dwell = dwell;
         this.validation = validation;
         this.intersect = intersect;
+        this.input = input;
 
         /**
          * Mapping of interaction types to their respective interaction objects
@@ -214,14 +210,6 @@ export class GazeManager extends EmitterGroup<
         this.input.disconnect();
     }
 
-    start() {
-        this.input.start();
-    }
-
-    stop() {
-        this.input.stop();
-    }
-
     calibrate() {
         this.input.calibrate();
     }
@@ -230,12 +218,7 @@ export class GazeManager extends EmitterGroup<
         this.input.setWindowCalibration(mouseEvent, window);
     }
 
-    createInput(input: GazeInputConfig) {
-        if (this.input?.isConnected) {
-            throw new Error('Cannot create input while another input is connected');
-        }
-        this.input = createGazeInput(input);
-    }
+    createInput(input: GazeInputConfig) {this.input.createInput(input);}
 
     register({interaction, element, settings}: GazeManagerRegistration) {
         this.registrationMap[interaction].register(element, settings);

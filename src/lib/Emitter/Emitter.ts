@@ -1,5 +1,5 @@
 export type EventMap = Record<string, object>;
-export type EventKey<T extends EventMap> = string & keyof T;
+export type EventKey<T extends EventMap> = Extract<keyof T, string>;
 export type EventReceiver<T> = (params: T) => void;
 
 /**
@@ -62,6 +62,92 @@ export abstract class Emitter<T extends EventMap> {
     emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
         if (this.handlers[eventName]) {
             this.handlers[eventName].forEach(handler => handler.fn(params));
+        }
+    }
+
+    clear(): void {
+        this.handlers = {};
+    }
+}
+
+export abstract class EmitterWithFacade<T extends EventMap> extends Emitter<T> {
+    internalEmitter: Emitter<T> | null = null;
+
+    /**
+     * Set or replace the internal emitter instance.
+     * Reattaches all preserved handlers to the new emitter.
+     * @param newEmitter - The new emitter instance.
+     */
+    setEmitter(newEmitter: Emitter<T> | null): void {
+        if (this.internalEmitter) {
+            this.internalEmitter.clear();  // Clear the old emitter
+        }
+        this.internalEmitter = newEmitter;
+
+        // Reattach all handlers to the new internal emitter
+        if (this.internalEmitter) {
+            for (const eventName in this.handlers) {
+                this.handlers[eventName]?.forEach(handler => {
+                    this.internalEmitter?.on(eventName as EventKey<T>, handler.fn, handler.priority);
+                });
+            }
+        }
+    }
+
+    /**
+     * Registers an event handler in both the facade and internal emitter if set.
+     * @param eventName - The name of the event.
+     * @param fn - The event handler function.
+     * @param priority - Priority level of the handler.
+     */
+    override on<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>, priority: number = 0): void {
+        super.on(eventName, fn, priority);  // Register in facade
+        if (this.internalEmitter) {
+            this.internalEmitter.on(eventName, fn, priority);  // Register in internal emitter
+        }
+    }
+
+    /**
+     * Unregisters an event handler in both the facade and internal emitter.
+     * @param eventName - The name of the event.
+     * @param fn - The event handler function to remove.
+     */
+    override off<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>): void {
+        super.off(eventName, fn);  // Remove from facade
+        if (this.internalEmitter) {
+            this.internalEmitter.off(eventName, fn);  // Remove from internal emitter
+        }
+    }
+
+    /**
+     * Emits the event. If the internal emitter is set, the event is emitted through it.
+     * Otherwise, the facade emits the event.
+     * @param eventName - The name of the event.
+     * @param params - Parameters to pass to the event handlers.
+     */
+    override emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
+        if (this.internalEmitter) {
+            this.internalEmitter.emit(eventName, params);  // Emit through internal emitter
+        } else {
+            super.emit(eventName, params);  // Emit through facade
+        }
+    }
+
+    /**
+     * Checks if there are any listeners registered in either the facade or the internal emitter.
+     * @returns True if any listeners are registered, false otherwise.
+     */
+    override hasListeners(): boolean {
+        return super.hasListeners() || (this.internalEmitter?.hasListeners() ?? false);
+    }
+
+    /**
+     * Clears all event handlers from the facade and the internal emitter.
+     */
+    override clear(): void {
+        super.clear();  // Clear facade handlers
+        if (this.internalEmitter) {
+            this.internalEmitter.clear();  // Clear internal emitter handlers
         }
     }
 }
