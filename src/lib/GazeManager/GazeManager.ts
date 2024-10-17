@@ -220,6 +220,10 @@ export class GazeManager extends EmitterGroup<
 
     createInput(input: GazeInputConfig) {this.input.createInput(input);}
 
+    start() {this.input.start();}
+
+    stop() {this.input.stop();}
+
     register({interaction, element, settings}: GazeManagerRegistration) {
         this.registrationMap[interaction].register(element, settings);
     }
