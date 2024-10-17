@@ -3,19 +3,32 @@
  * ================================
  */
 
-import type { GazeInteractionEvents, GazeInteraction } from './GazeInteraction/GazeInteraction';
+import type { EventMap } from './Emitter/Emitter';
+import type { GazeInteraction } from './GazeInteraction/GazeInteraction';
 import type { GazeInteractionObject } from './GazeInteraction/GazeInteractionObject';
 import type { GazeInteractionObjectListenerPayload } from "./GazeInteraction/GazeInteractionObject.settings";
+
+/**
+ * @module GazeManager
+ * 0. GazeManager
+ * ================================
+ * 0.1. The main facade of the library. Wraps all the functionality of the library.
+ * -------------------------------
+*/
+export { GazeManager } from '$lib/GazeManager/GazeManager.js';
+
 
 /**
  * @module GazeInput
  * 1. Gaze Input objects and its events.
  * ================================
- * 1.1 The main functionality of the library. Creating an instance of an eye tracking input. Immutable!
+ * 1.1 The main functionality of the library. Creating an instance of an eye tracking input.
+ *     And facade for the input.
  * -------------------------------
  */ 
 
 export { createGazeInput } from '$lib/GazeInput/index.js';
+export { GazeInputFacade } from '$lib/GazeInput/GazeInputFacade.js';
 
 /**
  * 1.2 Configuration types for the input.
@@ -32,14 +45,14 @@ export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, Gaz
  * -------------------------------
  */
 
-export type { GazeInteractionEvents, GazeInteraction };
+export type { GazeInteraction };
 
-export interface GazeInteractionComponentProps<TInteractionEvents extends GazeInteractionEvents, TInputData extends { type: string}, TListenerPayload extends GazeInteractionObjectListenerPayload> {
+export interface GazeInteractionComponentProps<TInteractionEvents extends EventMap, TInputData extends { type: string}, TListenerPayload extends GazeInteractionObjectListenerPayload> {
     gazeInteractionObject: GazeInteractionObject<TInteractionEvents, TInputData, TListenerPayload>;
     settings: Partial<TListenerPayload['listener']['settings']>;
 }
 
-export type GazeInteractionComponentPropsDefault = GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionObjectListenerPayload>
+export type GazeInteractionComponentPropsDefault = GazeInteractionComponentProps<EventMap, { type: string }, GazeInteractionObjectListenerPayload>
 
 /**
  * 2.2. Dwell interaction.

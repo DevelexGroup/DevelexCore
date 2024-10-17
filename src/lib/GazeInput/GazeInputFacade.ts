@@ -7,10 +7,6 @@ import type { ETHandlerMapping } from "./GazeInputEvent";
 
 export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
 
-    constructor() {
-        super();
-    }
-
     /**
      * Get the current input.
      * @returns The current input or null if no input is set.
