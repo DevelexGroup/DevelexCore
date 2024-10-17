@@ -183,9 +183,65 @@ export class GazeManager extends EmitterGroup<
         this.registrationMap[interaction].unregister(element);
     }
 
+    /**
+     * Get the current input.
+     * @returns The current input or null if no input is set.
+     * @readonly
+     */
     get input(): GazeInput<GazeInputConfig> | null {return this._input.input;}
 
+    /**
+     * Get the current input instance.
+     * @returns The current input instance or null if no input is set.
+     * @readonly
+     * @throws Error if no input is set.
+     */ 
     get inputInstance(): GazeInput<GazeInputConfig> {return this._input.inputInstance;}
+
+    /**
+	 * Get the current connected state.
+	 * @returns True if connected, false otherwise.
+	 * @readonly
+	 * @emits connect - When the connected state changes.
+	 * @emits state - When the connected state changes.
+	 */
+    get isConnected(): boolean { return this._input.isConnected; }
+
+    	/**
+	 * Get the current device calibration state.
+	 * @returns True if calibrated, false otherwise.
+	 * @readonly
+	 * @emits calibrated - When the device calibration state changes.
+	 * @emits state - When the device calibration state changes.
+	 */ 
+    get isDeviceCalibrated(): boolean { return this._input.isDeviceCalibrated; }
+
+    /**
+	 * Get the current window calibration state.
+	 * @returns True if calibrated, false otherwise.
+	 * @readonly
+	 * @emits windowCalibrated - When the window calibration state changes.
+	 * @emits state - When the window calibration state changes.
+	 */
+    get isWindowCalibrated(): boolean { return this._input.isWindowCalibrated; }
+
+    /**
+	 * Get the current window calibration contested state.
+	 * @returns True if contested, false otherwise.
+	 * @readonly
+	 * @emits windowCalibrationContested - When the window calibration contested state changes.
+	 * @emits state - When the window calibration contested state changes.
+	 */
+    get isWindowCalibrationContested(): boolean { return this._input.isWindowCalibrationContested; }
+
+    /**
+	 * Get the current emitting state.
+	 * @returns True if emitting, false otherwise.
+	 * @readonly
+	 * @emits emit - When the emitting state changes.
+	 * @emits state - When the emitting state changes.
+	 */
+    get isEmitting(): boolean { return this._input.isEmitting; }
 
     set input(input: GazeInput<GazeInputConfig>) {this._input.input = input;}
 }
