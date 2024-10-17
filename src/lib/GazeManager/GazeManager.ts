@@ -144,7 +144,12 @@ export class GazeManager extends EmitterGroup<
         const saccadeObject = new GazeInteractionObjectSaccade();
         const validation = new GazeInteractionObjectValidation();
         const input = createGazeInput(config);
-        super({
+
+        /**
+         * Mapping of event names to their respective emitters.
+         * This is used to route events to the correct emitter.
+         */
+        const eventMapping = {
             data: input,
             connect: input,
             state: input,
@@ -156,7 +161,16 @@ export class GazeManager extends EmitterGroup<
             saccadeObjectTo: saccadeObject,
             saccadeObjectFrom: saccadeObject,
             validation: validation,
-        });
+        };
+
+        /**
+         * Initialize the manager with the input and interaction objects.
+         */
+        super({...eventMapping});
+
+        /**
+         * Store the input and interaction objects for later use.
+         */
         this.input = input;
         this.fixation = fixation;
         this.fixationObject = fixationObject;
@@ -164,6 +178,11 @@ export class GazeManager extends EmitterGroup<
         this.saccadeObject = saccadeObject;
         this.dwell = dwell;
         this.validation = validation;
+        
+        /**
+         * Mapping of interaction types to their respective interaction objects
+         * to register and unregister HTML elements for gaze interaction.
+         */
         this.registrationMap = {
             'fixation': fixationObject,
             'saccade': saccadeObject,
