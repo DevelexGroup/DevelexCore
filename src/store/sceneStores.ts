@@ -16,6 +16,9 @@ import pointRepository from '../database/repositories/point.repository';
 import type { Validation } from '../database/models/Validation';
 import validationRepository from '../database/repositories/validation.repository';
 import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/GazeInteractionObjectValidation.event';
+import type { GazeInteractionObjectIntersectEvent } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.event';
+import type { Intersect } from '../database/models/Intersect';
+import intersectRepository from '../database/repositories/intersect.repository';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -77,6 +80,38 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixation
     void fixationRepository.create(event);
 
     sceneObjectFixationStore.update(events => {
+        // Add the new event
+        const updatedEvents = [event, ...events];
+        
+        // If there are more than 100 events, remove the oldest one
+        if (updatedEvents.length > 100) {
+            updatedEvents.pop();
+        }
+        
+        return updatedEvents;
+    });
+}
+
+export const sceneObjectIntersectStore = writable<Intersect[]>([]);
+
+export const addIntersectEvent = (unprocessedEvent: GazeInteractionObjectIntersectEvent) => {
+    // Extract the relevant information from the event
+    const { type, sessionId, timestamp, gazeData, target } = unprocessedEvent;
+    // convert target, which is array of Elements, id to string delimited by ;
+    // check if Array.isArray(target) is true
+    const aoi = Array.isArray(target) ? target.map((t) => t.id.toString()).join(';') : '';
+
+    const event: Intersect = {
+        type,
+        sessionId,
+        timestamp,
+        aoi,
+        gazeData
+    };
+
+    void intersectRepository.create(event);
+
+    sceneObjectIntersectStore.update(events => {
         // Add the new event
         const updatedEvents = [event, ...events];
         
