@@ -8,6 +8,7 @@ import { GazeInteractionObjectDwell } from "$lib/GazeInteraction/GazeInteraction
 import type { GazeInteractionObjectDwellEvents } from "$lib/GazeInteraction/GazeInteractionObjectDwell.event";
 import { GazeInteractionObjectFixation } from "$lib/GazeInteraction/GazeInteractionObjectFixation";
 import type { GazeInteractionObjectFixationEvents } from "$lib/GazeInteraction/GazeInteractionObjectFixation.event";
+import { GazeInteractionObjectIntersect } from "$lib/GazeInteraction/GazeInteractionObjectIntersect";
 import { GazeInteractionObjectSaccade } from "$lib/GazeInteraction/GazeInteractionObjectSaccade";
 import type { GazeInteractionObjectSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionObjectSaccade.event";
 import { GazeInteractionObjectValidation } from "$lib/GazeInteraction/GazeInteractionObjectValidation";
@@ -109,6 +110,7 @@ export class GazeManager extends EmitterGroup<
     saccadeObject: GazeInteractionObjectSaccade;
     dwell: GazeInteractionObjectDwell;
     validation: GazeInteractionObjectValidation;
+    intersect: GazeInteractionObjectIntersect;
     /**
      * A mapping of interaction types to their respective interaction objects.
      * Applicable only to GazeInteractionObject instances.
@@ -118,12 +120,14 @@ export class GazeManager extends EmitterGroup<
         'saccade': GazeInteractionObjectSaccade,
         'dwell': GazeInteractionObjectDwell,
         'validation': GazeInteractionObjectValidation,
+        'intersect': GazeInteractionObjectIntersect
     }
 
     linkData: (data: GazeDataPoint) => void = (data) => {
         this.fixation.evaluate(data);
         this.dwell.evaluate(data);
         this.validation.evaluate(data);
+        this.intersect.evaluate(data);
     }
 
     linkFixation: (data: GazeInteractionScreenFixationEvent) => void = (data) => {
@@ -143,6 +147,7 @@ export class GazeManager extends EmitterGroup<
         const saccade = new GazeInteractionScreenSaccade();
         const saccadeObject = new GazeInteractionObjectSaccade();
         const validation = new GazeInteractionObjectValidation();
+        const intersect = new GazeInteractionObjectIntersect();
         const input = createGazeInput(config);
 
         /**
@@ -161,6 +166,7 @@ export class GazeManager extends EmitterGroup<
             saccadeObjectTo: saccadeObject,
             saccadeObjectFrom: saccadeObject,
             validation: validation,
+            intersect: intersect
         };
 
         /**
@@ -178,7 +184,8 @@ export class GazeManager extends EmitterGroup<
         this.saccadeObject = saccadeObject;
         this.dwell = dwell;
         this.validation = validation;
-        
+        this.intersect = intersect;
+
         /**
          * Mapping of interaction types to their respective interaction objects
          * to register and unregister HTML elements for gaze interaction.
@@ -188,6 +195,7 @@ export class GazeManager extends EmitterGroup<
             'saccade': saccadeObject,
             dwell,
             validation,
+            intersect
         }
     }
 
@@ -254,4 +262,8 @@ export type GazeManagerRegistration = {
     interaction: 'validation',
     element: Element,
     settings: Partial<GazeInteractionObjectValidation['defaultSettings']>
+} | {
+    interaction: 'intersect',
+    element: Element,
+    settings: Partial<GazeInteractionObjectIntersect['defaultSettings']>
 }
