@@ -6,7 +6,7 @@
 	import type { GazeManager } from "$lib/GazeManager/GazeManager";
 
     export let validationSettings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number };
-    export let validator: GazeManager | null = null;
+    export let validator: GazeManager;
     export let aoi: string;
     export let animation: 'smaller' | 'bigger' | 'pulse' = 'smaller';
     export let color: string = 'red';

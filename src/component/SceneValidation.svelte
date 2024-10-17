@@ -22,13 +22,14 @@
         color: "green"},
     ] as const;
 
+    const validator = $gazeManagerStore;
 </script>
 
 <div class="holder">
     <Group heading="Validation Circles">
         <div class="grouping">
         {#each validations as setting}
-            <Validation aoi={setting.aoi} validationSettings={settings} validator={$gazeManagerStore} animation={setting.animation} color={setting.color} />
+            <Validation aoi={setting.aoi} validationSettings={settings} {validator} animation={setting.animation} color={setting.color} />
         {/each}
         </div>
     </Group>

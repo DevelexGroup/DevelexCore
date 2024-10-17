@@ -1,4 +1,4 @@
-import { EmitterGroup, EmitterWithFacade } from "$lib/Emitter/Emitter";
+import { EmitterGroup } from "$lib/Emitter/Emitter";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
@@ -9,6 +9,7 @@ import type { GazeInteractionObjectDwellEvents } from "$lib/GazeInteraction/Gaze
 import { GazeInteractionObjectFixation } from "$lib/GazeInteraction/GazeInteractionObjectFixation";
 import type { GazeInteractionObjectFixationEvents } from "$lib/GazeInteraction/GazeInteractionObjectFixation.event";
 import { GazeInteractionObjectIntersect } from "$lib/GazeInteraction/GazeInteractionObjectIntersect";
+import type { GazeInteractionObjectIntersectEvents } from "$lib/GazeInteraction/GazeInteractionObjectIntersect.event";
 import { GazeInteractionObjectSaccade } from "$lib/GazeInteraction/GazeInteractionObjectSaccade";
 import type { GazeInteractionObjectSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionObjectSaccade.event";
 import { GazeInteractionObjectValidation } from "$lib/GazeInteraction/GazeInteractionObjectValidation";
@@ -51,6 +52,7 @@ export class GazeManager extends EmitterGroup<
     GazeInteractionObjectFixationEvents &
     GazeInteractionObjectDwellEvents &
     GazeInteractionObjectValidationEvents &
+    GazeInteractionObjectIntersectEvents &
     ETHandlerMapping
 > {
     _input: GazeInputFacade;
@@ -73,20 +75,14 @@ export class GazeManager extends EmitterGroup<
         'intersect': GazeInteractionObjectIntersect
     }
 
-    linkData: (data: GazeDataPoint) => void = (data) => {
-        this.fixation.evaluate(data);
-        this.dwell.evaluate(data);
-        this.validation.evaluate(data);
-        this.intersect.evaluate(data);
-    }
-
-    linkFixation: (data: GazeInteractionScreenFixationEvent) => void = (data) => {
-        this.saccade.evaluate(data);
-        this.fixationObject.evaluate(data);
-    }
-
-    linkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void = (data) => {
-        this.saccadeObject.evaluate(data);
+    private linkData: (data: GazeDataPoint) => void
+    private linkFixation: (data: GazeInteractionScreenFixationEvent) => void
+    private linkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void
+    private link() {
+        this._input.on('data', this.linkData.bind(this));
+        this.fixation.on('fixationStart', this.linkFixation.bind(this));
+        this.fixation.on('fixationEnd', this.linkFixation.bind(this));
+        this.saccade.on('saccade', this.linkSaccade.bind(this));
     }
 
 
@@ -107,20 +103,27 @@ export class GazeManager extends EmitterGroup<
         const eventMapping = {
             dwell: dwell,
             dwellProgress: dwell,
+            dwellFinish: dwell,
+            dwellCancel: dwell,
+            fixation: fixation,
+            fixationStart: fixation,
+            fixationEnd: fixation,
+            fixationProgress: fixation,
             fixationObjectEnd: fixationObject,
             fixationObjectStart: fixationObject,
+            fixationObjectProgress: fixationObject,
             saccadeObjectTo: saccadeObject,
             saccadeObjectFrom: saccadeObject,
             validation: validation,
             intersect: intersect,
-            data: input as EmitterWithFacade<ETHandlerMapping>,
-            state: input as EmitterWithFacade<ETHandlerMapping>,
-            connect: input as EmitterWithFacade<ETHandlerMapping>,
-            emit: input as EmitterWithFacade<ETHandlerMapping>,
-            error: input as EmitterWithFacade<ETHandlerMapping>,
-            windowCalibrated: input as EmitterWithFacade<ETHandlerMapping>,
-            windowCalibrationContested: input as EmitterWithFacade<ETHandlerMapping>,
-            calibrated: input as EmitterWithFacade<ETHandlerMapping>,
+            data: input,
+            state: input,
+            connect: input,
+            emit: input,
+            error: input,
+            windowCalibrated: input,
+            windowCalibrationContested: input,
+            calibrated: input,
         };
 
         /**
@@ -151,21 +154,30 @@ export class GazeManager extends EmitterGroup<
             validation,
             intersect
         }
+
+        this.linkData = (data) => {
+            this.fixation.evaluate(data);
+            this.dwell.evaluate(data);
+            this.validation.evaluate(data);
+            this.intersect.evaluate(data);
+        }
+        this.linkFixation = (data) => {
+            this.saccade.evaluate(data);
+            this.fixationObject.evaluate(data);
+        }
+        this.linkSaccade = (data) => {
+            this.saccadeObject.evaluate(data);
+        }
+        this.link();
     }
 
     connect() {
-       this._input.on('data', this.linkData.bind(this));
-       this.fixation.on('fixationStart', this.linkFixation.bind(this));
-       this.fixation.on('fixationEnd', this.linkFixation.bind(this));
-       this.saccade.on('saccade', this.linkSaccade.bind(this));
        this._input.connect();
     }
 
     disconnect() {
-        this._input.off('data', this.linkData);
-        this.fixation.off('fixationEnd', this.linkFixation);
-        this.saccade.off('saccade', this.linkSaccade);
         this._input.disconnect();
+        console.log('disconnected', this._input, this._input.internalEmitter)
     }
 
     calibrate() {

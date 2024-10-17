@@ -1,7 +1,7 @@
 /**
  * Svelte store containing the gaze input instance.
  */
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 import { GazeManager } from '$lib/GazeManager/GazeManager';
 import { addDwellEvent, addFixationEvent, addIntersectEvent, addPointEvent, addSaccadeEvent, addValidationEvent } from "./sceneStores";
@@ -37,16 +37,11 @@ export const setGazeInput = (input: Input | null) => {
     });
 };
 
-gazeManagerStore.subscribe((gazeManager) => {
-    if (gazeManager === null) {
-        return;
-    }
-    gazeManager.on("data", addPointEvent);
-    gazeManager.on("dwell", addDwellEvent);
-    gazeManager.on("fixationObjectStart", addFixationEvent);
-    gazeManager.on("fixationObjectEnd", addFixationEvent);
-    gazeManager.on("saccadeObjectTo", addSaccadeEvent);
-    gazeManager.on("saccadeObjectFrom", addSaccadeEvent);
-    gazeManager.on("validation", addValidationEvent);
-    gazeManager.on("intersect", addIntersectEvent);
-});
+get(gazeManagerStore).on("data", addPointEvent);
+get(gazeManagerStore).on("dwell", addDwellEvent);
+get(gazeManagerStore).on("fixationObjectStart", addFixationEvent);
+get(gazeManagerStore).on("fixationObjectEnd", addFixationEvent);
+get(gazeManagerStore).on("saccadeObjectTo", addSaccadeEvent);
+get(gazeManagerStore).on("saccadeObjectFrom", addSaccadeEvent);
+get(gazeManagerStore).on("validation", addValidationEvent);
+get(gazeManagerStore).on("intersect", addIntersectEvent);

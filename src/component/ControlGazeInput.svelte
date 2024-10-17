@@ -37,11 +37,9 @@
         }
     };
 
-    $: if ($gazeManagerStore !== null) {
         $gazeManagerStore.on("state", (data) => {
             handleGazeInputMessage(data);
         });
-    }
 
     const drawGaze = (gaze: GazeDataPoint) => {
         indicator.draw(gaze);

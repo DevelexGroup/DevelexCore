@@ -25,10 +25,10 @@
     const handleGazeInputMessage = (data: GazeInputMessage) => {
         gazeInputStates = getGazeInputStates();
     };
-
+    
+    $gazeManagerStore.on("state", handleGazeInputMessage);
     // if gazeInputState, listen for messages
     $: if ($gazeManagerStore !== null) {
-        $gazeManagerStore.on("state", handleGazeInputMessage);
         gazeInputStates = getGazeInputStates();
         gazeInputConfig = getGazeInputConfig();
     } else {

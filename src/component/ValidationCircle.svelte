@@ -4,7 +4,7 @@
 	import type { GazeManager } from "$lib/GazeManager/GazeManager";
 
     export let validationSettings: Partial<GazeInteractionObjectValidationSettings> & { validationDuration: number };
-    export let validator: GazeManager | null;
+    export let validator: GazeManager;
     export let centerCoordinates: { x: number, y: number };
     export let animation: 'smaller' | 'bigger' | 'pulse' = 'smaller';
     export let color: string = 'red';
@@ -13,7 +13,6 @@
     let duration = validationSettings.validationDuration; // ms
 
     onMount(() => {
-        if (!validator) return;
         validator.register({
             interaction: "validation",
             element,
@@ -22,7 +21,6 @@
     });
 
     onDestroy(() => {
-        if (!validator) return;
         validator.unregister({
             interaction: "validation",
             element,
