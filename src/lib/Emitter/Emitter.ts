@@ -151,3 +151,54 @@ export abstract class EmitterWithFacade<T extends EventMap> extends Emitter<T> {
         }
     }
 }
+
+// Manager class that routes event registration to the correct Emitter
+
+export class EmitterGroup<T extends EventMap> {
+    // A mapping of event names to their respective emitters
+    private emitterMap: Record<EventKey<T>, Emitter<T> | EmitterWithFacade<T>>;
+
+    // Initialize the manager with emitters and their associated events
+    constructor(emitterMap: Record<string, Emitter<T> | EmitterWithFacade<T>>) {
+        this.emitterMap = emitterMap;
+    }
+
+    /**
+     * links an event handler for the specified event, automatically routing
+     * to the correct emitter.
+     * @param eventName - The name of the event (e.g., 'fixationEnd', 'dwell').
+     * @param fn - The event handler function.
+     * @param priority - The priority of the handler (default: 0).
+     */
+    on<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>, priority: number = 0): void {
+        const emitter = this.getEmitter(eventName);
+        if (emitter) {
+            emitter.on(eventName, fn, priority);
+        } else {
+            throw new Error(`No emitter found for event '${eventName}'`);
+        }
+    }
+
+    /**
+     * Unlinks an event handler for the specified event.
+     * @param eventName - The name of the event.
+     * @param fn - The event handler function to remove.
+     */
+    off<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>): void {
+        const emitter = this.getEmitter(eventName);
+        if (emitter) {
+            emitter.off(eventName, fn);
+        } else {
+            throw new Error(`No emitter found for event '${eventName}'`);
+        }
+    }
+
+    /**
+     * Finds the correct emitter for the given event name.
+     * @param eventName - The name of the event.
+     * @returns The emitter responsible for the event, or undefined if none exists.
+     */
+    private getEmitter<K extends EventKey<T>>(eventName: K): Emitter<T> | undefined {
+        return this.emitterMap[eventName];
+    }
+}

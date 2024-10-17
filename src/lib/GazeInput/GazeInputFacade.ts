@@ -13,15 +13,24 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
 
     /**
      * Get the current input instance.
+     * @returns The current input instance or null if not set.
+     */
+    get input(): GazeInput<GazeInputConfig> | null {
+        const input = this.internalEmitter
+        if (!input) return null
+        return input as GazeInput<GazeInputConfig>
+    }
+
+    /**
+     * Get the current input instance.
      * @returns The current input instance.
      * @throws Error if no input is set.
      */
-    get input(): GazeInput<GazeInputConfig> {
-        const input = this.internalEmitter
-        if (!input) {
-            throw new Error("GazeInputFacade: No input set.");
+    get inputInstance(): GazeInput<GazeInputConfig> {
+        if (!this.input) {
+            throw new Error("No input instance set.");
         }
-        return input as GazeInput<GazeInputConfig>
+        return this.input as GazeInput<GazeInputConfig>
     }
 
     /**
@@ -37,7 +46,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     start(): void {
-        this.input.start();
+        this.inputInstance.start();
     }
 
     /**
@@ -45,7 +54,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     stop(): void {
-        this.input.stop();
+        this.inputInstance.stop();
     }
 
     /**
@@ -53,7 +62,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     connect(): void {
-        this.input.connect();
+        this.inputInstance.connect();
     }
 
     /**
@@ -61,7 +70,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     disconnect(): void {
-        this.input.disconnect();
+        this.inputInstance.disconnect();
     }
 
     /**
@@ -69,7 +78,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     calibrate(): void {
-        this.input.calibrate();
+        this.inputInstance.calibrate();
     }
 
     /**
