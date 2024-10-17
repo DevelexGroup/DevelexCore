@@ -143,7 +143,9 @@ export const createGazePointFactory = (
 			validityL: true,
 			validityR: true,
 			parseValidity: true, // todo: implement validity check on window coordinates decorrelation
-			type: 'point'
+			type: 'point',
+			pupilDiameterL: 0,
+			pupilDiameterR: 0,
 		};
 		return fixationDetector.processGazePoint(point);
 	};

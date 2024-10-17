@@ -4,7 +4,7 @@ export type GazeInputConfig = GazeInputConfigBridge | GazeInputConfigDummy;
  * An eye tracker input that emits fixations.
  * This is a type alias for an instance of {@link GazeInput} with a configuration that emits fixations.
  */
-export type GazeInputConfigWithFixations = GazeInputConfigGazePoint & { fixationDetection: 'device' | 'idt' };
+export type GazeInputConfigWithFixations = GazeInputConfig & { fixationDetection: 'device' | 'idt' };
 
 export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigSMI | GazeInputConfigEyelogic;
 
