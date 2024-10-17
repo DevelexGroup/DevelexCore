@@ -109,6 +109,16 @@ export class GazeManager extends EmitterGroup<
     saccadeObject: GazeInteractionObjectSaccade;
     dwell: GazeInteractionObjectDwell;
     validation: GazeInteractionObjectValidation;
+    /**
+     * A mapping of interaction types to their respective interaction objects.
+     * Applicable only to GazeInteractionObject instances.
+     */
+    registrationMap: {
+        'fixation': GazeInteractionObjectFixation,
+        'saccade': GazeInteractionObjectSaccade,
+        'dwell': GazeInteractionObjectDwell,
+        'validation': GazeInteractionObjectValidation,
+    }
 
     linkData: (data: GazeDataPoint) => void = (data) => {
         this.fixation.evaluate(data);
@@ -154,6 +164,12 @@ export class GazeManager extends EmitterGroup<
         this.saccadeObject = saccadeObject;
         this.dwell = dwell;
         this.validation = validation;
+        this.registrationMap = {
+            'fixation': fixationObject,
+            'saccade': saccadeObject,
+            dwell,
+            validation,
+        }
     }
 
     connect() {
@@ -195,37 +211,11 @@ export class GazeManager extends EmitterGroup<
     }
 
     register({interaction, element, settings}: GazeManagerRegistration) {
-        switch (interaction) {
-            case 'fixation':
-                this.fixationObject.register(element, settings);
-                break;
-            case 'saccade':
-                this.saccadeObject.register(element, settings);
-                break;
-            case 'dwell':
-                this.dwell.register(element, settings);
-                break;
-            case 'validation':
-                this.validation.register(element, settings);
-                break;
-        }
+        this.registrationMap[interaction].register(element, settings);
     }
 
     unregister({interaction, element}: Omit<GazeManagerRegistration, 'settings'>) {
-        switch (interaction) {
-            case 'fixation':
-                this.fixationObject.unregister(element);
-                break;
-            case 'saccade':
-                this.saccadeObject.unregister(element);
-                break;
-            case 'dwell':
-                this.dwell.unregister(element);
-                break;
-            case 'validation':
-                this.validation.unregister(element);
-                break;
-        }
+        this.registrationMap[interaction].unregister(element);
     }
 }
 
