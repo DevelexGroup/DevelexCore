@@ -32,7 +32,7 @@
     if ($gazeManagerStore === null) {
         // Handle the case when $gazeInputStore is null
     } else {
-        if ($gazeManagerStore.input.isEmitting) {
+        if ($gazeManagerStore.isEmitting) {
             startInterval();
         }
         $gazeManagerStore.on("emit", (data) => {

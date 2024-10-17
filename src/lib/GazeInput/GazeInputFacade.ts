@@ -84,7 +84,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * Set the input instance.
      * @param input - The input instance to set.
      */
-    set input(input: GazeInput<GazeInputConfig>) {
+    set input(input: GazeInput<GazeInputConfig> | null) {
         this.setEmitter(input);
     }
 
@@ -117,6 +117,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     disconnect(): void {
+        if (!this.input) return
         this.inputInstance.disconnect();
     }
 
@@ -135,8 +136,7 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @throws Error if no input is set.
      */
     setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): void {
-        void mouseEvent;
-        void window;
+        this.inputInstance.setWindowCalibration(mouseEvent, window);
     }
 
     /**

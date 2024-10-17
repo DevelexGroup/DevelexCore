@@ -114,6 +114,13 @@ export class GazeManager extends EmitterGroup<
             validation: validation,
             intersect: intersect,
             data: input as EmitterWithFacade<ETHandlerMapping>,
+            state: input as EmitterWithFacade<ETHandlerMapping>,
+            connect: input as EmitterWithFacade<ETHandlerMapping>,
+            emit: input as EmitterWithFacade<ETHandlerMapping>,
+            error: input as EmitterWithFacade<ETHandlerMapping>,
+            windowCalibrated: input as EmitterWithFacade<ETHandlerMapping>,
+            windowCalibrationContested: input as EmitterWithFacade<ETHandlerMapping>,
+            calibrated: input as EmitterWithFacade<ETHandlerMapping>,
         };
 
         /**
@@ -243,7 +250,7 @@ export class GazeManager extends EmitterGroup<
 	 */
     get isEmitting(): boolean { return this._input.isEmitting; }
 
-    set input(input: GazeInput<GazeInputConfig>) {this._input.input = input;}
+    set input(input: GazeInput<GazeInputConfig> | null) {this._input.input = input;}
 }
 
 export type GazeManagerRegistration = {

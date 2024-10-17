@@ -8,7 +8,7 @@
 
     let isGazeIndicatorVisible = true;
     const indicator = new GazeIndicator();
-    $: disabled = $gazeManagerStore === null;
+    $: disabled = $gazeManagerStore.input === null;
 
     let isConnectedProcessing = false;
     let isStartedProcessing = false;

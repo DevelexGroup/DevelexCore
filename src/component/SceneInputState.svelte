@@ -7,15 +7,15 @@
 
     const getGazeInputStates = () => {
         return [
-            { variable: "Connected", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isConnected : null },
-            { variable: "Emitting", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isEmitting : null },
-            { variable: "Calibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isDeviceCalibrated : null },
-            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.input.isWindowCalibrated : null }
+            { variable: "Connected", value: $gazeManagerStore !== null ? $gazeManagerStore.isConnected : null },
+            { variable: "Emitting", value: $gazeManagerStore !== null ? $gazeManagerStore.isEmitting : null },
+            { variable: "Calibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isDeviceCalibrated : null },
+            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isWindowCalibrated : null }
         ]   
     };
 
     const getGazeInputConfig = () => {
-        if ($gazeManagerStore === null) return [];
+        if ($gazeManagerStore.input === null) return [];
         return Object.entries($gazeManagerStore.input.config).map(([key, value]) => ({ variable: key, value }));
     };
 

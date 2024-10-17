@@ -9,7 +9,7 @@ import { addDwellEvent, addFixationEvent, addIntersectEvent, addPointEvent, addS
 /**
  * The gaze input store.
  */
-export const gazeManagerStore = writable<GazeManager | null>(null);
+export const gazeManagerStore = writable<GazeManager>(new GazeManager());
 
 
 interface Input {
@@ -28,9 +28,10 @@ export const setGazeInput = (input: Input | null) => {
             gazeManager.disconnect();
         }
         if (input !== null) {
-            const newGazeManager = new GazeManager(input.inputConfig);
-            newGazeManager.setWindowCalibration(input.mouseEvent, input.window);
-            return newGazeManager;
+            gazeManager.createInput(input.inputConfig);
+            gazeManager.setWindowCalibration(input.mouseEvent, input.window);
+        } else {
+            gazeManager.input = null;
         }
         return gazeManager;
     });

@@ -29,14 +29,16 @@
         interval = null;
     };
 
-    gazeManagerStore.subscribe((value) => {
-        if (value === null) return;
-        if (value.input.isEmitting) {
+    if ($gazeManagerStore === null) {
+        // Handle the case when $gazeInputStore is null
+    } else {
+        if ($gazeManagerStore.isEmitting) {
             startInterval();
-        } else {
-            cancelInterval();
         }
-    });
+        $gazeManagerStore.on("emit", (data) => {
+            data.value ? startInterval() : cancelInterval();
+        });
+    }
 
     const settings = {
         bufferSize: 10
@@ -45,7 +47,6 @@
     const aoiLabels = ["intersect-a", "intersect-b", "intersect-c"];
 
     const registerFn = (element: HTMLElement) => {
-        if (!$gazeManagerStore) return;
         $gazeManagerStore.register({
             interaction: "intersect",
             element,
@@ -54,7 +55,6 @@
     };
 
     const unregisterFn = (element: HTMLElement) => {
-        if (!$gazeManagerStore) return;
         $gazeManagerStore.unregister({
             interaction: "intersect",
             element,
