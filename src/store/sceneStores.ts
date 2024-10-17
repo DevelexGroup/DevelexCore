@@ -92,8 +92,6 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixation
     });
 }
 
-export const sceneObjectIntersectStore = writable<Intersect[]>([]);
-
 export const addIntersectEvent = (unprocessedEvent: GazeInteractionObjectIntersectEvent) => {
     // Extract the relevant information from the event
     const { type, sessionId, timestamp, gazeData, target } = unprocessedEvent;
@@ -110,18 +108,6 @@ export const addIntersectEvent = (unprocessedEvent: GazeInteractionObjectInterse
     };
 
     void intersectRepository.create(event);
-
-    sceneObjectIntersectStore.update(events => {
-        // Add the new event
-        const updatedEvents = [event, ...events];
-        
-        // If there are more than 100 events, remove the oldest one
-        if (updatedEvents.length > 100) {
-            updatedEvents.pop();
-        }
-        
-        return updatedEvents;
-    });
 }
 
 export const sceneObjectSaccadeStore = writable<Saccade[]>([]);

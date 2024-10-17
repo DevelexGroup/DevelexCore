@@ -4,7 +4,7 @@
 import { writable } from 'svelte/store';
 import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 import { GazeManager } from '$lib/GazeManager/GazeManager';
-import { addDwellEvent, addFixationEvent, addPointEvent, addSaccadeEvent, addValidationEvent } from "./sceneStores";
+import { addDwellEvent, addFixationEvent, addIntersectEvent, addPointEvent, addSaccadeEvent, addValidationEvent } from "./sceneStores";
 
 /**
  * The gaze input store.
@@ -47,4 +47,5 @@ gazeManagerStore.subscribe((gazeManager) => {
     gazeManager.on("saccadeObjectTo", addSaccadeEvent);
     gazeManager.on("saccadeObjectFrom", addSaccadeEvent);
     gazeManager.on("validation", addValidationEvent);
+    gazeManager.on("intersect", addIntersectEvent);
 });

@@ -13,6 +13,17 @@ const intersectRepository = {
       return [];
     }
   },
+  async getLast(n: number): Promise<Intersect[]> {
+    try {
+      const intersects = await db.intersects.orderBy('timestamp').reverse().limit(n).toArray();
+
+      return intersects;
+    } catch (e) {
+      console.error(e);
+
+      return [];
+    }
+  },
   async create(data: Intersect): Promise<number | null> {
     try {
       const id = await db.intersects.add({
