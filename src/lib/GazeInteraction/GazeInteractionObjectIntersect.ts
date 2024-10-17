@@ -16,7 +16,7 @@ export class GazeInteractionObjectIntersect extends GazeInteractionObject<GazeIn
 		onIntersect: () => {}
 	};
 
-	triggeredListeners: GazeInteractionObjectIntersectListener[] = [];
+	private triggeredListeners: GazeInteractionObjectIntersectListener[] = [];
 
 	private preAllocatedEvent: GazeInteractionObjectIntersectEvent = {
 		sessionId: '',
