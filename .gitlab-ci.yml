@@ -1,4 +1,4 @@
-image: node:16
+image: node:18
 
 stages:
   - build
@@ -14,6 +14,8 @@ cache:
     - .npm
 
 before_script:
+  - ping -c 4 google.com  # Check if the runner can reach an external server
+  - curl -I https://registry.npmjs.org  # Check if npm registry is accessible
   - npm config set registry https://registry.npmjs.org/  # Explicitly set registry for npm install
   - npm config set timeout 60000
   - npm install
