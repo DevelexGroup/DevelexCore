@@ -1,6 +1,6 @@
 {
 	"name": "@473783/develex-core",
-	"version": "0.0.12",
+	"version": "0.1.1",
 	"publishConfig": {
 		"@473783:registry": "https://gitlab.ics.muni.cz/api/v4/projects/7015/packages/npm/"
 	},
@@ -21,7 +21,7 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^8.56.7",
-		"@types/node": "^20.14.10",
+		"@types/node": "^20.16.12",
 		"dexie": "^4.0.8",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -35,7 +35,7 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0-alpha.20",
-		"vite": "^5.0.11",
+		"vite": "^5.4.9",
 		"vite-plugin-dts": "^3.9.1",
 		"vitest": "^1.2.0"
 	},
