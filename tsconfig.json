@@ -1,15 +1,25 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"target": "es2017",
-		"moduleResolution": "node"
-	}
-}
+	  "allowJs": true,
+	  "checkJs": true,
+	  "esModuleInterop": true,
+	  "forceConsistentCasingInFileNames": true,
+	  "resolveJsonModule": true,
+	  "skipLibCheck": true,
+	  "sourceMap": true,
+	  "strict": true,
+	  "target": "es2017",
+	  "moduleResolution": "node",        // Ensures Node-style module resolution
+	  "types": ["vite/client"],          // Adds Vite's client types for worker support
+	  "baseUrl": ".",                    // Base URL for path aliases
+	  "paths": {
+		"$lib/*": ["src/lib/*"]          // Ensure the `$lib` alias is correctly mapped
+	  }
+	},
+	"include": [
+	  "src/**/*",                         // Include all your source files
+	  "global.d.ts"                       // Include the global types, especially for workers
+	]
+  }
+  
