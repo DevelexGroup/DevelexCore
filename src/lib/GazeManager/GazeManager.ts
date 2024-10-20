@@ -171,28 +171,27 @@ export class GazeManager extends EmitterGroup<
         this.link();
     }
 
-    connect() {
-       this._input.connect();
+    async connect() {
+       return this._input.connect();
     }
 
-    disconnect() {
-        this._input.disconnect();
-        console.log('disconnected', this._input, this._input.internalEmitter)
+    async disconnect() {
+        return this._input.disconnect();
     }
 
-    calibrate() {
-        this._input.calibrate();
+    async calibrate() {
+        return this._input.calibrate();
     }
 
-    setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields) {
-        this._input.setWindowCalibration(mouseEvent, window);
+    async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields) {
+        return this._input.setWindowCalibration(mouseEvent, window);
     }
 
     createInput(input: GazeInputConfig) {this._input.createInput(input);}
 
-    start() {this._input.start();}
+    async start() {return this._input.start();}
 
-    stop() {this._input.stop();}
+    async stop() {return this._input.stop();}
 
     register({interaction, element, settings}: GazeManagerRegistration) {
         this.registrationMap[interaction].register(element, settings);

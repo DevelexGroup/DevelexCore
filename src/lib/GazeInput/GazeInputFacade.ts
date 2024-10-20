@@ -88,41 +88,41 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * Start the input.
      * @throws Error if no input is set.
      */
-    start(): void {
-        this.inputInstance.start();
+    async start() {
+        return this.inputInstance.start();
     }
 
     /**
      * Stop the input.
      * @throws Error if no input is set.
      */
-    stop(): void {
-        this.inputInstance.stop();
+    async stop() {
+        return this.inputInstance.stop();
     }
 
     /**
      * Connect the input.
      * @throws Error if no input is set.
      */
-    connect(): void {
-        this.inputInstance.connect();
+    async connect() {
+        return this.inputInstance.connect();
     }
 
     /**
      * Disconnect the input.
      * @throws Error if no input is set.
      */
-    disconnect(): void {
+    async disconnect() {
         if (!this.input) return
-        this.inputInstance.disconnect();
+        return this.inputInstance.disconnect();
     }
 
     /**
      * Calibrate the input.
      * @throws Error if no input is set.
      */
-    calibrate(): void {
-        this.inputInstance.calibrate();
+    async calibrate() {
+        return this.inputInstance.calibrate();
     }
 
     /**
@@ -131,8 +131,8 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      * @param window - The window.
      * @throws Error if no input is set.
      */
-    setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): void {
-        this.inputInstance.setWindowCalibration(mouseEvent, window);
+    async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields) {
+        return this.inputInstance.setWindowCalibration(mouseEvent, window);
     }
 
     /**
