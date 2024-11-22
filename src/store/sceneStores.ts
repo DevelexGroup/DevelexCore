@@ -11,7 +11,7 @@ import type { Fixation } from '../database/models/Fixation';
 import fixationRepository from '../database/repositories/fixation.repository';
 import type { Saccade } from '../database/models/Saccade';
 import saccadeRepository from '../database/repositories/saccade.repository';
-import type { GazeDataPoint } from '$lib';
+import type { GazeDataPoint } from '$lib/index';
 import pointRepository from '../database/repositories/point.repository';
 import type { Validation } from '../database/models/Validation';
 import validationRepository from '../database/repositories/validation.repository';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy, SvelteComponent } from "svelte";
-    import type { GazeInteractionObjectValidationSettings } from "$lib";
+    import type { GazeInteractionObjectValidationSettings } from "$lib/index";
 	import ValidationCircle from "./ValidationCircle.svelte";
 	import type { GazeInteractionObjectValidationEvent } from "$lib/GazeInteraction/GazeInteractionObjectValidation.event";
 	import type { GazeManager } from "$lib/GazeManager/GazeManager";

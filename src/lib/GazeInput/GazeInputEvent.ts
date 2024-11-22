@@ -35,7 +35,7 @@ export interface GazeInputEventStateBoolsCalibrated extends GazeInputEventStateB
 export interface GazeInputMessage {
     type: string;
     timestamp: number;
-    value: any;
+    value: unknown;
 };
 
 export interface GazeInputEventStateMessage {
