@@ -1,6 +1,7 @@
 import type { EventMap } from "$lib/Emitter/Emitter";
 import { GazeInteraction } from "./GazeInteraction";
 import type { GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings";
+import { UtilityBoundingBoxManager } from "$lib/Utility/UtilityBoundingBoxManager";
 
 export abstract class GazeInteractionObject<
 	TInteractionEvents extends EventMap,
@@ -11,6 +12,8 @@ export abstract class GazeInteractionObject<
 	
 	listeners: TListenerPayload['listener'][] = [];
 
+	private boundingBoxManager = UtilityBoundingBoxManager.getInstance();
+
     /**
 	 * Registers an element for object events with the given settings.
      * @param element - Element to register for object events.
@@ -18,6 +21,10 @@ export abstract class GazeInteractionObject<
 	 */
     register(element: Element, settings: Partial<TListenerPayload['listener']['settings']>): void {
 		const mergedSettings = { ...this.defaultSettings, ...settings };
+
+		// Initial bounding box setup
+        this.boundingBoxManager.register(element)
+
         this.listeners.push(this.generateListener(element, mergedSettings));
     }
 
@@ -26,6 +33,10 @@ export abstract class GazeInteractionObject<
 	 * @param {Element} element - Element to unregister from object events.
 	 */
     unregister(element: Element): void {
+
+		// Clean up observers and cache
+		this.boundingBoxManager.unregister(element)
+
         this.listeners = this.listeners.filter((listener) => listener.element !== element);
     }
 
@@ -53,13 +64,7 @@ export abstract class GazeInteractionObject<
 	 * @returns
 	 */
 	isInside(element: Element, x: number, y: number, bufferSize: number): boolean {
-		const { top, left, right, bottom } = element.getBoundingClientRect();
-		return (
-			x >= left - bufferSize &&
-			x <= right + bufferSize &&
-			y >= top - bufferSize &&
-			y <= bottom + bufferSize
-		);
+		return this.boundingBoxManager.isPointInside(element, x, y)
 	}
 
     abstract generateListener(element: Element, settings: TListenerPayload['listener']['settings']): TListenerPayload['listener'];
