@@ -2,7 +2,6 @@ export class UtilityBoundingBoxManager {
     private static instance: UtilityBoundingBoxManager;
 
     private buffer: Float32Array; // Shared buffer for all bounding boxes
-    private elementMap = new Map<Element, number>(); // Maps elements to buffer index
     private referenceCount = new Map<Element, number>(); // Tracks how many classes registered each element
     private elementOrder: Element[] = []; // Maintains insertion order for reallocation
     private isObserving = false;
@@ -39,17 +38,32 @@ export class UtilityBoundingBoxManager {
         }
     }
 
+    private updateBoundingBox(element: Element): void {
+        const index = this.elementOrder.indexOf(element);
+        if (index === -1) return; // Element not found
+
+        const bufferIndex = index * 8; // Calculate buffer index
+        const rect = element.getBoundingClientRect();
+        this.buffer[bufferIndex] = rect.x;
+        this.buffer[bufferIndex + 1] = rect.y;
+        this.buffer[bufferIndex + 2] = rect.width;
+        this.buffer[bufferIndex + 3] = rect.height;
+        this.buffer[bufferIndex + 4] = rect.top;
+        this.buffer[bufferIndex + 5] = rect.left;
+        this.buffer[bufferIndex + 6] = rect.right;
+        this.buffer[bufferIndex + 7] = rect.bottom;
+    }
+
     public unregister(element: Element): void {
         const currentCount = this.referenceCount.get(element) || 0;
 
         if (currentCount <= 1) {
             // Remove the element entirely
             this.referenceCount.delete(element);
-            const index = this.elementMap.get(element);
+            const index = this.elementOrder.indexOf(element);
 
-            if (index !== undefined) {
-                this.elementMap.delete(element);
-                this.elementOrder = this.elementOrder.filter(e => e !== element);
+            if (index !== -1) {
+                this.elementOrder.splice(index, 1);
                 this.reallocateBuffer(); // Reallocate to remove the element
             }
         } else {
@@ -73,34 +87,18 @@ export class UtilityBoundingBoxManager {
         right: number,
         bottom: number,
     } | undefined {
-        const index = this.elementMap.get(element);
-        if (index === undefined) return undefined;
-
+        const bufferIndex = this.getBufferIndex(element);
+        if (bufferIndex === -1) throw new Error("No element registered for bb watching");
         return {
-            x: this.buffer[index],       // x
-            y: this.buffer[index + 1],   // y
-            width: this.buffer[index + 2],   // width
-            height: this.buffer[index + 3],   // height
-            top: this.buffer[index + 4],   // top
-            left: this.buffer[index + 5],   // left
-            right: this.buffer[index + 6],   // right
-            bottom: this.buffer[index + 7]    // bottom
-        }
-    }
-
-    private updateBoundingBox(element: Element): void {
-        const index = this.elementMap.get(element);
-        if (index === undefined) return;
-
-        const rect = element.getBoundingClientRect();
-        this.buffer[index] = rect.x;
-        this.buffer[index + 1] = rect.y;
-        this.buffer[index + 2] = rect.width;
-        this.buffer[index + 3] = rect.height;
-        this.buffer[index + 4] = rect.top;
-        this.buffer[index + 5] = rect.left;
-        this.buffer[index + 6] = rect.right;
-        this.buffer[index + 7] = rect.bottom;
+            x: this.buffer[bufferIndex],
+            y: this.buffer[bufferIndex + 1],
+            width: this.buffer[bufferIndex + 2],
+            height: this.buffer[bufferIndex + 3],
+            top: this.buffer[bufferIndex + 4],
+            left: this.buffer[bufferIndex + 5],
+            right: this.buffer[bufferIndex + 6],
+            bottom: this.buffer[bufferIndex + 7]
+        };
     }
 
     private startObserving(): void {
@@ -108,9 +106,14 @@ export class UtilityBoundingBoxManager {
 
         const observe = () => {
             if (!this.isObserving) return;
-
-            for (const element of this.elementMap.keys()) {
-                this.updateBoundingBox(element);
+            const buffer = this.buffer;
+            const elementOrder = this.elementOrder;
+            let i = elementOrder.length; // Start from the end for quick access
+            // Iterate over elementOrder to update bounding boxes
+            while (i--) {
+                const bufferIndex = i * 8; // Calculate buffer index
+                const rect = elementOrder[i].getBoundingClientRect();
+                buffer.set([rect.x, rect.y, rect.width, rect.height, rect.top, rect.left, rect.right, rect.bottom], bufferIndex);
             }
 
             requestAnimationFrame(observe);
@@ -123,38 +126,33 @@ export class UtilityBoundingBoxManager {
         this.isObserving = false;
     }
 
-    public isPointInside(element: Element, x: number, y: number, bufferSize: number): boolean {
-        const index = this.elementMap.get(element);
-        if (index === undefined) return false; // Element not registered
+    private getBufferIndex(element: Element): number {
+        const index = this.elementOrder.indexOf(element);
+        return index !== -1 ? index * 8 : -1;
+    }
     
-        // Access the bounding box values directly from the buffer
-        // For maximum performance, we avoid unnecessary variable assignments
-        return (
-            x >= this.buffer[index + 5] + bufferSize && // left
-            x <= this.buffer[index + 6] + bufferSize && // right
-            y >= this.buffer[index + 4] + bufferSize && // top
-            y <= this.buffer[index + 7] + bufferSize   // bottom
-        );
+
+    public isPointInside(element: Element, x: number, y: number, bufferSize: number): boolean {
+        const bufferIndex = this.getBufferIndex(element);
+        if (bufferIndex === -1) return false; // Element not registered
+        return x >= this.buffer[bufferIndex + 5] - bufferSize &&
+               x <= this.buffer[bufferIndex + 6] + bufferSize &&
+               y >= this.buffer[bufferIndex + 4] - bufferSize &&
+               y <= this.buffer[bufferIndex + 7] + bufferSize;
     }
 
     private reallocateBuffer(): void {
-        // Allocate a new buffer with space for all current elements
-        const newBuffer = new Float32Array(this.elementOrder.length * 8); // 8 slots per element
+        const newBuffer = new Float32Array(this.elementOrder.length * 8);
 
-        // Copy existing data to the new buffer
         this.elementOrder.forEach((element, i) => {
-            const index = i * 8;
-            const oldIndex = this.elementMap.get(element);
+            const bufferIndex = i * 8; // New buffer index
+            const oldIndex = i * 8; // Old buffer index
 
-            if (oldIndex !== undefined) {
-                newBuffer.set(this.buffer.subarray(oldIndex, oldIndex + 8), index);
+            if (oldIndex < this.buffer.length) {
+                newBuffer.set(this.buffer.subarray(oldIndex, oldIndex + 8), bufferIndex);
             }
-
-            // Update the map with the new index
-            this.elementMap.set(element, index);
         });
 
-        // Replace the old buffer with the new one
-        this.buffer = newBuffer;
+        this.buffer = newBuffer; // Replace the old buffer
     }
 }

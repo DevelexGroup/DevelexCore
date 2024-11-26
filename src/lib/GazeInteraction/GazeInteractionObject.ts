@@ -64,7 +64,7 @@ export abstract class GazeInteractionObject<
 	 * @returns
 	 */
 	isInside(element: Element, x: number, y: number, bufferSize: number): boolean {
-		return this.boundingBoxManager.isPointInside(element, x, y)
+		return this.boundingBoxManager.isPointInside(element, x, y, bufferSize)
 	}
 
     abstract generateListener(element: Element, settings: TListenerPayload['listener']['settings']): TListenerPayload['listener'];
