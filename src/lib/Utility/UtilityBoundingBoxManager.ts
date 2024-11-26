@@ -5,6 +5,7 @@ export class UtilityBoundingBoxManager {
     private referenceCount = new Map<Element, number>(); // Tracks how many classes registered each element
     private elementOrder: Element[] = []; // Maintains insertion order for reallocation
     private isObserving = false;
+    private checkerForCurrentValues = new Float32Array(8); // Preallocate for current values
 
     private constructor() {
         this.buffer = new Float32Array(0); // Start with an empty buffer
@@ -77,6 +78,11 @@ export class UtilityBoundingBoxManager {
         }
     }
 
+    /**
+     * Instead of directly accessing the element boundingBoxRect
+     * @param element 
+     * @returns 
+     */
     public getBoundingBox(element: Element): {
         x: number;
         y: number;
@@ -103,6 +109,7 @@ export class UtilityBoundingBoxManager {
 
     private startObserving(): void {
         this.isObserving = true;
+        const currentValues = this.checkerForCurrentValues;
 
         const observe = () => {
             if (!this.isObserving) return;
@@ -110,17 +117,87 @@ export class UtilityBoundingBoxManager {
             const elementOrder = this.elementOrder;
             let i = elementOrder.length; // Start from the end for quick access
             // Iterate over elementOrder to update bounding boxes
+            const changedIndices = []; // Array to store indices of changed elements
+
             while (i--) {
                 const bufferIndex = i * 8; // Calculate buffer index
                 const rect = elementOrder[i].getBoundingClientRect();
-                buffer.set([rect.x, rect.y, rect.width, rect.height, rect.top, rect.left, rect.right, rect.bottom], bufferIndex);
+
+                // Retrieve previous values from the buffer
+                const prevValues = buffer.subarray(bufferIndex, bufferIndex + 8);
+
+                // Populate `currentValues` in place
+                currentValues[0] = rect.x;
+                currentValues[1] = rect.y;
+                currentValues[2] = rect.width;
+                currentValues[3] = rect.height;
+                currentValues[4] = rect.top;
+                currentValues[5] = rect.left;
+                currentValues[6] = rect.right;
+                currentValues[7] = rect.bottom;
+
+/*                 // Check if any value has changed
+                let isChanged = false;
+                for (let j = 0; j < 8; j++) {
+                    if (currentValues[j] !== prevValues[j]) {
+                        isChanged = true;
+                        break; // Stop further comparison for this element
+                    }
+                } */
+
+                const isChanged = 
+                currentValues[0] !== prevValues[0] ||
+                currentValues[1] !== prevValues[1] ||
+                currentValues[2] !== prevValues[2] ||
+                currentValues[3] !== prevValues[3] ||
+                currentValues[4] !== prevValues[4] ||
+                currentValues[5] !== prevValues[5] ||
+                currentValues[6] !== prevValues[6] ||
+                currentValues[7] !== prevValues[7];
+
+                // If changed, record the index and update the buffer
+                if (isChanged) {
+                    changedIndices.push(i); // Record the index of the changed element
+                    buffer.set(currentValues, bufferIndex); // Update the buffer
+                }
             }
 
-            requestAnimationFrame(observe);
+            // Use `changedIndices` to know which elements have changed
+            if (changedIndices.length > 0) {
+                console.log("Changed indices:", changedIndices);
+            }
+
+            requestAnimationFrame(() => observe);
         };
 
-        requestAnimationFrame(observe);
+        requestAnimationFrame(() => observe);
     }
+
+    getElementBoundingBox(element: HTMLElement): {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    } {
+        let x = 0;
+        let y = 0;
+        let currentElement: HTMLElement | null = element;
+    
+        // Traverse up the DOM tree to calculate the position relative to the document
+        while (currentElement) {
+            x += currentElement.offsetLeft;
+            y += currentElement.offsetTop;
+            currentElement = currentElement.offsetParent as HTMLElement;
+        }
+    
+        return {
+            x,
+            y,
+            width: element.offsetWidth,
+            height: element.offsetHeight
+        };
+    }
+    
 
     private stopObserving(): void {
         this.isObserving = false;
