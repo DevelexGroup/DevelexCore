@@ -1,7 +1,7 @@
 import type { GazeInteractionObjectSaccadePayload, GazeInteractionObjectSaccadeSettings } from './GazeInteractionObjectSaccade.settings';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectSaccadeEvent, GazeInteractionObjectSaccadeEvents } from './GazeInteractionObjectSaccade.event';
-import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent';
+import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.event';
 
 /**
  * Manages saccade events from the given eye-tracker input for elements,

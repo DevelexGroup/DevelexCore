@@ -18,7 +18,7 @@ import { GazeInteractionScreenFixation } from "$lib/GazeInteraction/GazeInteract
 import type { GazeInteractionScreenFixationEvent, GazeInteractionScreenFixationEvents } from "$lib/GazeInteraction/GazeInteractionScreenFixation.event";
 import { GazeInteractionScreenSaccade } from "$lib/GazeInteraction/GazeInteractionScreenSaccade";
 
-import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent";
+import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccade.event";
 import type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig";
 
 /**

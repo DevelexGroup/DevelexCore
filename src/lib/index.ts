@@ -38,6 +38,20 @@ export { GazeInputFacade } from '$lib/GazeInput/GazeInputFacade.js';
 export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, GazeInputConfigEyelogic, GazeInputConfigDummy, GazeInputConfigWithFixations } from '$lib/GazeInput/GazeInputConfig.js';
 
 /**
+ * 1.3 Event types for the input.
+ * -------------------------------
+ */
+
+export type { 
+    GazeInputEventState,
+    GazeInputEventStateBools,
+    GazeInputEventStateMessage,
+    GazeInputEventStateCalibration,
+    GazeInputMessage,
+    ETHandlerMapping
+} from '$lib/GazeInput/GazeInputEvent.js';
+
+/**
  * @module GazeInteraction
  * 2. Gaze Interaction objects and its events.
  * ================================
@@ -46,6 +60,7 @@ export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, Gaz
  */
 
 export type { GazeInteraction };
+export type { GazeInteractionObject };
 
 export interface GazeInteractionComponentProps<TInteractionEvents extends EventMap, TInputData extends { type: string}, TListenerPayload extends GazeInteractionObjectListenerPayload> {
     gazeInteractionObject: GazeInteractionObject<TInteractionEvents, TInputData, TListenerPayload>;
@@ -106,7 +121,7 @@ export type { GazeInteractionObjectSaccadeSettings } from '$lib/GazeInteraction/
 
 export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.js';
 export type { GazeInteractionScreenSaccadeEvents,
-    GazeInteractionScreenSaccadeEvent} from '$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent.js';
+    GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.event.js';
 
 
 /**
@@ -116,6 +131,15 @@ export type { GazeInteractionScreenSaccadeEvents,
 
 export { GazeInteractionObjectValidation } from '$lib/GazeInteraction/GazeInteractionObjectValidation.js';
 export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteraction/GazeInteractionObjectValidation.settings.js';
+
+/**
+ * 2.6 Intersect interaction.
+ * -------------------------------
+ */
+
+export { GazeInteractionObjectIntersect } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.js';
+export type { GazeInteractionObjectIntersectEvent } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.event.js';
+export type { GazeInteractionObjectIntersectSettingsType } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.settings.js';
 
 /**
  * @module GazeIndicator
@@ -143,3 +167,26 @@ export { type GazeDataPoint, type GazeDataPointWithFixation, isGazeDataPointWith
 
 export { GazeWindowCalibrator } from '$lib/GazeWindowCalibrator/GazeWindowCalibrator.js';
 export type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from '$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
+
+/**
+ * @module GazeFixationDetector
+ * 6. GazeFixationDetector
+ * ================================
+ */
+
+export { 
+    getMaxDispersion,
+    getSizeInCentimetersFromDegrees,
+    getSizeInPixelsFromCentimeters 
+} from '$lib/GazeFixationDetector/GazeFixationDetectorIDT.js';
+
+/**
+ * @module GazeInteractionObjectValidationEvent
+ * 7. GazeInteractionObjectValidationEvent
+ * ================================
+ */
+
+export type { 
+    GazeInteractionObjectValidationEvents,
+    GazeInteractionObjectValidationEvent 
+} from '$lib/GazeInteraction/GazeInteractionObjectValidation.event.js';

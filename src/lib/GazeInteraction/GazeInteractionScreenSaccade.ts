@@ -2,7 +2,7 @@ import type { GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
 import { calculatePointDistance } from "$lib/utils/geometryUtils";
 import { GazeInteraction } from "./GazeInteraction";
 import type { GazeInteractionScreenFixationEvent } from "./GazeInteractionScreenFixation.event";
-import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccadeEvent";
+import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccade.event";
 
 export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractionScreenSaccadeEvents, GazeInteractionScreenFixationEvent> {
     
