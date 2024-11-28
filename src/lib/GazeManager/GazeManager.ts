@@ -75,16 +75,9 @@ export class GazeManager extends EmitterGroup<
         'intersect': GazeInteractionObjectIntersect
     }
 
-    private linkData: (data: GazeDataPoint) => void
-    private linkFixation: (data: GazeInteractionScreenFixationEvent) => void
-    private linkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void
-    private link() {
-        this._input.on('data', this.linkData.bind(this));
-        this.fixation.on('fixationStart', this.linkFixation.bind(this));
-        this.fixation.on('fixationEnd', this.linkFixation.bind(this));
-        this.saccade.on('saccade', this.linkSaccade.bind(this));
-    }
-
+    private boundLinkData: (data: GazeDataPoint) => void;
+    private boundLinkFixation: (data: GazeInteractionScreenFixationEvent) => void;
+    private boundLinkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void;
 
     constructor() {
         const dwell = new GazeInteractionObjectDwell();
@@ -155,20 +148,34 @@ export class GazeManager extends EmitterGroup<
             intersect
         }
 
-        this.linkData = (data) => {
-            this.fixation.evaluate(data);
-            this.dwell.evaluate(data);
-            this.validation.evaluate(data);
-            this.intersect.evaluate(data);
-        }
-        this.linkFixation = (data) => {
-            this.saccade.evaluate(data);
-            this.fixationObject.evaluate(data);
-        }
-        this.linkSaccade = (data) => {
-            this.saccadeObject.evaluate(data);
-        }
+        this.boundLinkData = this.linkData.bind(this);
+        this.boundLinkFixation = this.linkFixation.bind(this);
+        this.boundLinkSaccade = this.linkSaccade.bind(this);
+        
         this.link();
+    }
+
+    private linkData(data: GazeDataPoint): void {
+        this.fixation.evaluate(data);
+        this.dwell.evaluate(data);
+        this.intersect.evaluate(data);
+        this.validation.evaluate(data);
+    }
+
+    private linkFixation(data: GazeInteractionScreenFixationEvent): void {
+        this.fixationObject.evaluate(data);
+        this.saccade.evaluate(data);
+    }
+
+    private linkSaccade(data: GazeInteractionScreenSaccadeEvent): void {
+        this.saccadeObject.evaluate(data);
+    }
+
+    private link() {
+        this._input.on('data', this.boundLinkData);
+        this.fixation.on('fixationStart', this.boundLinkFixation);
+        this.fixation.on('fixationEnd', this.boundLinkFixation);
+        this.saccade.on('saccade', this.boundLinkSaccade);
     }
 
     async connect() {
