@@ -1,5 +1,6 @@
 import { GazeFixationDetector } from "./GazeFixationDetector"
 import { type GazeDataPointWithFixation, type GazeDataPoint, isGazeDataPointWithFixation } from "$lib/GazeData/GazeData";
+import { calculatePointDistance } from "$lib/utils/geometryUtils";
 
 /**
  * Default parameters are from Andersson et al. (2017):
@@ -84,7 +85,7 @@ export const getMaxDispersion = (gazePoints: GazeDataPoint[]): number => {
     let maxDispersion = 0;
     for (let i = 0; i < gazePoints.length; i++) {
         for (let j = i + 1; j < gazePoints.length; j++) {
-            const dispersion = getDispersion(gazePoints[i], gazePoints[j]);
+            const dispersion = calculatePointDistance(gazePoints[i], gazePoints[j]);
             if (dispersion > maxDispersion) {
                 maxDispersion = dispersion;
             }
@@ -93,9 +94,6 @@ export const getMaxDispersion = (gazePoints: GazeDataPoint[]): number => {
     return maxDispersion;
 }
 
-export const getDispersion = (gazePoint1: GazeDataPoint, gazePoint2: GazeDataPoint): number => {
-    return Math.sqrt(Math.pow(gazePoint1.x - gazePoint2.x, 2) + Math.pow(gazePoint1.y - gazePoint2.y, 2));
-}
 
 export const getSizeInCentimetersFromDegrees = (degrees: number, distanceFromScreen: number): number => {
     return 2 * distanceFromScreen * Math.tan(degrees / 2);

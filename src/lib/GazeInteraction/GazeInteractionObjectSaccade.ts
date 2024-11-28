@@ -1,17 +1,13 @@
 import type { GazeInteractionObjectSaccadePayload, GazeInteractionObjectSaccadeSettings } from './GazeInteractionObjectSaccade.settings';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectSaccadeEvent, GazeInteractionObjectSaccadeEvents } from './GazeInteractionObjectSaccade.event';
-import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/Screen/GazeInteractionScreenSaccadeEvent';
-import type { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/Screen/GazeInteractionScreenSaccade';
+import type { GazeInteractionScreenSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.event';
 
 /**
  * Manages saccade events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectSaccade<
-	TInteractionEvents extends GazeInteractionObjectSaccadeEvents,
-	TListenerPayload extends GazeInteractionObjectSaccadePayload
-> extends GazeInteractionObject<TInteractionEvents, GazeInteractionScreenSaccadeEvent, TListenerPayload> {
+export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInteractionObjectSaccadeEvents, GazeInteractionScreenSaccadeEvent, GazeInteractionObjectSaccadePayload> {
 
 	triggeredTargetsTo: Element[] = [];
 	triggeredSettingsTo: GazeInteractionObjectSaccadeSettings[] = [];
@@ -24,14 +20,6 @@ export class GazeInteractionObjectSaccade<
 		saccadeObjectFrom: () => {}
 	};
 
-    connect(input: GazeInteractionScreenSaccade): void {
-        input.on('saccade', this.inputCallback);
-    }
-
-    disconnect(input: GazeInteractionScreenSaccade): void {
-        input.off('saccade', this.inputCallback);
-    }
-
 	/**
 	 * Generates a listener object for saccade events.
 	 * There is a timestamp property to keep track of the saccade time. Null if the saccade is not active.
@@ -39,7 +27,7 @@ export class GazeInteractionObjectSaccade<
 	 * @param settings for the saccade events.
 	 * @returns the generated listener object.
 	 */
-	generateListener(element: Element, settings: TListenerPayload['listener']['settings']): TListenerPayload['listener'] {
+	generateListener(element: Element, settings: GazeInteractionObjectSaccadePayload['listener']['settings']): GazeInteractionObjectSaccadePayload['listener'] {
 		return {
 			element,
 			settings
@@ -51,20 +39,20 @@ export class GazeInteractionObjectSaccade<
 	 * @param data The eye-tracker data to evaluate.
 	 * @param listener The listener to evaluate for saccade events.
 	 */
-	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: TListenerPayload['listener']) {
+	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSaccadePayload['listener']) {
 		const isTo = this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize);
 		const isFrom = this.isInside(listener.element, data.originGazeData.x, data.originGazeData.y, listener.settings.bufferSize);
 		if (!isTo && !isFrom) return;
 		this.evaluateActiveListener(data, listener, isTo);
 	}
 
-	evaluateInputData(data: GazeInteractionScreenSaccadeEvent): void {
+	evaluate(data: GazeInteractionScreenSaccadeEvent): void {
 		this.triggeredTargetsTo = [];
 		this.triggeredSettingsTo = [];
 		this.triggeredTargetsFrom = [];
 		this.triggeredSettingsFrom = [];
 
-		super.evaluateInputData(data); // This is the original code from the parent class evaluating each listener for activation
+		super.evaluate(data); // This is the original code from the parent class evaluating each listener for activation
 
 		const eventTo = this.createSaccadeEvent('saccadeObjectTo', this.triggeredTargetsTo, this.triggeredSettingsTo, data);
 		const eventFrom = this.createSaccadeEvent('saccadeObjectFrom', this.triggeredTargetsFrom, this.triggeredSettingsFrom, data);

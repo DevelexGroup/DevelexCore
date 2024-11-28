@@ -4,6 +4,7 @@ import type { Saccade } from './models/Saccade';
 import type { Dwell } from './models/Dwell';
 import type { Point } from './models/Point';
 import type { Validation } from './models/Validation';
+import type { Intersect } from './models/Intersect';
 
 export class DevelexCoreControlDatabase extends Dexie {
   fixations!: Table<Fixation>;
@@ -11,6 +12,7 @@ export class DevelexCoreControlDatabase extends Dexie {
   dwells!: Table<Dwell>;
   points!: Table<Point>;
   validations!: Table<Validation>;
+  intersects!: Table<Intersect>;
 
   constructor() {
     super('develex-core-control');
@@ -20,7 +22,8 @@ export class DevelexCoreControlDatabase extends Dexie {
       saccades: '++id, sessionId, timestamp, type, duration, aoi, angleToScreen, angleToPrevious, angleToPreviousInvalidityTime, gazeData, originGazeData',
       dwells: '++id, sessionId, timestamp, type, duration, aoi, gazeData',
       points: '++id, sessionId, timestamp, x, xL, xR, xLScreenRelative, xRScreenRelative, y, yL, yR, yLScreenRelative, yRScreenRelative, validityL, validityR, parseValidity, fixationDuration, fixationId',
-      validations: '++id, sessionId, timestamp, type, isValid, allDataPointsCount, validDataPointsCount, validDataPointsPercentage, accuracy, precision'
+      validations: '++id, sessionId, timestamp, type, isValid, allDataPointsCount, validDataPointsCount, validDataPointsPercentage, accuracy, precision',
+      intersects: '++id, sessionId, timestamp, aoi'
     });
   }
 };

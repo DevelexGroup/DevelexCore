@@ -1,12 +1,46 @@
 # develex-core
-develex-core is a npm library for gaze data processing. It provides a set of functions for gaze data input, controlling remote eye-trackers and gaze data processing. The library is built with Svelte Kit and is published to the GitLab package registry.
 
-The library is a part of the develex software, which aims to provide a set of tools for gaze data processing for dyslexia interventions. Its parts can be used separately for other purposes as well, from collecting gaze data on a webpage for research to controlling maps with gaze.
+A comprehensive TypeScript/JavaScript library for eye tracking integration and gaze-based interactions in web applications. Part of the develex ecosystem, primarily focused on gaze data processing for dyslexia interventions.
 
-We use Svelte Kit to build the library and showcase it on a webpage. Learn more about [packaging with Svelte Kit](https://kit.svelte.dev/docs/).
+## Core Components
+
+### Emitter
+
+Base event emitter functionality used throughout the library. Provides core event handling capabilities for all gaze-related components.
+
+### GazeManager
+
+The main facade of the library that coordinates all gaze-related functionality. Provides a centralized way to manage eye tracking inputs, interactions, and calibration.
+
+### GazeInput
+
+Core functionality for handling eye tracking device inputs. Includes interfaces and implementations for different eye tracking devices (GazePoint, SMI, Eyelogic, and a dummy input for testing).
+
+### GazeInteraction
+
+Components and types for handling different types of gaze interactions:
+
+- Fixation: Detects when a user's gaze stabilizes on an element
+- Saccade: Detects rapid eye movements between fixation points
+- Dwell: Tracks how long a user's gaze remains on an element
+- Validation: Provides accuracy and precision measurements for gaze tracking
+- Intersect: Detects when a user's gaze intersects with elements
+
+### GazeIndicator
+
+Visual feedback component for gaze position. Useful for debugging and providing user feedback.
+
+### GazeWindowCalibrator
+
+Utilities for calibrating gaze data to window coordinates.
+
+### GazeFixationDetector
+
+Utilities for detecting and analyzing fixations, including dispersion calculations and size conversions.
 
 ## Testing eye-trackers
-We provide a testing webpage, build with GitLab Pages, for you to test functionality of your GazePoint, SMI and EyeLogic eye-tracker. To enable gaze data in a browser environment you have to:
+
+We provide a testing webpage, built with GitLab Pages, for you to test functionality of your GazePoint, SMI and EyeLogic eye-tracker. To enable gaze data in a browser environment you have to:
 
 1. Start your eye-tracking controller software (e.g., GazePoint Control)
 2. Start develex-bridge
@@ -18,31 +52,18 @@ Once you've created a project and installed dependencies with `npm install` (or 
 
 ```bash
 npm run dev
+```
 
-# or start the server and open the app in a new browser tab
+or start the server and open the app in a new browser tab
+
+```bash
 npm run dev -- --open
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` is used to showcase its functionality.
-
-## Building
-
-To build your library:
-
-```bash
-npm run package
-```
-
-To create a production version of your showcase app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
 ## Publishing
-The package is published to the GitLab package registry. To publish the package, you need to set the `CI_JOB_TOKEN` environment variable and run the `npm publish` command.
+
+The package is published to the GitLab package registry. To publish the package, you
+need to set the `CI_JOB_TOKEN` environment variable and run the `npm publish` command.
 
 ```bash
 set CI_JOB_TOKEN=<your-token>
@@ -50,14 +71,17 @@ npm publish
 ```
 
 ## Using the package
-To use the package, you need to set the GitLab package registry and pass the token to the npm configuration.
+
+To use the package, you need to set the GitLab package registry and pass the token to
+the npm configuration.
 
 ```bash
 npm config set -- //gitlab.ics.muni.cz/:_authToken=<your-token>
 ```
 
 ```bash
-npm config set @473783:registry=https://gitlab.ics.muni.cz/api/v4/projects/7015/packages/npm/
+npm config set @473783:registry=https://gitlab.ics.muni.cz/api/v4/projects/7015/
+packages/npm/
 ```
 
 ```bash

@@ -2,13 +2,13 @@
 	import { GazeIndicator } from "$lib/GazeIndicator/GazeIndicator";
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
-    import { gazeInputStore, setGazeInput } from "../store/gazeInputStore";
+    import { gazeManagerStore, setGazeInput } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
 	import { sceneStateStore } from "../store/sceneStores";
 
     let isGazeIndicatorVisible = true;
     const indicator = new GazeIndicator();
-    $: disabled = $gazeInputStore === null;
+    $: disabled = $gazeManagerStore.input === null;
 
     let isConnectedProcessing = false;
     let isStartedProcessing = false;
@@ -29,7 +29,7 @@
     };
 
     const handleEmitEvent = (data: GazeInputMessage) => {
-        if (!$gazeInputStore) return;
+        if (!$gazeManagerStore) return;
         if (data.value && isGazeIndicatorVisible) {
             initIndicator();
         } else {
@@ -37,34 +37,32 @@
         }
     };
 
-    $: if ($gazeInputStore !== null) {
-        $gazeInputStore.on("state", (data) => {
+        $gazeManagerStore.on("state", (data) => {
             handleGazeInputMessage(data);
         });
-    }
 
     const drawGaze = (gaze: GazeDataPoint) => {
         indicator.draw(gaze);
     };
 
     const initIndicator = () => {
-        if ($gazeInputStore === null) {
+        if ($gazeManagerStore === null) {
             return;
         }
         indicator.init(document);
-        $gazeInputStore.on("data", drawGaze);
+        $gazeManagerStore.on("data", drawGaze);
     };
 
     const destroyIndicator = () => {
-        if ($gazeInputStore === null) {
+        if ($gazeManagerStore === null) {
             return;
         }
-        $gazeInputStore.off("data", drawGaze);
+        $gazeManagerStore.off("data", drawGaze);
         indicator.remove();
     };
 
     const toggleGazeIndicator = (targetValue: boolean) => {
-        if ($gazeInputStore === null) {
+        if ($gazeManagerStore === null) {
             return;
         }
         if (targetValue) {
@@ -78,10 +76,10 @@
     const connect = async () => {
         isConnectedProcessing = true;
         try {
-            if ($gazeInputStore === null) {
+            if ($gazeManagerStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            await $gazeInputStore.connect();
+            await $gazeManagerStore.connect();
         } catch (error) {
             console.error(error);
         }
@@ -91,10 +89,10 @@
     const disconnect = async () => {
         isDisconnectedProcessing = true;
         try {
-            if ($gazeInputStore === null) {
+            if ($gazeManagerStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            await $gazeInputStore.disconnect();
+            await $gazeManagerStore.disconnect();
         } catch (error) {
             console.error(error);
         }
@@ -104,10 +102,10 @@
     const start = async () => {
         isStartedProcessing = true;
         try {
-            if ($gazeInputStore === null) {
+            if ($gazeManagerStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            await $gazeInputStore.start();
+            await $gazeManagerStore.start();
         } catch (error) {
             console.error(error);
         }
@@ -117,10 +115,10 @@
     const stop = async () => {
         isStoppedProcessing = true;
         try {
-            if ($gazeInputStore === null) {
+            if ($gazeManagerStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            await $gazeInputStore.stop();
+            await $gazeManagerStore.stop();
         } catch (error) {
             console.error(error);
         }
@@ -130,10 +128,10 @@
     const calibrate = async () => {
         isCalibratedProcessing = true;
         try {
-            if ($gazeInputStore === null) {
+            if ($gazeManagerStore === null) {
                 throw new Error("No gaze input configured.");
             }
-            await $gazeInputStore.calibrate();
+            await $gazeManagerStore.calibrate();
         } catch (error) {
             console.error(error);
         }

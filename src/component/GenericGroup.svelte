@@ -12,4 +12,7 @@
         margin-top: 0;
         font-size: small;
     }
+    div {
+        max-width: 100%;
+    }
 </style>

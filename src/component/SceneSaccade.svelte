@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { saccadeObjectStore } from "../store/interactionStores";
+    import { gazeManagerStore } from "../store/gazeInputStore";
     import { sceneObjectSaccadeStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
@@ -12,11 +12,20 @@
     const aoiLabels = ["saccade-a", "saccade-b", "saccade-c"];
 
     const registerFn = (element: HTMLElement) => {
-        $saccadeObjectStore.register(element, settings);
+        if (!$gazeManagerStore) return;
+        $gazeManagerStore.register({
+            interaction: "saccade",
+            element,
+            settings,
+        });
     };
 
     const unregisterFn = (element: HTMLElement) => {
-        $saccadeObjectStore.unregister(element);
+        if (!$gazeManagerStore) return;
+        $gazeManagerStore.unregister({
+            interaction: "saccade",
+            element,
+        });
     };
 </script>
 

@@ -3,8 +3,6 @@ import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayl
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectDwellEvent, GazeInteractionObjectDwellEvents } from './GazeInteractionObjectDwell.event';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwell.settings';
-import type { GazeInput } from '$lib/GazeInput/GazeInput';
-import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 
 /**
  * Manages dwell events from the given eye-tracker input for elements,
@@ -20,14 +18,6 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 		onDwellFinish: () => {},
 		onDwellCancel: () => {}
 	};
-
-	connect(input: GazeInput<GazeInputConfig>): void {
-		input.on('data', this.inputCallback);
-	}
-
-	disconnect(input: GazeInput<GazeInputConfig>): void {
-		input.off('data', this.inputCallback);
-	}
 
 	/**
 	 * Evaluates the listener for dwell events and calls the callbacks if valid.

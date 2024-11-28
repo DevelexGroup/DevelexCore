@@ -1,132 +1,191 @@
 /**
- * Imports
+ * @module Emitter
  * ================================
+ * Base event emitter functionality used throughout the library.
+ * Provides core event handling capabilities for all gaze-related components.
  */
+export { 
+    Emitter,
+    EmitterGroup 
+} from '$lib/Emitter/Emitter.js';
+export type { EventMap } from '$lib/Emitter/Emitter.js';
 
-import type { GazeInteractionEvents, GazeInteraction } from './GazeInteraction/GazeInteraction';
-import type { GazeInteractionObject } from './GazeInteraction/Object/GazeInteractionObject';
-import type { GazeInteractionObjectListenerPayload } from "./GazeInteraction/Object/GazeInteractionObject.settings";
+/**
+ * @module GazeManager
+ * ================================
+ * The main facade of the library that coordinates all gaze-related functionality.
+ * Provides a centralized way to manage eye tracking inputs, interactions, and calibration.
+ */
+export { GazeManager } from '$lib/GazeManager/GazeManager.js';
+export type { GazeManagerRegistration } from '$lib/GazeManager/GazeManager.js';
 
 /**
  * @module GazeInput
- * 1. Gaze Input objects and its events.
  * ================================
- * 1.1 The main functionality of the library. Creating an instance of an eye tracking input. Immutable!
- * -------------------------------
- */ 
+ * Core functionality for handling eye tracking device inputs.
+ * Provides interfaces and implementations for different eye tracking devices.
+ */
 
+/**
+ * Factory function to create appropriate gaze input handler based on configuration
+ */
 export { createGazeInput } from '$lib/GazeInput/index.js';
 
 /**
- * 1.2 Configuration types for the input.
- * -------------------------------
+ * Main interface for interacting with eye tracking devices
  */
+export { GazeInputFacade } from '$lib/GazeInput/GazeInputFacade.js';
 
-export type { GazeInputConfig, GazeInputConfigGazePoint, GazeInputConfigSMI, GazeInputConfigEyelogic, GazeInputConfigDummy, GazeInputConfigWithFixations } from '$lib/GazeInput/GazeInputConfig.js';
+/**
+ * Configuration types for different eye tracking devices and scenarios
+ */
+export type { 
+    GazeInputConfig,
+    GazeInputConfigGazePoint,
+    GazeInputConfigSMI,
+    GazeInputConfigEyelogic,
+    GazeInputConfigDummy,
+    GazeInputConfigWithFixations 
+} from '$lib/GazeInput/GazeInputConfig.js';
+
+/**
+ * Event types and interfaces for gaze input state management
+ */
+export type { 
+    GazeInputEventState,
+    GazeInputEventStateBools,
+    GazeInputEventStateMessage,
+    GazeInputEventStateCalibration,
+    GazeInputMessage,
+    ETHandlerMapping,
+    GazeInputEventStateMessageError,
+    GazeInputEventStateMessageMessage,
+    GazeInputEventStateBoolsConnect,
+    GazeInputEventStateBoolsEmit,
+    GazeInputEventStateBoolsCalibrated
+} from '$lib/GazeInput/GazeInputEvent.js';
 
 /**
  * @module GazeInteraction
- * 2. Gaze Interaction objects and its events.
  * ================================
- * 2.1. Abstract types and classes.
- * -------------------------------
- */
-
-export type { GazeInteractionEvents, GazeInteraction };
-
-export interface GazeInteractionComponentProps<TInteractionEvents extends GazeInteractionEvents, TInputData extends { type: string}, TListenerPayload extends GazeInteractionObjectListenerPayload> {
-    gazeInteractionObject: GazeInteractionObject<TInteractionEvents, TInputData, TListenerPayload>;
-    settings: Partial<TListenerPayload['listener']['settings']>;
-}
-
-export type GazeInteractionComponentPropsDefault = GazeInteractionComponentProps<GazeInteractionEvents, { type: string }, GazeInteractionObjectListenerPayload>
-
-/**
- * 2.2. Dwell interaction.
- * -------------------------------
- */
-
-export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.js';
-export type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.event.js';
-export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.settings.js';
-
-/**
- * 2.3. Fixation interaction.
- * -------------------------------
+ * Components and types for handling different types of gaze interactions.
+ * Includes implementations for fixations, saccades, dwell time, and validation.
  */
 
 /**
- * 2.3.1. Fixation object.
- * -------------------------------
+ * Base types for gaze interactions
  */
-
-export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.js';
-export type { GazeInteractionObjectFixationEvents,
-    GazeInteractionObjectFixationEvent} from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.event.js';
-export type { GazeInteractionObjectFixationSettings } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.settings.js';
-
-/**
- * 2.3.2. Fixation screen.
- * -------------------------------
- */
-
-export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/Screen/GazeInteractionScreenFixation.js';
-export type { GazeInteractionScreenFixationEvents,
-    GazeInteractionScreenFixationEvent} from '$lib/GazeInteraction/Screen/GazeInteractionScreenFixation.event.js';
-
-/**
- * 2.4. Saccade interaction.
- * -------------------------------
- * 2.4.1. Saccade object.
- * -------------------------------
- */
-
-export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.js';
-export type { GazeInteractionObjectSaccadeEvents,
-    GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.event.js';
-export type { GazeInteractionObjectSaccadeSettings } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.settings.js';
-
-/**
- * 2.4.2. Saccade screen.
- * -------------------------------
- */
-
-export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/Screen/GazeInteractionScreenSaccade.js';
-export type { GazeInteractionScreenSaccadeEvents,
-    GazeInteractionScreenSaccadeEvent} from '$lib/GazeInteraction/Screen/GazeInteractionScreenSaccadeEvent.js';
+export type { GazeInteraction } from '$lib/GazeInteraction/GazeInteraction.js';
+export type { GazeInteractionObject } from '$lib/GazeInteraction/GazeInteractionObject.js';
+export type { GazeInteractionEvent } from '$lib/GazeInteraction/GazeInteraction.event.js';
 
 
 /**
- * 2.5 Validation interaction.
- * -------------------------------
+ * Dwell-based interaction implementation
+ * Tracks how long a user's gaze remains on an element
  */
+export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObjectDwell.js';
+export type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event.js';
+export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/GazeInteractionObjectDwell.settings.js';
 
-export { GazeInteractionObjectValidation } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.js';
-export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.settings.js';
+/**
+ * Fixation-based interaction implementation
+ * Detects when a user's gaze stabilizes on an element
+ */
+export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObjectFixation.js';
+export type { 
+    GazeInteractionObjectFixationEvents,
+    GazeInteractionObjectFixationEvent
+} from '$lib/GazeInteraction/GazeInteractionObjectFixation.event.js';
+export type { GazeInteractionObjectFixationSettings } from '$lib/GazeInteraction/GazeInteractionObjectFixation.settings.js';
+
+/**
+ * Screen-level fixation detection
+ */
+export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreenFixation.js';
+export type { 
+    GazeInteractionScreenFixationEvents,
+    GazeInteractionScreenFixationEvent
+} from '$lib/GazeInteraction/GazeInteractionScreenFixation.event.js';
+
+/**
+ * Saccade-based interaction implementation
+ * Detects rapid eye movements between fixation points
+ */
+export { GazeInteractionObjectSaccade } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.js';
+export type { 
+    GazeInteractionObjectSaccadeEvents,
+    GazeInteractionObjectSaccadeEvent 
+} from '$lib/GazeInteraction/GazeInteractionObjectSaccade.event.js';
+export type { GazeInteractionObjectSaccadeSettings } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.settings.js';
+
+/**
+ * Screen-level saccade detection
+ */
+export { GazeInteractionScreenSaccade } from '$lib/GazeInteraction/GazeInteractionScreenSaccade.js';
+export type { 
+    GazeInteractionScreenSaccadeEvents,
+    GazeInteractionScreenSaccadeEvent
+} from '$lib/GazeInteraction/GazeInteractionScreenSaccade.event.js';
+
+/**
+ * Validation interaction implementation
+ * Provides accuracy and precision measurements for gaze tracking
+ */
+export { GazeInteractionObjectValidation } from '$lib/GazeInteraction/GazeInteractionObjectValidation.js';
+export type { 
+    GazeInteractionObjectValidationEvents,
+    GazeInteractionObjectValidationEvent 
+} from '$lib/GazeInteraction/GazeInteractionObjectValidation.event.js';
+export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteraction/GazeInteractionObjectValidation.settings.js';
+
+/**
+ * Intersection-based interaction implementation
+ * Detects when a user's gaze intersects with elements
+ */
+export { GazeInteractionObjectIntersect } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.js';
+export type { GazeInteractionObjectIntersectEvent } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.event.js';
+export type { GazeInteractionObjectIntersectSettingsType } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.settings.js';
 
 /**
  * @module GazeIndicator
- * 3. GazeIndicator
  * ================================
+ * Visual feedback component for gaze position
+ * Useful for debugging and providing user feedback
  */
-
 export { GazeIndicator } from '$lib/GazeIndicator/GazeIndicator.js';
 
 /**
  * @module GazeData
- * 4. GazeData
  * ================================
+ * Core data types and utilities for handling gaze data points
  */
-
 export { type GazeInput, isGazeInputWithFixations } from '$lib/GazeInput/GazeInput.js';
-
-export { type GazeDataPoint, type GazeDataPointWithFixation, isGazeDataPointWithFixation } from '$lib/GazeData/GazeData.js';
+export { 
+    type GazeDataPoint, 
+    type GazeDataPointWithFixation, 
+    isGazeDataPointWithFixation 
+} from '$lib/GazeData/GazeData.js';
 
 /**
  * @module GazeWindowCalibrator
- * 5. GazeWindowCalibrator
  * ================================
+ * Utilities for calibrating gaze data to window coordinates
  */
-
 export { GazeWindowCalibrator } from '$lib/GazeWindowCalibrator/GazeWindowCalibrator.js';
-export type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from '$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
+export type { 
+    GazeWindowCalibratorConfig,
+    GazeWindowCalibratorConfigMouseEventFields,
+    GazeWindowCalibratorConfigWindowFields 
+} from '$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
+
+/**
+ * @module GazeFixationDetector
+ * ================================
+ * Utilities for detecting and analyzing fixations
+ */
+export { 
+    getMaxDispersion,
+    getSizeInCentimetersFromDegrees,
+    getSizeInPixelsFromCentimeters 
+} from '$lib/GazeFixationDetector/GazeFixationDetectorIDT.js';

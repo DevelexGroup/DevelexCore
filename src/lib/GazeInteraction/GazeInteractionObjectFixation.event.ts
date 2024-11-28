@@ -1,13 +1,12 @@
-import type { GazeDataPointWithFixation } from '../../GazeData/GazeData';
-import type { GazeInteractionEvents } from '../GazeInteraction';
-import type { GazeInteractionEvent } from '../GazeInteractionEvent';
+import type { GazeDataPointWithFixation } from '../GazeData/GazeData';
+import type { GazeInteractionEvent } from './GazeInteraction.event';
 import type { GazeInteractionObjectFixationSettings } from './GazeInteractionObjectFixation.settings';
 
 export type GazeInteractionObjectFixationEvents = {
 	'fixationObjectProgress': GazeInteractionObjectFixationEvent;
 	'fixationObjectEnd': GazeInteractionObjectFixationEvent;
 	'fixationObjectStart': GazeInteractionObjectFixationEvent;
-} & GazeInteractionEvents;
+};
 
 /**
  * Fired when a fixation event occurs.

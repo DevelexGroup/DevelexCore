@@ -1,22 +1,28 @@
 <script lang="ts">
 	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
-    import { gazeInputStore } from "../store/gazeInputStore";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
     import { sceneStateStore } from "../store/sceneStores";
+	import { gazeManagerStore } from "../store/gazeInputStore";
 
     const getGazeInputStates = () => {
         return [
-            { variable: "Connected", value: $gazeInputStore !== null ? $gazeInputStore.isConnected : null },
-            { variable: "Emitting", value: $gazeInputStore !== null ? $gazeInputStore.isEmitting : null },
-            { variable: "Calibrated", value: $gazeInputStore !== null ? $gazeInputStore.isDeviceCalibrated : null },
-            { variable: "WindowCalibrated", value: $gazeInputStore !== null ? $gazeInputStore.isWindowCalibrated : null }
+            { variable: "Connected", value: $gazeManagerStore !== null ? $gazeManagerStore.isConnected : null },
+            { variable: "Emitting", value: $gazeManagerStore !== null ? $gazeManagerStore.isEmitting : null },
+            { variable: "Calibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isDeviceCalibrated : null },
+            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isWindowCalibrated : null },
+            { variable: "WindowCalibration ClientX", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.clientX : null },
+            { variable: "WindowCalibration ScreenX", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.screenX : null },
+            { variable: "WindowCalibration ClientY", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.clientY : null },
+            { variable: "WindowCalibration ScreenY", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.screenY : null },
+            { variable: "WindowCalibration Width", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.windowScreenWidth : null },
+            { variable: "WindowCalibration Height", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.windowScreenHeight : null }
         ]   
     };
 
     const getGazeInputConfig = () => {
-        if ($gazeInputStore === null) return [];
-        return Object.entries($gazeInputStore.config).map(([key, value]) => ({ variable: key, value }));
+        if ($gazeManagerStore.input === null) return [];
+        return Object.entries($gazeManagerStore.input.config).map(([key, value]) => ({ variable: key, value }));
     };
 
     let gazeInputStates = getGazeInputStates();
@@ -25,10 +31,10 @@
     const handleGazeInputMessage = (data: GazeInputMessage) => {
         gazeInputStates = getGazeInputStates();
     };
-
+    
+    $gazeManagerStore.on("state", handleGazeInputMessage);
     // if gazeInputState, listen for messages
-    $: if ($gazeInputStore !== null) {
-        $gazeInputStore.on("state", handleGazeInputMessage);
+    $: if ($gazeManagerStore !== null) {
         gazeInputStates = getGazeInputStates();
         gazeInputConfig = getGazeInputConfig();
     } else {
@@ -59,5 +65,6 @@
         gap: 1rem;
         grid-template-columns: 250px 250px 1fr;
         min-width: 800px;
+        width: 100%;
     }
 </style>

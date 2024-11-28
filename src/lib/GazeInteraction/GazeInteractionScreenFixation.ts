@@ -1,22 +1,12 @@
 import { isGazeDataPointWithFixation, type GazeDataPoint, type GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
-import type { GazeInput } from "$lib/GazeInput/GazeInput";
-import type { GazeInputConfigWithFixations } from "$lib/GazeInput/GazeInputConfig";
-import { GazeInteractionScreen } from "./GazeInteractionScreen";
+import { GazeInteraction } from "./GazeInteraction";
 import { type GazeInteractionScreenFixationEvent, type GazeInteractionScreenFixationEvents } from "./GazeInteractionScreenFixation.event";
 
-export class GazeInteractionScreenFixation extends GazeInteractionScreen<GazeInteractionScreenFixationEvents, GazeDataPoint> {
+export class GazeInteractionScreenFixation extends GazeInteraction<GazeInteractionScreenFixationEvents, GazeDataPoint> {
 
     currentFixationLastPoint: GazeDataPointWithFixation | null = null;
 
-    connect(input: GazeInput<GazeInputConfigWithFixations>): void {
-        input.on("data", this.inputCallback);
-    }
-
-    disconnect(input: GazeInput<GazeInputConfigWithFixations>): void {
-        input.off("data", this.inputCallback);
-    }
-
-    evaluateInputData(data: GazeDataPoint): void {
+    evaluate(data: GazeDataPoint): void {
         const { fixationPhase, fixationPoint, lastFixationPoint } = this.decideFixationPhase(data, this.currentFixationLastPoint);
         switch (fixationPhase) {
             case "start": {

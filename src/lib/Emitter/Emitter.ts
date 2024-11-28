@@ -1,5 +1,5 @@
 export type EventMap = Record<string, object>;
-export type EventKey<T extends EventMap> = string & keyof T;
+export type EventKey<T extends EventMap> = Extract<keyof T, string>;
 export type EventReceiver<T> = (params: T) => void;
 
 /**
@@ -18,6 +18,15 @@ export abstract class Emitter<T extends EventMap> {
             priority: number
         }>;
     } = {};
+
+    /**
+     * Checks if the gaze interaction has any listeners.
+     * It can be used for optimization purposes.
+     * @returns True if the gaze interaction has listeners, false otherwise.
+     */
+    hasListeners(): boolean {
+        return Object.keys(this.handlers).length > 0;
+    }
 
     /**
      * Registers an event handler for the specified event.
@@ -51,8 +60,150 @@ export abstract class Emitter<T extends EventMap> {
      * @param params - The parameters to pass to the event handlers.
      */
     emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
-        if (this.handlers[eventName]) {
-            this.handlers[eventName].forEach(handler => handler.fn(params));
+        const handlers = this.handlers[eventName];
+        if (!handlers?.length) return;  // Early return if no handlers
+        
+        // Cache length and use regular for loop for better performance
+        const len = handlers.length;
+        for (let i = 0; i < len; i++) {
+            handlers[i].fn(params);
         }
+    }
+
+    clear(): void {
+        this.handlers = {};
+    }
+}
+
+export abstract class EmitterWithFacade<T extends EventMap> extends Emitter<T> {
+    internalEmitter: Emitter<T> | null = null;
+
+    /**
+     * Set or replace the internal emitter instance.
+     * Reattaches all preserved handlers to the new emitter.
+     * @param newEmitter - The new emitter instance.
+     */
+    setEmitter(newEmitter: Emitter<T> | null): void {
+        if (this.internalEmitter) {
+            this.internalEmitter.clear();  // Clear the old emitter
+        }
+        this.internalEmitter = newEmitter;
+
+        // Reattach all handlers to the new internal emitter
+        if (this.internalEmitter) {
+            for (const eventName in this.handlers) {
+                this.handlers[eventName]?.forEach(handler => {
+                    this.internalEmitter?.on(eventName as EventKey<T>, handler.fn, handler.priority);
+                });
+            }
+        }
+    }
+
+    /**
+     * Registers an event handler in both the facade and internal emitter if set.
+     * @param eventName - The name of the event.
+     * @param fn - The event handler function.
+     * @param priority - Priority level of the handler.
+     */
+    override on<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>, priority: number = 0): void {
+        super.on(eventName, fn, priority);  // Register in facade
+        if (this.internalEmitter) {
+            this.internalEmitter.on(eventName, fn, priority);  // Register in internal emitter
+        }
+    }
+
+    /**
+     * Unregisters an event handler in both the facade and internal emitter.
+     * @param eventName - The name of the event.
+     * @param fn - The event handler function to remove.
+     */
+    override off<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>): void {
+        super.off(eventName, fn);  // Remove from facade
+        if (this.internalEmitter) {
+            this.internalEmitter.off(eventName, fn);  // Remove from internal emitter
+        }
+    }
+
+    /**
+     * Emits the event. If the internal emitter is set, the event is emitted through it.
+     * Otherwise, the facade emits the event.
+     * @param eventName - The name of the event.
+     * @param params - Parameters to pass to the event handlers.
+     */
+    override emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
+        if (this.internalEmitter) {
+            this.internalEmitter.emit(eventName, params);  // Emit through internal emitter
+        } else {
+            super.emit(eventName, params);  // Emit through facade
+        }
+    }
+
+    /**
+     * Checks if there are any listeners registered in either the facade or the internal emitter.
+     * @returns True if any listeners are registered, false otherwise.
+     */
+    override hasListeners(): boolean {
+        return super.hasListeners() || (this.internalEmitter?.hasListeners() ?? false);
+    }
+
+    /**
+     * Clears all event handlers from the facade and the internal emitter.
+     */
+    override clear(): void {
+        super.clear();  // Clear facade handlers
+        if (this.internalEmitter) {
+            this.internalEmitter.clear();  // Clear internal emitter handlers
+        }
+    }
+}
+
+// Manager class that routes event registration to the correct Emitter
+
+export class EmitterGroup<T extends EventMap> {
+    // A mapping of event names to their respective emitters
+    private emitterMap: Record<EventKey<T>, Emitter<T> | EmitterWithFacade<T>>;
+
+    // Initialize the manager with emitters and their associated events
+    constructor(emitterMap: Record<string, Emitter<T> | EmitterWithFacade<T>>) {
+        this.emitterMap = emitterMap;
+    }
+
+    /**
+     * links an event handler for the specified event, automatically routing
+     * to the correct emitter.
+     * @param eventName - The name of the event (e.g., 'fixationEnd', 'dwell').
+     * @param fn - The event handler function.
+     * @param priority - The priority of the handler (default: 0).
+     */
+    on<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>, priority: number = 0): void {
+        const emitter = this.getEmitter(eventName);
+        if (emitter) {
+            emitter.on(eventName, fn, priority);
+        } else {
+            throw new Error(`No emitter found for event '${eventName}'`);
+        }
+    }
+
+    /**
+     * Unlinks an event handler for the specified event.
+     * @param eventName - The name of the event.
+     * @param fn - The event handler function to remove.
+     */
+    off<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>): void {
+        const emitter = this.getEmitter(eventName);
+        if (emitter) {
+            emitter.off(eventName, fn);
+        } else {
+            throw new Error(`No emitter found for event '${eventName}'`);
+        }
+    }
+
+    /**
+     * Finds the correct emitter for the given event name.
+     * @param eventName - The name of the event.
+     * @returns The emitter responsible for the event, or undefined if none exists.
+     */
+    private getEmitter<K extends EventKey<T>>(eventName: K): Emitter<T> | undefined {
+        return this.emitterMap[eventName];
     }
 }

@@ -1,4 +1,4 @@
-import type { GazeInteractionObjectDwellEvent } from "$lib/GazeInteraction/Object/GazeInteractionObjectDwell.event";
+import type { GazeInteractionObjectDwellEvent } from "$lib/GazeInteraction/GazeInteractionObjectDwell.event";
 
 export interface Dwell extends Omit<GazeInteractionObjectDwellEvent, "target" | "settings"> {
     aoi: string;

@@ -1,5 +1,5 @@
 /**
- * Fired when a dwell event occurs.
+ * Base interface for all gaze interaction events with mandatory properties.
  * @property {string} type of the event.
  * @property {string} sessionId of the event.
  * @property {number} timestamp of the event.

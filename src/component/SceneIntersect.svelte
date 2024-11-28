@@ -1,21 +1,20 @@
 <script lang="ts">
 	import { gazeManagerStore } from "../store/gazeInputStore";
-    import { sceneObjectDwellStore } from "../store/sceneStores";
+    import { sceneIntersectStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
 	import GenericTestElement from "./GenericTestElement.svelte";
 
     const settings = {
-        bufferSize: 10,
-        dwellTime: 500
+        bufferSize: 10
     };
 
-    const aoiLabels = ["dwell-a", "dwell-b", "dwell-c"];
+    const aoiLabels = ["intersect-a", "intersect-b", "intersect-c"];
 
     const registerFn = (element: HTMLElement) => {
         if (!$gazeManagerStore) return;
         $gazeManagerStore.register({
-            interaction: "dwell",
+            interaction: "intersect",
             element,
             settings,
         });
@@ -24,22 +23,22 @@
     const unregisterFn = (element: HTMLElement) => {
         if (!$gazeManagerStore) return;
         $gazeManagerStore.unregister({
-            interaction: "dwell",
+            interaction: "intersect",
             element,
         });
     };
 </script>
 
 <div class="holder">
-    <Group heading="Dwell Interaction Elements">
+    <Group heading="Intersect Interaction Elements">
         <div class="grouping">
         {#each aoiLabels as aoi}
             <GenericTestElement aoi={aoi} {registerFn} {unregisterFn} />
         {/each}
         </div>
     </Group>
-    <Group heading="Dwell Interaction Log">
-        <GenericTable data={$sceneObjectDwellStore} headers={["timestamp", "type", "duration", "aoi"]} />
+    <Group heading="Intersect Interaction Log">
+        <GenericTable data={$sceneIntersectStore} headers={["timestamp", "gazeData.xL", "gazeData.xR", "gazeData.yL", "gazeData.yR", "gazeData.fixationDuration", "aoi"]} />
     </Group>
 </div>
 

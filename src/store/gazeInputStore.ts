@@ -1,15 +1,15 @@
 /**
  * Svelte store containing the gaze input instance.
  */
-import { writable } from 'svelte/store';
-import { createGazeInput } from '$lib';
-import { GazeInput } from '$lib/GazeInput/GazeInput';
+import { writable, get } from 'svelte/store';
 import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
+import { GazeManager } from '$lib/GazeManager/GazeManager';
+import { addDwellEvent, addFixationEvent, addIntersectEvent, addPointEvent, addSaccadeEvent, addValidationEvent } from "./sceneStores";
 
 /**
  * The gaze input store.
  */
-export const gazeInputStore = writable<GazeInput<GazeInputConfig> | null>(null);
+export const gazeManagerStore = writable<GazeManager>(new GazeManager());
 
 
 interface Input {
@@ -23,15 +23,25 @@ interface Input {
  * @param input - The gaze input instance.
  */
 export const setGazeInput = (input: Input | null) => {
-    gazeInputStore.update((gazeInput) => {
-        if (gazeInput) {
-            gazeInput.disconnect();
+    gazeManagerStore.update((gazeManager) => {
+        if (gazeManager !== null) {
+            gazeManager.disconnect();
         }
         if (input !== null) {
-            const GazeInput = createGazeInput(input.inputConfig);
-            GazeInput.setWindowCalibration(input.mouseEvent, input.window);
-            return GazeInput;
+            gazeManager.createInput(input.inputConfig);
+            gazeManager.setWindowCalibration(input.mouseEvent, input.window);
+        } else {
+            gazeManager.input = null;
         }
-        return null;
+        return gazeManager;
     });
 };
+
+get(gazeManagerStore).on("data", addPointEvent);
+get(gazeManagerStore).on("dwell", addDwellEvent);
+get(gazeManagerStore).on("fixationObjectStart", addFixationEvent);
+get(gazeManagerStore).on("fixationObjectEnd", addFixationEvent);
+get(gazeManagerStore).on("saccadeObjectTo", addSaccadeEvent);
+get(gazeManagerStore).on("saccadeObjectFrom", addSaccadeEvent);
+get(gazeManagerStore).on("validation", addValidationEvent);
+get(gazeManagerStore).on("intersect", addIntersectEvent);

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fixationObjectStore } from "../store/interactionStores";
+	import { gazeManagerStore } from "../store/gazeInputStore";
     import { sceneObjectFixationStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
@@ -12,11 +12,20 @@
     const aoiLabels = ["fixation-a", "fixation-b", "fixation-c"];
 
     const registerFn = (element: HTMLElement) => {
-        $fixationObjectStore.register(element, settings);
+        if (!$gazeManagerStore) return;
+        $gazeManagerStore.register({
+            interaction: "fixation",
+            element,
+            settings,
+        });
     };
 
     const unregisterFn = (element: HTMLElement) => {
-        $fixationObjectStore.unregister(element);
+        if (!$gazeManagerStore) return;
+        $gazeManagerStore.unregister({
+            interaction: "fixation",
+            element,
+        });
     };
 </script>
 

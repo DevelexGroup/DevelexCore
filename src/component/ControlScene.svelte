@@ -3,6 +3,7 @@
 	import SceneDwell from "./SceneDwell.svelte";
 	import SceneFixation from "./SceneFixation.svelte";
     import SceneInputState from "./SceneInputState.svelte";
+	import SceneIntersect from "./SceneIntersect.svelte";
 	import ScenePointData from "./ScenePointData.svelte";
 	import SceneSaccade from "./SceneSaccade.svelte";
 	import SceneValidation from "./SceneValidation.svelte";
@@ -18,28 +19,33 @@
             value: 2,
             component: ScenePointData
         },
-        { label: "Dwell",
+        {
+            label: "Intersect",
             value: 3,
+            component: SceneIntersect
+        },
+        { label: "Dwell",
+            value: 4,
             component: SceneDwell
         },
         {
             label: "Fixation",
-            value: 4,
+            value: 5,
             component: SceneFixation
         },
         {
             label: "Saccade",
-            value: 5,
+            value: 6,
             component: SceneSaccade
         },
         {
             label: "Validation",
-            value: 6,
+            value: 7,
             component: SceneValidation
         },
         {
             label: "Download",
-            value: 7,
+            value: 8,
             component: SceneDownload
         }
     ];

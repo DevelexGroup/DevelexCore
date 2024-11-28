@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
 import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
-import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectDwell.event';
-import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectFixation.event';
-import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectSaccade.event';
+import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event';
+import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/GazeInteractionObjectFixation.event';
+import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.event';
 
 import type { Dwell } from '../database/models/Dwell';
 import dwellRepository from '../database/repositories/dwell.repository';
@@ -11,11 +11,15 @@ import type { Fixation } from '../database/models/Fixation';
 import fixationRepository from '../database/repositories/fixation.repository';
 import type { Saccade } from '../database/models/Saccade';
 import saccadeRepository from '../database/repositories/saccade.repository';
-import type { GazeDataPoint } from '$lib';
-import pointRepository from '../database/repositories/point.repository';
+import type { GazeDataPoint } from '$lib/index';
 import type { Validation } from '../database/models/Validation';
 import validationRepository from '../database/repositories/validation.repository';
-import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/Object/GazeInteractionObjectValidation.event';
+import type { GazeInteractionObjectValidationEvent } from '$lib/GazeInteraction/GazeInteractionObjectValidation.event';
+import type { GazeInteractionObjectIntersectEvent } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.event';
+import type { Intersect } from '../database/models/Intersect';
+import intersectRepository from '../database/repositories/intersect.repository';
+import type { Point } from '../database/models/Point';
+import pointRepository from '../database/repositories/point.repository';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
@@ -89,6 +93,31 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixation
     });
 }
 
+export const sceneIntersectStore = writable<Intersect[]>([]);
+
+export const addIntersectEvent = (unprocessedEvent: GazeInteractionObjectIntersectEvent) => {
+    const { type, sessionId, timestamp, gazeData, target } = unprocessedEvent;
+    const aoi = Array.isArray(target) ? target.map((t) => t.id.toString()).join(';') : '';
+
+    const event: Intersect = {
+        type,
+        sessionId,
+        timestamp,
+        aoi,
+        gazeData
+    };
+
+    void intersectRepository.create(event);
+    
+    sceneIntersectStore.update(events => {
+        const updatedEvents = [event, ...events];
+        if (updatedEvents.length > 100) {
+            updatedEvents.pop();
+        }
+        return updatedEvents;
+    });
+}
+
 export const sceneObjectSaccadeStore = writable<Saccade[]>([]);
 
 export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEvent) => {
@@ -127,8 +156,18 @@ export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEv
     });
 }
 
-export const addPointEvent = (e: GazeDataPoint) => {
-    void pointRepository.create(e);
+export const scenePointStore = writable<Point[]>([]);
+
+export const addPointEvent = (data: GazeDataPoint) => {
+    void pointRepository.create(data);
+    
+    scenePointStore.update(points => {
+        const updatedPoints = [data, ...points];
+        if (updatedPoints.length > 100) {
+            updatedPoints.pop();
+        }
+        return updatedPoints;
+    });
 }
 
 export const sceneObjectValidationStore = writable<Validation[]>([]);

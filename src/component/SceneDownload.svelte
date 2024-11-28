@@ -2,6 +2,7 @@
 	import { db } from "../database/database";
 	import dwellRepository from "../database/repositories/dwell.repository";
 	import fixationRepository from "../database/repositories/fixation.repository";
+	import intersectRepository from "../database/repositories/intersect.repository";
 	import pointRepository from "../database/repositories/point.repository";
 	import saccadeRepository from "../database/repositories/saccade.repository";
 	import validationRepository from "../database/repositories/validation.repository";
@@ -69,6 +70,16 @@ const downloadValidations = () => {
     });
 };
 
+const downloadIntersects = () => {
+    intersectRepository.getAll().then((intersects) => {
+        const csv = intersectRepository.csvHeader() + "\n" +
+        intersects.map((intersect) => {
+            return intersectRepository.toCsv(intersect);
+        }).join("\n");
+        saveCsvString(csv, "gaze-intersects.csv");
+    });
+};
+
 </script>
 
 <div class="holder">
@@ -85,6 +96,7 @@ const downloadValidations = () => {
             Caution, data is exported as a CSV file seperated by commas. If your Microsoft Excel is not set to use commas as seperator, like in Germany or Czechia by default, the data will not be displayed correctly.
         </p>
         <Button text={"Download gaze points"} on:click={downloadPoints} />
+        <Button text={"Download intersects"} on:click={downloadIntersects} />
         <Button text={"Download fixations"} on:click={downloadFixations} />
         <Button text={"Download saccades"} on:click={downloadSaccades} />
         <Button text={"Download dwells"} on:click={downloadDwells} />
