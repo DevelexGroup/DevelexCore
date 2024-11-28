@@ -13,14 +13,17 @@ import type { GazeInputConfigDummy } from './GazeInputConfig';
  * TODO: Input classes simpler, more consistent, and more robust to handle high-frequency data.
  */
 export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
+	private readonly boundUpdateMousePosition: (event: MouseEvent) => void;
 	lastMouseCoordinates: { x: number; y: number } = { x: 0, y: 0 };
 	intervalId: number | null = null;
 	precisionError: number | null = null;
 	windowCalibrator: GazeWindowCalibrator | null = null;
+	private gazePointFactory: ((x: number, y: number) => GazeDataPoint) | null = null;
 
 	constructor(config: GazeInputConfigDummy) {
 		super(config);
 		this.precisionError = config.precisionMinimalError;
+		this.boundUpdateMousePosition = this.updateMousePosition.bind(this);
 	}
 
 	connect(): Promise<void> {
@@ -29,7 +32,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 		this.handleConnected({ sessionId: this.createSessionId() });
 
-		document.addEventListener('mousemove', this.updateMousePosition.bind(this));
+		document.addEventListener('mousemove', this.boundUpdateMousePosition);
 
 		return Promise.resolve();
 	}
@@ -44,12 +47,20 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		if (!this.windowCalibrator) {
 			return Promise.reject('Window calibrator is not set.');
 		}
-		const gazePointGetter = createGazePointFactory(this.sessionId, this.windowCalibrator, createGazeFixationDetector(this.config.fixationDetection));
+
+		if (!this.gazePointFactory) {
+			this.gazePointFactory = createGazePointFactory(
+				this.sessionId,
+				this.windowCalibrator,
+				createGazeFixationDetector(this.config.fixationDetection)
+			);
+		}
+
 		const interval = 1000 / this.config.frequency;
 		this.intervalId = window.setInterval(() => {
 			if (this.config && this.isConnected) {
 				const { x, y } = this.calculateCoordinates();
-				this.emit('data', gazePointGetter(x, y));
+				this.emit('data', this.gazePointFactory!(x, y));
 			}
 		}, interval);
 		this.handleStarted();
@@ -68,7 +79,8 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	disconnect(): Promise<void> {
 		if (!this.isConnected) return Promise.resolve();
 		if (this.isEmitting) this.stop();
-		document.removeEventListener('mousemove', this.updateMousePosition.bind(this));
+		document.removeEventListener('mousemove', this.boundUpdateMousePosition);
+		this.gazePointFactory = null;
 		this.handleDisconnected();
 		return Promise.resolve();
 	}
