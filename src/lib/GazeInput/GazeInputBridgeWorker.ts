@@ -149,7 +149,9 @@ const generateBridgeProcessor = (
             yLScreenRelative: data.yL,
             yRScreenRelative: data.yR,
             sessionId,
-            parseValidity: true // can be disvalidated by (i) fixation detector or (ii) window coordinates decorrelation in main thread wrapper
+            parseValidity: true, // can be disvalidated by (i) fixation detector or (ii) window coordinates decorrelation in main thread wrapper
+            pupilDiameterL: data.pupilDiameterL,
+            pupilDiameterR: data.pupilDiameterR
         };
         const fixation = fixationDetector.processGazePoint(windowCalibratedData);
         postMessage(fixation);

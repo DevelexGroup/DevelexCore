@@ -1,21 +1,25 @@
-# The Docker image that will be used to build your app
 image: node:lts
 
-# The stages of the pipeline
 stages:
   - build
+  - deploy
 
-# Cache configuration to store node_modules between builds
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
+  key:
+    files:
+      - package-lock.json
+      - package.json
   paths:
     - node_modules/
+    - .npm
 
-# Functions that should be executed before the build script is run
 before_script:
+  - apt-get update && apt-get install -y curl  # Install curl
+  - curl -I https://registry.npmjs.org  # Check if npm registry is accessible
+  - npm config set registry https://registry.npmjs.org/  # Explicitly set registry for npm install
+  - npm config set timeout 60000
   - npm install
 
-# The job for building the project
 pages:
   stage: build
   script:
@@ -24,16 +28,17 @@ pages:
     - cp -r build/* public/
   artifacts:
     paths:
-      - public/  
+      - public/
+    expire_in: 1 week
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
-# The job for publishing the npm package
 publish-npm:
-  stage: build
+  stage: deploy
   script:
-    - echo "@scope:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
-    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
+    - echo "registry=https://registry.npmjs.org/" > .npmrc  # Explicitly set npm registry for general installs
+    - echo "@scope:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" >> .npmrc  # Set registry for your scope
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc  # Set auth token
     - npm publish
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
