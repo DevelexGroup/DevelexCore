@@ -17,7 +17,6 @@ before_script:
   - apt-get update && apt-get install -y curl  # Install curl
   - curl -I https://registry.npmjs.org  # Check if npm registry is accessible
   - npm config set registry https://registry.npmjs.org/  # Explicitly set registry for npm install
-  - npm config set timeout 60000
   - npm install
 
 pages:
