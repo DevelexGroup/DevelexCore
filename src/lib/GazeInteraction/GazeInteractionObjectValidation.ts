@@ -1,4 +1,5 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+import { calculatePointDistance } from "$lib/utils/geometryUtils";
 import { GazeInteractionObject } from "./GazeInteractionObject";
 import type { GazeInteractionObjectValidationEvent, GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidation.event";
 import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidation.settings";
@@ -94,23 +95,13 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
 type Point = { x: number, y: number };
 
 /**
- * Calculates the Euclidean distance between two points.
- * @param p1 - The first point.
- * @param p2 - The second point.
- * @returns The Euclidean distance between the points.
- */
-export const distance = (p1: Point, p2: Point): number => {
-  return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-};
-
-/**
  * Calculates the average distance of points from the origin (0, 0), representing accuracy.
  * @param points - Array of points.
  * @param origin - The origin point.
  * @returns The average distance from the origin.
  */
 export const calculateAccuracy = (points: Point[], origin: Point = { x: 0, y: 0 }): number => {
-  const totalDistance = points.reduce((sum, point) => sum + distance(point, origin), 0);
+  const totalDistance = points.reduce((sum, point) => sum + calculatePointDistance(point, origin), 0);
   return totalDistance / points.length;
 };
 
@@ -124,7 +115,7 @@ export const calculatePrecision = (points: Point[]): number => {
     x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
     y: points.reduce((sum, point) => sum + point.y, 0) / points.length
   };
-  const distances = points.map(point => distance(point, centroid));
+  const distances = points.map(point => calculatePointDistance(point, centroid));
   const meanDistance = distances.reduce((sum, d) => sum + d, 0) / distances.length;
   const variance = distances.reduce((sum, d) => sum + Math.pow(d - meanDistance, 2), 0) / distances.length;
   return Math.sqrt(variance);

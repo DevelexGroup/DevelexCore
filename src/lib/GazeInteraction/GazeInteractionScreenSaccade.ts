@@ -1,4 +1,5 @@
 import type { GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
+import { calculatePointDistance } from "$lib/utils/geometryUtils";
 import { GazeInteraction } from "./GazeInteraction";
 import type { GazeInteractionScreenFixationEvent } from "./GazeInteractionScreenFixation.event";
 import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccadeEvent";
@@ -45,21 +46,9 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
         return (angleTwo - angleOne + 180) % 360 - 180;
     }
 
-    /**
-     * Calculates the distance between two points.
-     * @param x1 x-coordinate of the first point.
-     * @param y1 y-coordinate of the first point.
-     * @param x2 x-coordinate of the second point. 
-     * @param y2 y-coordinate of the second point. 
-     * @returns the distance between two points.
-    */
-    calculateDistance(x1: number, y1: number, x2: number, y2: number): number {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    }
-
     createSaccadeEvent(fixationOne: GazeDataPointWithFixation, fixationTwo: GazeDataPointWithFixation): GazeInteractionScreenSaccadeEvents["saccade"] {
         const angleToScreen = this.calculateAngleToScreen(fixationOne.x, fixationOne.y, fixationTwo.x, fixationTwo.y);
-        const distance = this.calculateDistance(fixationOne.x, fixationOne.y, fixationTwo.x, fixationTwo.y);
+        const distance = calculatePointDistance(fixationOne, fixationTwo);
         const duration = fixationTwo.timestamp - fixationOne.timestamp;
         const timestamp = fixationOne.timestamp;
         const type = "saccade";
