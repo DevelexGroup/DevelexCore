@@ -166,7 +166,9 @@ export class UtilityBoundingBoxManager {
             const numberOfChangedElements = changedIndices.length;
             for (let i = 0; i < numberOfChangedElements; i++) {
                 const index = changedIndices[i];
-                console.log(`Element ${index} changed: ${elementOrder[index].id}`);
+                // Prepare for logging
+                const element = elementOrder[index];
+                console.log(`Element ${index} changed: ${element.id}`);
             }
 
             animationFrameId = requestAnimationFrame(observe);
