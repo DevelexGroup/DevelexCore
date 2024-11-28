@@ -110,6 +110,7 @@ export class UtilityBoundingBoxManager {
     private startObserving(): void {
         this.isObserving = true;
         const currentValues = this.checkerForCurrentValues;
+        let animationFrameId: number;
 
         const observe = () => {
             if (!this.isObserving) return;
@@ -167,10 +168,16 @@ export class UtilityBoundingBoxManager {
                 console.log("Changed indices:", changedIndices);
             }
 
-            requestAnimationFrame(() => observe);
+            animationFrameId = requestAnimationFrame(observe);
         };
 
-        requestAnimationFrame(() => observe);
+        animationFrameId = requestAnimationFrame(observe);
+        
+        // Add cleanup to stopObserving
+        this.stopObserving = () => {
+            this.isObserving = false;
+            cancelAnimationFrame(animationFrameId);
+        };
     }
 
     getElementBoundingBox(element: HTMLElement): {
