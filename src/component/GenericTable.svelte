@@ -23,42 +23,60 @@
       
       return `${hours}:${minutes}:${seconds}.${milliseconds}`;
     }
+
+    function formatJSON(obj: object) {
+      // Format JSON with line breaks and indentation
+      const entries = Object.entries(obj);
+      return entries.map(([key, value]) => `${key}: ${value}`).join('\n');
+    }
   </script>
   
-  <table>
-    <thead>
-      <tr>
-        {#each headers as header}
-          <th>{header}</th>
-        {/each}
-      </tr>
-    </thead>
-    <tbody>
-      {#each data as row}
+  <div class="table-container">
+    <table>
+      <thead>
         <tr>
           {#each headers as header}
-            <td>
-              {#if header === 'timestamp'}
-                {getTime(row[header])}
-              {:else}
-                {#if getNestedValue(row, header) !== undefined}
-                  {getNestedValue(row, header)}
-                {/if}
-              {/if}
-            </td>
+            <th>{header}</th>
           {/each}
         </tr>
-      {:else}
-        <tr>
-          <td colspan={headers.length}>No data yet</td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {#each data as row}
+          <tr class="w-full">
+            {#each headers as header}
+              <td class="table-cell w-full">
+                {#if header === 'timestamp'}
+                  {getTime(row[header])}
+                {:else}
+                  {@const value = getNestedValue(row, header)}
+                  {#if value !== undefined && value !== ''}
+                    {#if typeof value === 'object'}
+                      {formatJSON(value)}
+                    {:else}
+                      {JSON.stringify(value)}
+                    {/if}
+                  {/if}
+                {/if}
+              </td>
+            {/each}
+          </tr>
+        {:else}
+          <tr>
+            <td colspan={headers.length}>No data yet</td>
+          </tr>
+        {/each}
+      </tbody>
+    </table>
+  </div>
   
 <style>
-    table {
+    .table-container {
         overflow-x: auto;
+        width: 100%;
+        padding-bottom: 1rem;
+    }
+
+    table {
         border: 1px solid #ddd;
         width: 100%;
         border-collapse: collapse;
@@ -66,17 +84,24 @@
         font-size: small;
     }
 
-    tbody {
-        min-width: 800px;
-    }
-
     th, td {
         padding: 5px 10px;
         border-bottom: 1px solid #ddd;
+        vertical-align: top;
+        text-align: left;
+    }
+
+    .table-cell {
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-width: 300px;
+        text-align: left;
     }
 
     th {
         background-color: #f2f2f2;
+        text-align: left;
+        vertical-align: top;
     }
 
     tr:hover {

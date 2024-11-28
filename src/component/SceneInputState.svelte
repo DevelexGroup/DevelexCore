@@ -10,7 +10,13 @@
             { variable: "Connected", value: $gazeManagerStore !== null ? $gazeManagerStore.isConnected : null },
             { variable: "Emitting", value: $gazeManagerStore !== null ? $gazeManagerStore.isEmitting : null },
             { variable: "Calibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isDeviceCalibrated : null },
-            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isWindowCalibrated : null }
+            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isWindowCalibrated : null },
+            { variable: "WindowCalibration ClientX", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.clientX : null },
+            { variable: "WindowCalibration ScreenX", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.screenX : null },
+            { variable: "WindowCalibration ClientY", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.clientY : null },
+            { variable: "WindowCalibration ScreenY", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.screenY : null },
+            { variable: "WindowCalibration Width", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.windowScreenWidth : null },
+            { variable: "WindowCalibration Height", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.windowScreenHeight : null }
         ]   
     };
 
@@ -59,5 +65,6 @@
         gap: 1rem;
         grid-template-columns: 250px 250px 1fr;
         min-width: 800px;
+        width: 100%;
     }
 </style>
