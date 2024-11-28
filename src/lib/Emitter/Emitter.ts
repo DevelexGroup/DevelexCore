@@ -60,8 +60,13 @@ export abstract class Emitter<T extends EventMap> {
      * @param params - The parameters to pass to the event handlers.
      */
     emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
-        if (this.handlers[eventName]) {
-            this.handlers[eventName].forEach(handler => handler.fn(params));
+        const handlers = this.handlers[eventName];
+        if (!handlers?.length) return;  // Early return if no handlers
+        
+        // Cache length and use regular for loop for better performance
+        const len = handlers.length;
+        for (let i = 0; i < len; i++) {
+            handlers[i].fn(params);
         }
     }
 
