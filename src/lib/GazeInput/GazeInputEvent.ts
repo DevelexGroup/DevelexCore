@@ -3,11 +3,12 @@
 
 
 import type {GazeDataPoint} from "../GazeData/GazeData.js";
+import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
 
-export type GazeInputEventState = GazeInputEventStateBools | GazeInputEventStateMessage;
+export type GazeInputEventState = GazeInputEventStateBools | GazeInputEventStateMessage | GazeInputEventStateCalibration;
 
 export interface GazeInputEventStateBools {
-    type: "connect" | "emit" | "windowCalibrated" | "windowCalibrationContested" | "calibrated";
+    type: "connect" | "emit" | "calibrated";
     timestamp: number;
     value: boolean;
 };
@@ -20,12 +21,10 @@ export interface GazeInputEventStateBoolsEmit extends GazeInputEventStateBools {
     type: "emit";
 };
 
-export interface GazeInputEventStateBoolsWindowCalibrated extends GazeInputEventStateBools {
+export interface GazeInputEventStateCalibration {
     type: "windowCalibrated";
-};
-
-export interface GazeInputEventStateBoolsWindowCalibrationContested extends GazeInputEventStateBools {
-    type: "windowCalibrationContested";
+    timestamp: number;
+    value: GazeWindowCalibratorConfig | null;
 };
 
 export interface GazeInputEventStateBoolsCalibrated extends GazeInputEventStateBools {
@@ -58,8 +57,7 @@ export type ETHandlerMapping = {
     "state": GazeInputEventState;
     "connect": GazeInputEventStateBoolsConnect;
     "emit": GazeInputEventStateBoolsEmit;
-    "windowCalibrated": GazeInputEventStateBoolsWindowCalibrated;
-    "windowCalibrationContested": GazeInputEventStateBoolsWindowCalibrationContested;
+    "windowCalibrated": GazeInputEventStateCalibration;
     "calibrated": GazeInputEventStateBoolsCalibrated;
     "message": GazeInputEventStateMessage;
     "error": GazeInputEventStateMessageError;

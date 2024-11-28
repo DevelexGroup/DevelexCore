@@ -102,8 +102,9 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	}
 
 	setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, windowConfig: GazeWindowCalibratorConfigWindowFields): Promise<void> {
-		this.windowCalibrator = new GazeWindowCalibrator(createGazeWindowCalibrator(mouseEvent, windowConfig));
-		this.isWindowCalibrated = true;
+		const calibrationObject = createGazeWindowCalibrator(mouseEvent, windowConfig);
+		this.windowCalibrator = new GazeWindowCalibrator(calibrationObject);
+		this.handleWindowCalibrated(calibrationObject);
 		return Promise.resolve();
 	}
 

@@ -1,5 +1,5 @@
 import type { ETHandlerMapping } from './GazeInputEvent.js';
-import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
+import type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
 import type { GazeInputConfig, GazeInputConfigWithFixations } from './GazeInputConfig.js';
 import { Emitter } from '$lib/Emitter/Emitter.js';
 
@@ -14,9 +14,9 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 
 	_isConnected: boolean = false;
 	_isEmitting: boolean = false;
-	_isWindowCalibrated: boolean = false;
-	_isWindowCalibrationContested: boolean = false;
 	_isDeviceCalibrated: boolean = false;
+
+	windowCalibration: GazeWindowCalibratorConfig | null = null;
 
 	sessionId: string | null = null;
 
@@ -49,19 +49,10 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 	 * Get the current window calibration state.
 	 * @returns True if calibrated, false otherwise.
 	 * @readonly
-	 * @emits windowCalibrated - When the window calibration state changes.
-	 * @emits state - When the window calibration state changes.
 	 */
-	get isWindowCalibrated(): boolean { return this._isWindowCalibrated }
-
-	/**
-	 * Get the current window calibration contested state.
-	 * @returns True if contested, false otherwise.
-	 * @readonly
-	 * @emits windowCalibrationContested - When the window calibration contested state changes.
-	 * @emits state - When the window calibration contested state changes.
-	 */
-	get isWindowCalibrationContested(): boolean { return this._isWindowCalibrationContested }
+	get isWindowCalibrated(): boolean { 
+		return this.windowCalibration !== null;
+	}
 
 	/**
 	 * Get the current device calibration state.
@@ -95,32 +86,6 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 		this._isEmitting = isEmitting
 		const event = { type: 'emit', timestamp: Date.now(), value: isEmitting } as const
 		this.emit("emit", event)
-		this.emit('state', event)
-	}
-
-	/**
-	 * Set the window calibration state.
-	 * @param isWindowCalibrated - The window calibration state to set.
-	 * @emits windowCalibrated - When the window calibration state changes.
-	 * @emits state - When the window calibration state changes.
-	 */
-	protected set isWindowCalibrated(isWindowCalibrated: boolean) { 
-		this._isWindowCalibrated = isWindowCalibrated
-		const event = { type: 'windowCalibrated', timestamp: Date.now(), value: isWindowCalibrated } as const
-		this.emit("windowCalibrated", event)
-		this.emit('state', event)
-	}
-
-	/**
-	 * Set the window calibration contested state.
-	 * @param isWindowCalibrationContested - The window calibration contested state to set.
-	 * @emits windowCalibrationContested - When the window calibration contested state changes.
-	 * @emits state - When the window calibration contested state changes.
-	 */
-	protected set isWindowCalibrationContested(isWindowCalibrationContested: boolean) { 
-		this._isWindowCalibrationContested = isWindowCalibrationContested
-		const event = { type: 'windowCalibrationContested', timestamp: Date.now(), value: isWindowCalibrationContested } as const
-		this.emit("windowCalibrationContested", event)
 		this.emit('state', event)
 	}
 
@@ -175,12 +140,11 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
     }
 
 	/**
-	 * Handle the window calibration contested event.
+	 * Handle the window calibration event.
 	 * @param data - The data of the event.
 	 */
-    protected handleWindowCalibrated() {
-        this.isWindowCalibrated = true;
-        this.isWindowCalibrationContested = false;
+    protected handleWindowCalibrated(data: GazeWindowCalibratorConfig) {
+		this.setWindowCalibrationValues(data);
     }
 
 	/**
@@ -216,6 +180,13 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<ETHan
 	abstract setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<void>;
 	abstract start(): Promise<void>;
 	abstract stop(): Promise<void>;
+
+	protected setWindowCalibrationValues(calibration: GazeWindowCalibratorConfig | null) {
+		this.windowCalibration = calibration;
+		const event = { type: 'windowCalibrated', timestamp: Date.now(), value: calibration } as const;
+		this.emit("windowCalibrated", event);
+		this.emit('state', event);
+	}
 }
 
 export const isGazeInputWithFixations = (input: GazeInput<GazeInputConfig>): input is GazeInput<GazeInputConfigWithFixations> => {

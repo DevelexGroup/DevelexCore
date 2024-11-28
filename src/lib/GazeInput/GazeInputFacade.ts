@@ -4,6 +4,7 @@ import { createGazeInput } from ".";
 import type { GazeInput } from "./GazeInput";
 import type { GazeInputConfig } from "./GazeInputConfig";
 import type { ETHandlerMapping } from "./GazeInputEvent";
+import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
 
 export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
 
@@ -57,16 +58,16 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
 	 * @emits state - When the window calibration state changes.
 	 */
     get isWindowCalibrated(): boolean { return this.input ? this.input.isWindowCalibrated : false }
-	
+
     /**
-	 * Get the current window calibration contested state.
-	 * @returns True if contested, false otherwise.
-	 * @readonly
-	 * @emits windowCalibrationContested - When the window calibration contested state changes.
-	 * @emits state - When the window calibration contested state changes.
-	 */
-    get isWindowCalibrationContested(): boolean { return this.input ? this.input.isWindowCalibrationContested : false }
-	
+     * Get the window calibration values.
+     * @returns The window calibration values or null if no window calibration is set.
+     * @readonly
+     */
+    get windowCalibration(): GazeWindowCalibratorConfig | null { 
+        return this.input ? this.input.windowCalibration : null 
+    }
+
     /**
 	 * Get the current device calibration state.
 	 * @returns True if calibrated, false otherwise.

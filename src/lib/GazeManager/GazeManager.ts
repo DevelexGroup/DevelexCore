@@ -19,7 +19,7 @@ import type { GazeInteractionScreenFixationEvent, GazeInteractionScreenFixationE
 import { GazeInteractionScreenSaccade } from "$lib/GazeInteraction/GazeInteractionScreenSaccade";
 
 import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccadeEvent";
-import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig";
+import type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig";
 
 /**
  * Manager class for gaze interaction.
@@ -251,13 +251,11 @@ export class GazeManager extends EmitterGroup<
     get isWindowCalibrated(): boolean { return this._input.isWindowCalibrated; }
 
     /**
-	 * Get the current window calibration contested state.
-	 * @returns True if contested, false otherwise.
-	 * @readonly
-	 * @emits windowCalibrationContested - When the window calibration contested state changes.
-	 * @emits state - When the window calibration contested state changes.
-	 */
-    get isWindowCalibrationContested(): boolean { return this._input.isWindowCalibrationContested; }
+     * Get the window calibration values.
+     * @returns The window calibration values or null if no window calibration is set.
+     * @readonly
+     */
+    get windowCalibration(): GazeWindowCalibratorConfig | null { return this._input.windowCalibration; }
 
     /**
 	 * Get the current emitting state.
