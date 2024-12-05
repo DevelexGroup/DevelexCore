@@ -3,10 +3,10 @@ import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorCo
 import { createGazeInput } from ".";
 import type { GazeInput } from "./GazeInput";
 import type { GazeInputConfig } from "./GazeInputConfig";
-import type { ETHandlerMapping } from "./GazeInputEvent";
+import type { GazeInputEvents } from "./GazeInputEvent";
 import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
 
-export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
+export class GazeInputFacade extends EmitterWithFacade<GazeInputEvents> {
 
     /**
      * Get the current input.

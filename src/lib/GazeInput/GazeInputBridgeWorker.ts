@@ -11,6 +11,7 @@ import type { GazeFixationDetector } from '../GazeFixationDetector/GazeFixationD
 import { createGazeFixationDetector } from '../GazeFixationDetector';
 import { GazeInputBridgeWebsocket } from './GazeInputBridgeWebsocket';
 import type {GazeInputBridgeWebsocketOutcomerConnect } from './GazeInputBridgeWebsocketOutcomer';
+import type { SendToWorkerMessages } from './GazeInputBridge.types';
 
 let config: GazeInputConfigBridge | null = null;
 let sessionId: string | null = null;
@@ -23,8 +24,8 @@ let fixationDetector: GazeFixationDetector | null = null;
  * Communicates with the DeveLex Bridge WebSocket server written in Python.
  */
 
-self.onmessage = (event) => {
-    const { messageType, data } = event.data;
+self.onmessage = (event: MessageEvent<SendToWorkerMessages>) => {
+    const { type } = event.data;
     console.log('Worker received message', messageType, data);
     switch (messageType) {
         case 'connect':
@@ -81,7 +82,7 @@ const sendConnect = (config: GazeInputConfigBridge, newSessionId: string) => {
     socket.onStartedCallback = generateMessage;
     socket.onStoppedCallback = generateMessage;
 
-    const connectMessage: GazeInputBridgeWebsocketOutcomerConnect = config.tracker === 'opengaze' ? {
+    const connectMessage: GazeInputBridgeWebsocketOutcomerConnect = config.tracker === 'gazepoint' ? {
         type: 'connect',
         tracker: config.tracker,
         sessionId,
