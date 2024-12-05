@@ -42,7 +42,6 @@ export { GazeInputFacade } from '$lib/GazeInput/GazeInputFacade.js';
 export type { 
     GazeInputConfig,
     GazeInputConfigGazePoint,
-    GazeInputConfigSMI,
     GazeInputConfigEyelogic,
     GazeInputConfigDummy,
     GazeInputConfigWithFixations 
@@ -53,16 +52,9 @@ export type {
  */
 export type { 
     GazeInputEventState,
-    GazeInputEventStateBools,
-    GazeInputEventStateMessage,
-    GazeInputEventStateCalibration,
-    GazeInputMessage,
-    ETHandlerMapping,
-    GazeInputEventStateMessageError,
-    GazeInputEventStateMessageMessage,
-    GazeInputEventStateBoolsConnect,
-    GazeInputEventStateBoolsEmit,
-    GazeInputEventStateBoolsCalibrated
+    GazeInputEventError,
+    GazeInputEventMessage,
+    GazeInputEvents,
 } from '$lib/GazeInput/GazeInputEvent.js';
 
 /**

@@ -4,7 +4,7 @@
     import InputText from "./InputText.svelte";
     import InputSubmit from "./InputSubmit.svelte";
     import { setGazeInput } from "../store/gazeInputStore";
-    const tracker = "opengaze";
+    const tracker = "gazepoint";
     const config: GazeInputConfigGazePoint = {
         tracker,
         fixationDetection: "device",
