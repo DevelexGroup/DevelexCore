@@ -2,7 +2,7 @@ import { EmitterGroup } from "$lib/Emitter/Emitter";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
-import type { ETHandlerMapping } from "$lib/GazeInput/GazeInputEvent";
+import type { GazeInputEvents } from "$lib/GazeInput/GazeInputEvent";
 import { GazeInputFacade } from "$lib/GazeInput/GazeInputFacade";
 import { GazeInteractionObjectDwell } from "$lib/GazeInteraction/GazeInteractionObjectDwell";
 import type { GazeInteractionObjectDwellEvents } from "$lib/GazeInteraction/GazeInteractionObjectDwell.event";
@@ -53,7 +53,7 @@ export class GazeManager extends EmitterGroup<
     GazeInteractionObjectDwellEvents &
     GazeInteractionObjectValidationEvents &
     GazeInteractionObjectIntersectEvents &
-    ETHandlerMapping
+    GazeInputEvents
 > {
     _input: GazeInputFacade;
     fixation: GazeInteractionScreenFixation;
