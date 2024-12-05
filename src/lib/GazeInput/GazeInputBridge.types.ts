@@ -1,0 +1,110 @@
+import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig";
+import type { GazeInputConfigBridge } from "./GazeInputConfig";
+
+export type CommandType =
+  | 'subscribe'
+  | 'unsubscribe'
+  | 'connect'
+  | 'disconnect'
+  | 'calibrate'
+  | 'start'
+  | 'stop'
+  | 'status';
+
+interface CorrelationId {
+  correlationId: number;
+}
+
+interface InitiatorId {
+  initiatorId: string;
+}
+
+interface Timestamp {
+  timestamp: string; // ISO date-time string
+}
+
+interface CommandPayloadBase extends CorrelationId, InitiatorId {
+  type: CommandType;
+}
+
+interface TrackerConfig {
+  trackerType: 'gazepoint' | 'eyelogic';
+}
+
+interface CommandPayloadConnect extends CommandPayloadBase {
+  type: 'connect';
+  config: TrackerConfig;
+}
+
+export interface CommandPayloadGeneric extends CommandPayloadBase {
+  type: Exclude<CommandType, 'connect'>;
+}
+
+export type CommandPayload = CommandPayloadConnect | CommandPayloadGeneric;
+
+export interface MessagePayload extends CorrelationId, InitiatorId {
+  type: 'message';
+  content: string;
+}
+
+export interface GazeDataPayload {
+  type: 'gaze';
+  timestamp: number; // milliseconds
+  // Left eye data
+  xL: number;
+  yL: number;
+  validityL: boolean;
+  pupilDiameterL: number;
+  // Right eye data
+  xR: number;
+  yR: number;
+  validityR: boolean;
+  pupilDiameterR: number;
+  // Optional fixation data
+  fixationDuration?: number | null;
+  fixationId?: number | null;
+}
+
+export interface GazeInputStatus {
+  status:
+    | 'trackerDisconnected'
+    | 'trackerConnected'
+    | 'trackerCalibrating'
+    | 'trackerEmitting';
+  /**
+   * Time of the last device calibration.
+   * Null if unknown, probably not calibrated at all.
+   */
+  trackerCalibration: string | null; // nullable ISO date-time
+}
+
+export interface ReceiveStatusPayload extends CorrelationId, InitiatorId, Timestamp, GazeInputStatus {
+  type: 'status';
+  responseTo: CommandType;
+}
+
+export interface ReceiveMessagePayload extends CorrelationId, InitiatorId, Timestamp {
+  type: 'message';
+  content: string;
+}
+
+export interface ReceiveErrorPayload extends CorrelationId, InitiatorId, Timestamp {
+  type: 'error';
+  content: string;
+}
+
+export interface ViewportCalibrationPayload extends GazeWindowCalibratorConfig {
+    type: 'viewportCalibration';
+    correlationId: number;
+}
+
+export interface SetupPayload extends InitiatorId {
+  type: 'setup';
+  config: GazeInputConfigBridge;
+}
+
+export type SendToWorkerAsyncMessages = CommandPayload | MessagePayload | ViewportCalibrationPayload;
+
+export type SendToWorkerSyncMessages = SetupPayload;
+
+export type SendToWorkerMessages = SendToWorkerAsyncMessages | SendToWorkerSyncMessages;

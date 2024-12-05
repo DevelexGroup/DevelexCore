@@ -5,6 +5,7 @@ import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
 import BridgeWebWorker from '$lib/GazeInput/GazeInputBridgeWorker.ts?worker&inline';
+import type { CommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveStatusPayload, SendToWorkerAsyncMessages } from "./GazeInputBridge.types";
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
@@ -15,148 +16,141 @@ import BridgeWebWorker from '$lib/GazeInput/GazeInputBridgeWorker.ts?worker&inli
 export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
     readonly worker: Worker;
-    private messageHandlers: { [key: string]: Function } = {};
+    private workerReady: Promise<void>;
+    private pendingPromises: Map<number, { 
+        resolve: (value: GazeInputBridge) => void, 
+        reject: (reason?: unknown) => void 
+    }> = new Map();
+    private correlationId: number = 0;
 
     constructor(config: GazeInputConfigBridge) {
         super(config);
         this.worker = new BridgeWebWorker();
-        this.worker.onmessage = (event) => {
-            const { type, data } = event.data;
-            const handler = this.messageHandlers[type];
-            if (handler) {
-                handler(data);
-            } else {
-                console.error('Unknown message type:', event);
+        
+        // Simple one-time listener for the worker to be ready.
+        this.workerReady = new Promise((resolve) => {
+            this.worker.addEventListener('message', ({ data }) => {
+                if (data.type === 'ready') {
+                    resolve();
+                }
+            }, { once: true });
+        });
+
+        // Send a one-time message to the worker to set it up (set the URI + fixation detection method).
+        this.worker.postMessage({
+            type: 'setup',
+            initiatorId: this.inputId,
+            config: this.config,
+        });
+
+        // Set up permanent listener for messages from the worker.
+        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveStatusPayload | ReceiveErrorPayload | ReceiveMessagePayload>) => {
+            const { type, timestamp } = event.data;
+            
+            switch (type) {
+                case 'point':
+                    this.emit('inputData', event.data);
+                    break;
+                case 'status':
+                    this.setStatusValues(event.data);
+                    break;
+                case 'error':
+                    this.emit('inputError', {
+                        type: 'inputError',
+                        timestamp,
+                        content: event.data.content,
+                    });
+                    break;
+                case 'message':
+                    this.emit('inputMessage', {
+                        type: 'inputMessage',
+                        timestamp,
+                        content: event.data.content,
+                        fromInitiator: event.data.initiatorId
+                    });
+                    break;
             }
         };
-        this.initMessageHandlers();
     }
 
-    private initMessageHandlers() {
-        this.addMessageHandler('point', (data: GazeDataPoint) => this.emit('data', data));
-        this.addMessageHandler('error', this.handleError.bind(this));
-        this.addMessageHandler('disconnected', this.handleDisconnected.bind(this));
-        this.addMessageHandler('stopped', this.handleStopped.bind(this));
-        this.addMessageHandler('connected', this.handleConnected.bind(this));
-        this.addMessageHandler('calibrated', this.handleCalibrated.bind(this));
-        this.addMessageHandler('windowCalibrated', this.handleWindowCalibrated.bind(this));
-        this.addMessageHandler('started', this.handleStarted.bind(this));
+    protected createCorrelationId(): number {
+        return this.correlationId++;
     }
 
-    protected addMessageHandler(type: string, handler: Function) {
-        this.messageHandlers[type] = handler;
+    subscribe(): Promise<this> {
+        return this.sendGenericCommand('subscribe');
     }
 
-    /**
-     * Triggers the worker to connect to the WebSocket server (DeveLex Bridge).
-     * @returns resolved promise after receiving the open event from the WebSocket and the worker confirms the connection via a message.
-     */
-    async connect(): Promise<void> {
-        if (this.isConnected) return Promise.resolve();
-        return this.createCommand(
-            'connect',
-            { config: this.config, sessionId: this.createSessionId() },
-            'connected',
-            this.handleConnected.bind(this)
-        );
+    unsubscribe(): Promise<this> {
+        return this.sendGenericCommand('unsubscribe');
     }
 
-    /**
-     * Triggers the worker to disconnect from the WebSocket server.
-     * @returns resolved promise after receiving the close event from the WebSocket and the worker confirms the disconnection via a message.
-     */
-    async disconnect(): Promise<void> {
-        if (!this.isConnected) return Promise.resolve()
-        if (this.isEmitting) {
-            try {
-                void this.stop(); // no await on purpose, as we want to disconnect even if stop fails - bridge will handle it
-            } catch (error) {
-                return Promise.reject(error);
-            }
-        } 
-        return this.createCommand(
-            'disconnect',
-            { sessionId: this.sessionId },
-            'disconnected',
-            this.handleDisconnected.bind(this)
-        );
+    refreshStatus(): Promise<this> {
+        return this.sendGenericCommand('status');
     }
 
-    async calibrate(): Promise<void> {
-        if (!this.sessionId) {
-            this.handleError({ type: 'error', message: 'Not connected.' });
-            return Promise.reject('Not connected.');
-        }
-        return this.createCommand(
-            'calibrate',
-            { sessionId: this.sessionId },
-            'calibrated',
-            this.handleCalibrated.bind(this)
-        );
+    start(): Promise<this> {
+        return this.sendGenericCommand('start');
     }
 
-    send(msg: string): void {
-        console.log(msg);
+    stop(): Promise<this> {
+        return this.sendGenericCommand('stop');
     }
 
-    async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<void> {
-        return this.createCommand(
-            'setWindowCalibration',
-            { windowConfig: createGazeWindowCalibrator(mouseEvent, window), config: this.config },
-            'windowCalibrated',
-            this.handleWindowCalibrated.bind(this)
-        );
-    }
-
-    async start(): Promise<void> {
-        if (this.isEmitting) return Promise.resolve();
-        console.log('start', this.sessionId);
-        if (!this.sessionId) {
-            this.handleError({ type: 'error', message: 'Not connected.' });
-            return Promise.reject('Not connected.');
-        }
-        return this.createCommand(
-            'start',
-            { sessionId: this.sessionId },
-            'started',
-            this.handleStarted.bind(this)
-        );
-    }
-
-    async stop(): Promise<void> {
-        if (!this.isEmitting) return Promise.resolve();
-        if (!this.sessionId) {
-            this.handleError({ type: 'error', message: 'Not connected.' });
-            return Promise.reject('Not connected.');
-        }
-        return this.createCommand(
-            'stop',
-            { sessionId: this.sessionId },
-            'stopped',
-            this.handleStopped.bind(this)
-        );
-    }
-
-    createCommand = <T>(
-        messageType: string,
-        data: T,
-        successMessage: string, 
-        updateState: (data: T) => void
-    ): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
-            this.worker.postMessage({
-                messageType,
-                data
-            });
-            const successHandler = (data: T) => {
-                updateState(data);
-                resolve();
-            };
-            this.addMessageHandler(successMessage, (data: T) => successHandler(data));
-            this.addMessageHandler('error', (data: { type: string, message: string }) => {
-                this.handleError(data);
-                reject(data.message);
-            });
+    connect(): Promise<this> {
+        const config = {
+            trackerType: this.config.tracker,
+        };
+        return this.send({
+            type: 'connect',
+            initiatorId: this.inputId,
+            correlationId: this.createCorrelationId(),
+            config,
         });
-    };
+    }
+
+    disconnect(): Promise<this> {
+        return this.sendGenericCommand('disconnect');
+    }
+
+    calibrate(): Promise<this> {
+        return this.sendGenericCommand('calibrate');
+    }
+
+    message(content: string): Promise<this> {
+        const correlationId = this.createCorrelationId();
+        return this.send({
+            type: 'message',
+            correlationId,
+            initiatorId: this.inputId,
+            content,
+        });
+    }
+
+    setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<this> {
+        const viewportCalibration = createGazeWindowCalibrator(mouseEvent, window);
+        const correlationId = this.createCorrelationId();
+        return this.send({
+            type: 'viewportCalibration',
+            correlationId,
+            ...viewportCalibration,
+        });
+    }
+
+    protected sendGenericCommand(commandType: Exclude<CommandType, 'connect'>): Promise<this> {
+        return this.send({
+            type: commandType,
+            correlationId: this.createCorrelationId(),
+            initiatorId: this.inputId,
+        });
+    }
+
+    protected async send(payload: SendToWorkerAsyncMessages): Promise<this> {
+        await this.workerReady;
+        const correlationId = payload.correlationId;
+        return new Promise<this>((resolve, reject) => {
+            this.pendingPromises.set(correlationId, { resolve: resolve as (value: GazeInputBridge) => void, reject });
+            this.worker.postMessage(payload);
+        });
+    }
 }
