@@ -4,7 +4,7 @@ import { GazeInput } from "./GazeInput";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
-import BridgeWebWorker from '$lib/GazeInput/GazeInputBridgeWorker.ts?worker&inline';
+import BridgeWebWorker from '$lib/GazeInput/GazeInputBridge.worker.ts?worker&inline';
 import type { CommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveStatusPayload, SendToWorkerAsyncMessages } from "./GazeInputBridge.types";
 
 /**
@@ -52,9 +52,13 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                     this.emit('inputData', event.data);
                     break;
                 case 'status':
+                    // resolve the promise with the status
+                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     this.setStatusValues(event.data);
                     break;
                 case 'error':
+                    // resolve the promise with the error
+                    this.pendingPromises.get(event.data.correlationId)?.reject(event.data.content);
                     this.emit('inputError', {
                         type: 'inputError',
                         timestamp,
@@ -62,6 +66,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                     });
                     break;
                 case 'message':
+                    // resolve the promise with the message
+                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     this.emit('inputMessage', {
                         type: 'inputMessage',
                         timestamp,
@@ -133,6 +139,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         return this.send({
             type: 'viewportCalibration',
             correlationId,
+            initiatorId: this.inputId,
             ...viewportCalibration,
         });
     }

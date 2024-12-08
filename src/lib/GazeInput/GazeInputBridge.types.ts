@@ -93,9 +93,8 @@ export interface ReceiveErrorPayload extends CorrelationId, InitiatorId, Timesta
   content: string;
 }
 
-export interface ViewportCalibrationPayload extends GazeWindowCalibratorConfig {
+export interface ViewportCalibrationPayload extends GazeWindowCalibratorConfig, CorrelationId, InitiatorId {
     type: 'viewportCalibration';
-    correlationId: number;
 }
 
 export interface SetupPayload extends InitiatorId {

@@ -1,7 +1,7 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
-import type { CommandPayloadGeneric, GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveStatusPayload, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload } from "./GazeInputBridge.types";
+import type { CommandPayloadGeneric, GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveStatusPayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload } from "./GazeInputBridge.types";
 import { GazeWindowCalibrator } from "$lib/GazeWindowCalibrator/GazeWindowCalibrator";
 import type { GazeFixationDetector } from "$lib/GazeFixationDetector/GazeFixationDetector";
 import { createGazeFixationDetector } from "$lib/GazeFixationDetector";
@@ -21,6 +21,7 @@ let fixationDetector: GazeFixationDetector | null = null;
 let gazeDataProcessor: (data: GazeDataPayload) => void = () => {
     console.warn('No gaze data processor set up.');
 };
+let isSubscribed = false;
 
 apiClient.on('gaze', (data: GazeDataPayload) => {
     gazeDataProcessor(data);
@@ -60,7 +61,7 @@ self.addEventListener('message', (event: MessageEvent<SendToWorkerMessages>) => 
         case 'stop':
         case 'status':
         case 'message':
-            apiClient.send(event.data);
+            transmitToWebSocket(event.data);
             break;
     }
 });
@@ -145,8 +146,21 @@ const setupWebSocket = (subscribePayload: CommandPayloadGeneric) => {
 }
 
 const closeWebSocket = (unsubscribePayload: CommandPayloadGeneric) => {
+    if (!isSubscribed) {
+        sendNotSubscribedErrorToTheMainThread(unsubscribePayload.correlationId, unsubscribePayload.initiatorId);
+        return;
+    }
+    isSubscribed = false;
     apiClient.send(unsubscribePayload);
     // TODO: close the websocket connection after the message is sent and received with the correct correlationId
+}
+
+const transmitToWebSocket = (payload: SendToWorkerAsyncMessages) => {
+    if (!isSubscribed) {
+        sendNotSubscribedErrorToTheMainThread(payload.correlationId, payload.initiatorId);
+        return;
+    }
+    apiClient.send(payload);
 }
 
 const sendToTheMainThread = (payload: ReceiveFromWorkerMessages) => {
@@ -155,6 +169,10 @@ const sendToTheMainThread = (payload: ReceiveFromWorkerMessages) => {
 
 const sendWorkerErrorToTheMainThread = (message: string, correlationId: number, initiatorId: string) => {
     sendToTheMainThread({ type: 'error', content: message, correlationId, initiatorId, timestamp: createISO8601Timestamp() });
+}
+
+const sendNotSubscribedErrorToTheMainThread = (correlationId: number, initiatorId: string) => {
+    sendWorkerErrorToTheMainThread('Not subscribed to the WebSocket server.', correlationId, initiatorId);
 }
 /**
  * WORK IN PROGRESS
