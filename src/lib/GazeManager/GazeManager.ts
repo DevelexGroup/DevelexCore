@@ -109,11 +109,10 @@ export class GazeManager extends EmitterGroup<
             saccadeObjectFrom: saccadeObject,
             validation: validation,
             intersect: intersect,
-            data: input,
-            state: input,
-            connect: input,
-            emit: input,
-            error: input,
+            inputData: input,
+            inputState: input,
+            inputMessage: input,
+            inputError: input,
             windowCalibrated: input,
             windowCalibrationContested: input,
             calibrated: input,
@@ -172,7 +171,7 @@ export class GazeManager extends EmitterGroup<
     }
 
     private link() {
-        this._input.on('data', this.boundLinkData);
+        this._input.on('inputData', this.boundLinkData);
         this.fixation.on('fixationStart', this.boundLinkFixation);
         this.fixation.on('fixationEnd', this.boundLinkFixation);
         this.saccade.on('saccade', this.boundLinkSaccade);

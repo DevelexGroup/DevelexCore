@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GazeIndicator } from "$lib/GazeIndicator/GazeIndicator";
-	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
+	import type { GazeInputEventMessage, GazeInputEventState } from "$lib/GazeInput/GazeInputEvent";
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeManagerStore, setGazeInput } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
@@ -16,30 +16,20 @@
     let isDisconnectedProcessing = false;
     let isCalibratedProcessing = false;
 
-    const handleGazeInputMessage = (data: GazeInputMessage) => {
+    const handleGazeInputEventState = (data: GazeInputEventState) => {
         sceneStateStore.update((store) => {
             store.push(data);
             return store;
         });
-        switch (data.type) {
-            case "emit":
-                handleEmitEvent(data);
-                break;
-        }
-    };
-
-    const handleEmitEvent = (data: GazeInputMessage) => {
         if (!$gazeManagerStore) return;
-        if (data.value && isGazeIndicatorVisible) {
+        if (data.trackerStatus?.status === "trackerEmitting" && isGazeIndicatorVisible) {
             initIndicator();
         } else {
             destroyIndicator();
         }
     };
 
-        $gazeManagerStore.on("state", (data) => {
-            handleGazeInputMessage(data);
-        });
+    $gazeManagerStore.on("inputState", handleGazeInputEventState);
 
     const drawGaze = (gaze: GazeDataPoint) => {
         indicator.draw(gaze);
@@ -50,14 +40,14 @@
             return;
         }
         indicator.init(document);
-        $gazeManagerStore.on("data", drawGaze);
+        $gazeManagerStore.on("inputData", drawGaze);
     };
 
     const destroyIndicator = () => {
         if ($gazeManagerStore === null) {
             return;
         }
-        $gazeManagerStore.off("data", drawGaze);
+        $gazeManagerStore.off("inputData", drawGaze);
         indicator.remove();
     };
 
