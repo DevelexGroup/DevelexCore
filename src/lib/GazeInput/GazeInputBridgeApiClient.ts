@@ -11,26 +11,41 @@ interface WebSocketEvents extends EventMap {
 export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
     private websocket: WebSocket | null = null;
 
-    public openConnection(uri: string) {
+    public async openConnection(uri: string): Promise<this> {
         if (this.websocket) {
-            this.closeConnection();
-        }
-        this.websocket = new WebSocket(uri);
-        this.websocket.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data) as ReceiveFromWebSocketMessages;
-                this.emit(data.type, data);
-            } catch (error) {
-                console.error('Failed to parse WebSocket message:', error);
-            }
-        };
+            await this.closeConnection();
+        }   
+        return new Promise((resolve, reject) => {
+            this.websocket = new WebSocket(uri);
+            
+            this.websocket.onopen = () => {
+                resolve(this);
+            };
+
+            // Add connection error handler
+            this.websocket.onerror = (error) => {
+                reject(error);
+            };
+
+            this.websocket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data) as ReceiveFromWebSocketMessages;
+                    this.emit(data.type, data);
+                } catch (error) {
+                    console.error('Failed to parse WebSocket message:', error);
+                }
+            };
+        });
     }
 
-    public closeConnection() {
-        if (this.websocket) {
-            this.websocket.close();
-            this.websocket = null;
-        }
+    public async closeConnection(): Promise<this> {
+        return new Promise((resolve) => {
+            if (this.websocket) {
+                this.websocket.close();
+                this.websocket = null;
+            }
+            resolve(this);
+        });
     }
 
     public send(message: SendToWorkerMessages) {

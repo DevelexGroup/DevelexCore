@@ -74,8 +74,9 @@
             await $gazeManagerStore.connect();
         } catch (error) {
             console.error(error);
+        } finally {
+            isConnectedProcessing = false;
         }
-        isConnectedProcessing = false;
     };
 
     const disconnect = async () => {
@@ -87,8 +88,9 @@
             await $gazeManagerStore.disconnect();
         } catch (error) {
             console.error(error);
+        } finally {
+            isDisconnectedProcessing = false;
         }
-        isDisconnectedProcessing = false;
     };
 
     const start = async () => {
@@ -100,8 +102,9 @@
             await $gazeManagerStore.start();
         } catch (error) {
             console.error(error);
+        } finally {
+            isStartedProcessing = false;
         }
-        isStartedProcessing = false;
     };
 
     const stop = async () => {
@@ -113,8 +116,9 @@
             await $gazeManagerStore.stop();
         } catch (error) {
             console.error(error);
+        } finally {
+            isStoppedProcessing = false;
         }
-        isStoppedProcessing = false;
     };
 
     const calibrate = async () => {
@@ -126,20 +130,31 @@
             await $gazeManagerStore.calibrate();
         } catch (error) {
             console.error(error);
+        } finally {
+            isCalibratedProcessing = false;
         }
-        isCalibratedProcessing = false;
     };
 
     const subscribe = async () => {
         isSubscribedProcessing = true;
-        await $gazeManagerStore?.subscribe();
-        isSubscribedProcessing = false;
+        try {
+            await $gazeManagerStore?.subscribe();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isSubscribedProcessing = false;
+        }
     };
 
     const unsubscribe = async () => {
         isUnsubscribedProcessing = true;
-        await $gazeManagerStore?.unsubscribe();
-        isUnsubscribedProcessing = false;
+        try {
+            await $gazeManagerStore?.unsubscribe();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isUnsubscribedProcessing = false;
+        }
     };
 </script>
 

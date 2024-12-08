@@ -123,7 +123,7 @@ const createBridgeProcessor = (
     }
 }
 
-const setupWebSocket = (subscribePayload: CommandPayloadGeneric) => {
+const setupWebSocket = async (subscribePayload: CommandPayloadGeneric) => {
     // check first if we have a valid setup payload
     if (!setupPayload) {
         sendWorkerErrorToTheMainThread('No setup payload found.', subscribePayload.correlationId, subscribePayload.initiatorId);
@@ -139,10 +139,20 @@ const setupWebSocket = (subscribePayload: CommandPayloadGeneric) => {
     }
     // prepare the gaze data processor
     gazeDataProcessor = createBridgeProcessor(gazeWindowCalibrator, fixationDetector, setupPayload.initiatorId, sendToTheMainThread);
-    // open the websocket connection
-    apiClient.openConnection(setupPayload.config.uri);
-    // send the subscribe message
-    apiClient.send(subscribePayload);
+    
+    try {
+        // attempt to open the websocket connection
+        await apiClient.openConnection(setupPayload.config.uri);
+        // send the subscribe message
+        apiClient.send(subscribePayload);
+    } catch {
+        sendWorkerErrorToTheMainThread(
+            `Failed to connect to WebSocket server at ${setupPayload.config.uri}`,
+            subscribePayload.correlationId,
+            subscribePayload.initiatorId
+        );
+        return;
+    }
 }
 
 const closeWebSocket = (unsubscribePayload: CommandPayloadGeneric) => {

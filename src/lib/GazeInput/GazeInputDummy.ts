@@ -137,9 +137,27 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			this.precisionError = precisionError;
 		}
 
+		const previousStatus = this._lastStatus;
+		if (!previousStatus) {
+			return this.sendError('No previous status found.');
+		}
+
 		this.setStatusValues({
 			type: 'status',
 			status: 'trackerCalibrating',
+			trackerCalibration: previousStatus.trackerCalibration,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'calibrate'
+		});
+
+		// wait for 1 second
+		await new Promise(resolve => setTimeout(resolve, 1000));
+
+		this.setStatusValues({
+			type: 'status',
+			status: 'trackerConnected',
 			trackerCalibration: createISO8601Timestamp(),
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
