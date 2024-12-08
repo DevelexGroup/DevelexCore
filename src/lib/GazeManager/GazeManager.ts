@@ -1,7 +1,7 @@
 import { EmitterGroup } from "$lib/Emitter/Emitter";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
-import type { ReceiveStatusPayload } from "$lib/GazeInput/GazeInputBridge.types";
+import type { ReceiveResponsePayload } from "$lib/GazeInput/GazeInputBridge.types";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import type { GazeInputEvents } from "$lib/GazeInput/GazeInputEvent";
 import { GazeInputFacade } from "$lib/GazeInput/GazeInputFacade";
@@ -245,7 +245,7 @@ export class GazeManager extends EmitterGroup<
      * @returns The last status or null if no status is set.
      * @readonly
      */
-    get lastStatus(): ReceiveStatusPayload | null { return this._input.lastStatus; }
+    get lastStatus(): ReceiveResponsePayload | null { return this._input.lastStatus; }
 
     set input(input: GazeInput<GazeInputConfig> | null) {this._input.input = input;}
 }

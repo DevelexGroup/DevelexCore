@@ -2,7 +2,7 @@ import type { GazeInputEvents } from './GazeInputEvent.js';
 import type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig.js';
 import type { GazeInputConfig, GazeInputConfigWithFixations } from './GazeInputConfig.js';
 import { Emitter } from '$lib/Emitter/Emitter.js';
-import type { ReceiveStatusPayload } from './GazeInputBridge.types.js';
+import type { ReceiveResponsePayload } from './GazeInputBridge.types.js';
 import { createISO8601Timestamp } from '$lib/utils/timeUtils.js';
 
 /**
@@ -15,7 +15,7 @@ import { createISO8601Timestamp } from '$lib/utils/timeUtils.js';
 export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<GazeInputEvents> {
 
 	_windowCalibration: GazeWindowCalibratorConfig | null = null;
-	_lastStatus: ReceiveStatusPayload | null = null;
+	_lastStatus: ReceiveResponsePayload | null = null;
 	inputId: string;
 
 	readonly config: T;
@@ -27,7 +27,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<GazeI
 	}
 
 	get windowCalibration(): GazeWindowCalibratorConfig | null { return this._windowCalibration }
-	get lastStatus(): ReceiveStatusPayload | null { return this._lastStatus }
+	get lastStatus(): ReceiveResponsePayload | null { return this._lastStatus }
 
 	/**
 	 * Needed for all event data to be emitted in each Input adapter.
@@ -58,7 +58,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<GazeI
 		});
 	}
 
-	protected setStatusValues(status: ReceiveStatusPayload | null) {
+	protected setStatusValues(status: ReceiveResponsePayload | null) {
 		this._lastStatus = status;
 		this.emit('inputState', {
 			type: 'inputState',

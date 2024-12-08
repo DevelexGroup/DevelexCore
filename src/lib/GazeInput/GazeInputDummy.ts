@@ -49,7 +49,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		document.addEventListener('mousemove', this.boundUpdateMousePosition);
 		
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: 'trackerConnected',
 			trackerCalibration: null,
 			correlationId: this.createCorrelationId(),
@@ -79,7 +79,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		}, interval);
 
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: 'trackerEmitting',
 			trackerCalibration: null,
 			correlationId: this.createCorrelationId(),
@@ -100,7 +100,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		const nextTrackerCalibration = this._lastStatus?.status ? this._lastStatus?.status : null;
 
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: nextStatus,
 			trackerCalibration: nextTrackerCalibration,
 			correlationId: this.createCorrelationId(),
@@ -119,7 +119,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		document.removeEventListener('mousemove', this.boundUpdateMousePosition);
 
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: 'trackerDisconnected',
 			trackerCalibration: null,
 			correlationId: this.createCorrelationId(),
@@ -143,7 +143,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		}
 
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: 'trackerCalibrating',
 			trackerCalibration: previousStatus.trackerCalibration,
 			correlationId: this.createCorrelationId(),
@@ -156,7 +156,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		await new Promise(resolve => setTimeout(resolve, 1000));
 
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: 'trackerConnected',
 			trackerCalibration: createISO8601Timestamp(),
 			correlationId: this.createCorrelationId(),
@@ -189,7 +189,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		const nextStatus = this._lastStatus?.status ? this._lastStatus?.status : 'trackerDisconnected';
 		const nextTrackerCalibration = this._lastStatus?.trackerCalibration ? this._lastStatus?.trackerCalibration : null;
 		this.setStatusValues({
-			type: 'status',
+			type: 'response',
 			status: nextStatus,
 			trackerCalibration: nextTrackerCalibration,
 			correlationId: this.createCorrelationId(),

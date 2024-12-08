@@ -1,7 +1,7 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
-import type { CommandPayloadGeneric, GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveStatusPayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload } from "./GazeInputBridge.types";
+import type { CommandPayloadGeneric, GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload } from "./GazeInputBridge.types";
 import { GazeWindowCalibrator } from "$lib/GazeWindowCalibrator/GazeWindowCalibrator";
 import type { GazeFixationDetector } from "$lib/GazeFixationDetector/GazeFixationDetector";
 import { createGazeFixationDetector } from "$lib/GazeFixationDetector";
@@ -31,7 +31,7 @@ apiClient.on('error', (data: ReceiveErrorPayload) => {
     sendToTheMainThread(data);
 });
 
-apiClient.on('status', (data: ReceiveStatusPayload) => {
+apiClient.on('response', (data: ReceiveResponsePayload) => {
     sendToTheMainThread(data);
 });
 
@@ -59,7 +59,7 @@ self.addEventListener('message', (event: MessageEvent<SendToWorkerMessages>) => 
         case 'calibrate':
         case 'start':
         case 'stop':
-        case 'status':
+        case 'response':
         case 'message':
             transmitToWebSocket(event.data);
             break;
@@ -75,6 +75,7 @@ const setupInitialisation = (incomingSetupPayload: SetupPayload) => {
 
 const setupViewportCalibration = (incomingViewportCalibrationPayload: ViewportCalibrationPayload) => {
     gazeWindowCalibrator = new GazeWindowCalibrator(incomingViewportCalibrationPayload);
+    console.log('Viewport calibration received.', incomingViewportCalibrationPayload);
     self.postMessage(incomingViewportCalibrationPayload);
 }
 
@@ -166,10 +167,7 @@ const closeWebSocket = (unsubscribePayload: CommandPayloadGeneric) => {
 }
 
 const transmitToWebSocket = (payload: SendToWorkerAsyncMessages) => {
-    if (!isSubscribed) {
-        sendNotSubscribedErrorToTheMainThread(payload.correlationId, payload.initiatorId);
-        return;
-    }
+
     apiClient.send(payload);
 }
 

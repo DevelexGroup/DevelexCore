@@ -1,10 +1,10 @@
-import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveStatusPayload, GazeDataPayload, ReceiveFromWebSocketMessages } from './GazeInputBridge.types';
+import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveResponsePayload, GazeDataPayload, ReceiveFromWebSocketMessages } from './GazeInputBridge.types';
 import { Emitter, type EventMap } from '$lib/Emitter/Emitter';
 
 interface WebSocketEvents extends EventMap {
     message: ReceiveMessagePayload;
     error: ReceiveErrorPayload;
-    status: ReceiveStatusPayload;
+    response: ReceiveResponsePayload;
     gaze: GazeDataPayload;
 }
 
@@ -30,6 +30,7 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
             this.websocket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data) as ReceiveFromWebSocketMessages;
+                    console.log('Received message:', data);
                     this.emit(data.type, data);
                 } catch (error) {
                     console.error('Failed to parse WebSocket message:', error);
@@ -49,6 +50,7 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
     }
 
     public send(message: SendToWorkerMessages) {
+        console.log('Sending message:', message);
         if (!this.websocket) {
             throw new Error('WebSocket is not connected');
         }

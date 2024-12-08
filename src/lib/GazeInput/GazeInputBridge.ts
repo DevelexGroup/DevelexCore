@@ -5,7 +5,7 @@ import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
 import BridgeWebWorker from '$lib/GazeInput/GazeInputBridge.worker.ts?worker&inline';
-import type { CommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveStatusPayload, SendToWorkerAsyncMessages } from "./GazeInputBridge.types";
+import type { CommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, ViewportCalibrationPayload } from "./GazeInputBridge.types";
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
@@ -44,17 +44,21 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
 
         // Set up permanent listener for messages from the worker.
-        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveStatusPayload | ReceiveErrorPayload | ReceiveMessagePayload>) => {
+        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload>) => {
             const { type, timestamp } = event.data;
             
             switch (type) {
                 case 'gaze':
                     this.emit('inputData', event.data);
                     break;
-                case 'status':
+                case 'response':
                     // resolve the promise with the status
-                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     this.setStatusValues(event.data);
+                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
+                    break;
+                case 'viewportCalibration':
+                    this.setWindowCalibrationValues(event.data);
+                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     break;
                 case 'error':
                     // resolve the promise with the error
@@ -92,7 +96,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
     }
 
     refreshStatus(): Promise<this> {
-        return this.sendGenericCommand('status');
+        return this.sendGenericCommand('response');
     }
 
     start(): Promise<this> {
@@ -133,7 +137,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
     }
 
-    setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<this> {
+    async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<this> {
         const viewportCalibration = createGazeWindowCalibrator(mouseEvent, window);
         const correlationId = this.createCorrelationId();
         return this.send({

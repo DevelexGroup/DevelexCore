@@ -1,6 +1,6 @@
 import type {GazeDataPoint} from "../GazeData/GazeData.js";
 import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
-import type { ReceiveStatusPayload } from "./GazeInputBridge.types.js";
+import type { ReceiveResponsePayload } from "./GazeInputBridge.types.js";
 
 export interface GazeInputEvent {
     type: keyof GazeInputEvents;
@@ -9,7 +9,7 @@ export interface GazeInputEvent {
 
 export interface GazeInputEventState extends GazeInputEvent {
     viewportCalibration: GazeWindowCalibratorConfig | null;
-    trackerStatus: ReceiveStatusPayload | null;
+    trackerStatus: ReceiveResponsePayload | null;
 }
 
 export interface GazeInputEventMessage extends GazeInputEvent {

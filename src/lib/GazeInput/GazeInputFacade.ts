@@ -5,7 +5,7 @@ import type { GazeInput } from "./GazeInput";
 import type { GazeInputConfig } from "./GazeInputConfig";
 import type { GazeInputEvents } from "./GazeInputEvent";
 import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
-import type { ReceiveStatusPayload } from "./GazeInputBridge.types";
+import type { ReceiveResponsePayload } from "./GazeInputBridge.types";
 
 export class GazeInputFacade extends EmitterWithFacade<GazeInputEvents> {
 
@@ -47,7 +47,7 @@ export class GazeInputFacade extends EmitterWithFacade<GazeInputEvents> {
      * @returns The last status or null if no status is set.
      * @readonly
      */
-    get lastStatus(): ReceiveStatusPayload | null {
+    get lastStatus(): ReceiveResponsePayload | null {
         return this.input ? this.input.lastStatus : null
     }
 

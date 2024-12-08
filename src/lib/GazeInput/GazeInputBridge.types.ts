@@ -9,7 +9,7 @@ export type CommandType =
   | 'calibrate'
   | 'start'
   | 'stop'
-  | 'status';
+  | 'response';
 
 interface CorrelationId {
   correlationId: number;
@@ -78,8 +78,8 @@ export interface GazeInputStatus {
   trackerCalibration: string | null; // nullable ISO date-time
 }
 
-export interface ReceiveStatusPayload extends CorrelationId, InitiatorId, Timestamp, GazeInputStatus {
-  type: 'status';
+export interface ReceiveResponsePayload extends CorrelationId, InitiatorId, Timestamp, GazeInputStatus {
+  type: 'response';
   responseTo: CommandType;
 }
 
@@ -112,6 +112,6 @@ export type SendToWorkerSyncMessages = SetupPayload;
 
 export type SendToWorkerMessages = SendToWorkerAsyncMessages | SendToWorkerSyncMessages;
 
-export type ReceiveFromWebSocketMessages = ReceiveStatusPayload | ReceiveMessagePayload | ReceiveErrorPayload | GazeDataPayload;
+export type ReceiveFromWebSocketMessages = ReceiveResponsePayload | ReceiveMessagePayload | ReceiveErrorPayload | GazeDataPayload;
 
 export type ReceiveFromWorkerMessages = ReceiveFromWebSocketMessages | ReadyPayload;
