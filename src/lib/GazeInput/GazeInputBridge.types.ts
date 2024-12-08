@@ -61,8 +61,8 @@ export interface GazeDataPayload {
   validityR: boolean;
   pupilDiameterR: number;
   // Optional fixation data
-  fixationDuration?: number | null;
-  fixationId?: number | null;
+  fixationDuration?: number;
+  fixationId?: number;
 }
 
 export interface GazeInputStatus {
@@ -103,8 +103,16 @@ export interface SetupPayload extends InitiatorId {
   config: GazeInputConfigBridge;
 }
 
+export interface ReadyPayload extends InitiatorId {
+  type: 'ready';
+}
+
 export type SendToWorkerAsyncMessages = CommandPayload | MessagePayload | ViewportCalibrationPayload;
 
 export type SendToWorkerSyncMessages = SetupPayload;
 
 export type SendToWorkerMessages = SendToWorkerAsyncMessages | SendToWorkerSyncMessages;
+
+export type ReceiveFromWebSocketMessages = ReceiveStatusPayload | ReceiveMessagePayload | ReceiveErrorPayload | GazeDataPayload;
+
+export type ReceiveFromWorkerMessages = ReceiveFromWebSocketMessages | ReadyPayload;

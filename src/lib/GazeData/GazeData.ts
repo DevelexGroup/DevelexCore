@@ -1,5 +1,5 @@
 export interface GazeDataPoint {
-    type: 'point';
+    type: 'gaze';
 
     x: number;
     xL: number;
