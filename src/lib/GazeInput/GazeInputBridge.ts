@@ -48,7 +48,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             const { type, timestamp } = event.data;
             
             switch (type) {
-                case 'point':
+                case 'gaze':
                     this.emit('inputData', event.data);
                     break;
                 case 'status':
