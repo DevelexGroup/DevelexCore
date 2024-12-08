@@ -32,9 +32,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		return this.correlationId++;
 	}
 
+	private async sendError(error: string): Promise<never> {
+		await this.emit('inputError', {
+			type: 'inputError',
+			content: error,
+			timestamp: createISO8601Timestamp()
+		});
+		return Promise.reject(new Error(error));
+	}
+
 	async connect(): Promise<this> {
 		if (!this.windowCalibrator) {
-			throw new Error('Window calibrator is not set.');
+			return this.sendError('Window calibrator is not set.');
 		}
 
 		document.addEventListener('mousemove', this.boundUpdateMousePosition);
@@ -54,7 +63,11 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 	async start(): Promise<this> {
 		if (!this.windowCalibrator || !this.fixationDetector) {
-			throw new Error('Window calibrator or fixation detector is not set.');
+			return this.sendError('Window calibrator or fixation detector is not set.');
+		}
+
+		if (this._lastStatus?.status !== 'trackerConnected' && this._lastStatus?.status !== 'trackerEmitting') {
+			return this.sendError('Cannot start: tracker is not connected.');
 		}
 
 		const interval = 1000 / this.config.frequency;
@@ -83,10 +96,13 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			clearInterval(this.intervalId);
 		}
 
+		const nextStatus = this._lastStatus?.status === 'trackerEmitting' ? 'trackerConnected' : 'trackerDisconnected';
+		const nextTrackerCalibration = this._lastStatus?.status ? this._lastStatus?.status : null;
+
 		this.setStatusValues({
 			type: 'status',
-			status: 'trackerConnected',
-			trackerCalibration: null,
+			status: nextStatus,
+			trackerCalibration: nextTrackerCalibration,
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
@@ -152,10 +168,22 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	}
 
 	async subscribe(): Promise<this> {
+		const nextStatus = this._lastStatus?.status ? this._lastStatus?.status : 'trackerDisconnected';
+		const nextTrackerCalibration = this._lastStatus?.trackerCalibration ? this._lastStatus?.trackerCalibration : null;
+		this.setStatusValues({
+			type: 'status',
+			status: nextStatus,
+			trackerCalibration: nextTrackerCalibration,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'subscribe'
+		});
 		return this;
 	}
 
 	async unsubscribe(): Promise<this> {
+		this.setStatusValues(null);
 		return this;
 	}
 
@@ -186,6 +214,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 	private createGazePoint(x: number, y: number): GazeDataPoint {
 		if (!this.windowCalibrator) {
+			this.sendError('Window calibrator is not set.');
 			throw new Error('Window calibrator is not set.');
 		}
 

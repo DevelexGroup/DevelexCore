@@ -1,6 +1,7 @@
 import { EmitterGroup } from "$lib/Emitter/Emitter";
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
+import type { ReceiveStatusPayload } from "$lib/GazeInput/GazeInputBridge.types";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
 import type { GazeInputEvents } from "$lib/GazeInput/GazeInputEvent";
 import { GazeInputFacade } from "$lib/GazeInput/GazeInputFacade";
@@ -30,7 +31,8 @@ import type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFi
  * @example
  * const gazeManager = new GazeManager();
  * gazeManager.createInput({ type: 'webgazer' });
- * gazeManager.connect();
+ * await gazeManager.subscribe();
+ * await gazeManager.connect();
  * gazeManager.register({
  *    interaction: 'fixation',
  *    element: document.body,
@@ -177,6 +179,14 @@ export class GazeManager extends EmitterGroup<
         this.saccade.on('saccade', this.boundLinkSaccade);
     }
 
+    async subscribe() {
+        return this._input.subscribe();
+    }
+
+    async unsubscribe() {
+        return this._input.unsubscribe();
+    }
+
     async connect() {
        return this._input.connect();
     }
@@ -222,32 +232,6 @@ export class GazeManager extends EmitterGroup<
      */ 
     get inputInstance(): GazeInput<GazeInputConfig> {return this._input.inputInstance;}
 
-    /**
-	 * Get the current connected state.
-	 * @returns True if connected, false otherwise.
-	 * @readonly
-	 * @emits connect - When the connected state changes.
-	 * @emits state - When the connected state changes.
-	 */
-    get isConnected(): boolean { return this._input.isConnected; }
-
-    	/**
-	 * Get the current device calibration state.
-	 * @returns True if calibrated, false otherwise.
-	 * @readonly
-	 * @emits calibrated - When the device calibration state changes.
-	 * @emits state - When the device calibration state changes.
-	 */ 
-    get isDeviceCalibrated(): boolean { return this._input.isDeviceCalibrated; }
-
-    /**
-	 * Get the current window calibration state.
-	 * @returns True if calibrated, false otherwise.
-	 * @readonly
-	 * @emits windowCalibrated - When the window calibration state changes.
-	 * @emits state - When the window calibration state changes.
-	 */
-    get isWindowCalibrated(): boolean { return this._input.isWindowCalibrated; }
 
     /**
      * Get the window calibration values.
@@ -257,13 +241,11 @@ export class GazeManager extends EmitterGroup<
     get windowCalibration(): GazeWindowCalibratorConfig | null { return this._input.windowCalibration; }
 
     /**
-	 * Get the current emitting state.
-	 * @returns True if emitting, false otherwise.
-	 * @readonly
-	 * @emits emit - When the emitting state changes.
-	 * @emits state - When the emitting state changes.
-	 */
-    get isEmitting(): boolean { return this._input.isEmitting; }
+     * Get the last status.
+     * @returns The last status or null if no status is set.
+     * @readonly
+     */
+    get lastStatus(): ReceiveStatusPayload | null { return this._input.lastStatus; }
 
     set input(input: GazeInput<GazeInputConfig> | null) {this._input.input = input;}
 }

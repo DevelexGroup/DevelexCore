@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { GazeInteractionObjectValidationSettings } from "$lib";
+	import type { GazeInteractionObjectValidationSettings } from "$lib/index";
     import { sceneObjectValidationStore } from "../store/sceneStores";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
