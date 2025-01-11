@@ -1,5 +1,6 @@
 import type { GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
 import { calculatePointDistance } from "$lib/utils/geometryUtils";
+import { getDifferenceInMilliseconds, getUnixTimestampFromISO8601 } from "$lib/utils/timeUtils";
 import { GazeInteraction } from "./GazeInteraction";
 import type { GazeInteractionScreenFixationEvent } from "./GazeInteractionScreenFixation.event";
 import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccade.event";
@@ -49,7 +50,7 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
     createSaccadeEvent(fixationOne: GazeDataPointWithFixation, fixationTwo: GazeDataPointWithFixation): GazeInteractionScreenSaccadeEvents["saccade"] {
         const angleToScreen = this.calculateAngleToScreen(fixationOne.x, fixationOne.y, fixationTwo.x, fixationTwo.y);
         const distance = calculatePointDistance(fixationOne, fixationTwo);
-        const duration = fixationTwo.timestamp - fixationOne.timestamp;
+        const duration = getDifferenceInMilliseconds(fixationTwo.timestamp, fixationOne.timestamp);
         const timestamp = fixationOne.timestamp;
         const type = "saccade";
 
@@ -67,7 +68,7 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
         }
 
         const angleToPrevious = this.calculateAngleToPrevious(this.lastSaccadeData.angleToScreen, angleToScreen);
-        const angleToPreviousInvalidityTime = (fixationOne.timestamp - fixationOne.fixationDuration) - this.lastSaccadeData.timestamp;
+        const angleToPreviousInvalidityTime = (getUnixTimestampFromISO8601(fixationOne.timestamp) - fixationOne.fixationDuration) - getUnixTimestampFromISO8601(this.lastSaccadeData.timestamp);
 
         return {
             type,

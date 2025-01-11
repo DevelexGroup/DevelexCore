@@ -3,10 +3,11 @@ import type { GazeWindowCalibratorConfigMouseEventFields, GazeWindowCalibratorCo
 import { createGazeInput } from ".";
 import type { GazeInput } from "./GazeInput";
 import type { GazeInputConfig } from "./GazeInputConfig";
-import type { ETHandlerMapping } from "./GazeInputEvent";
+import type { GazeInputEvents } from "./GazeInputEvent";
 import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
+import type { ReceiveResponsePayload } from "./GazeInputBridge.types";
 
-export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
+export class GazeInputFacade extends EmitterWithFacade<GazeInputEvents> {
 
     /**
      * Get the current input.
@@ -33,33 +34,6 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
     }
 
     /**
-	 * Get the current connected state.
-	 * @returns True if connected, false otherwise.
-	 * @readonly
-	 * @emits connect - When the connected state changes.
-	 * @emits state - When the connected state changes.
-	 */
-    get isConnected(): boolean { return this.input ? this.input.isConnected : false }
-	
-    /**
-	 * Get the current emitting state.
-	 * @returns True if emitting, false otherwise.
-	 * @readonly
-	 * @emits emit - When the emitting state changes.
-	 * @emits state - When the emitting state changes.
-	 */
-    get isEmitting(): boolean { return this.input ? this.input.isEmitting : false }
-	
-    /**
-	 * Get the current window calibration state.
-	 * @returns True if calibrated, false otherwise.
-	 * @readonly
-	 * @emits windowCalibrated - When the window calibration state changes.
-	 * @emits state - When the window calibration state changes.
-	 */
-    get isWindowCalibrated(): boolean { return this.input ? this.input.isWindowCalibrated : false }
-
-    /**
      * Get the window calibration values.
      * @returns The window calibration values or null if no window calibration is set.
      * @readonly
@@ -69,13 +43,13 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
     }
 
     /**
-	 * Get the current device calibration state.
-	 * @returns True if calibrated, false otherwise.
-	 * @readonly
-	 * @emits calibrated - When the device calibration state changes.
-	 * @emits state - When the device calibration state changes.
-	 */ 
-    get isDeviceCalibrated(): boolean { return this.input ? this.input.isDeviceCalibrated : false }
+     * Get the last status.
+     * @returns The last status or null if no status is set.
+     * @readonly
+     */
+    get lastStatus(): ReceiveResponsePayload | null {
+        return this.input ? this.input.lastStatus : null
+    }
 
     /**
      * Set the input instance.
@@ -101,6 +75,22 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
         return this.inputInstance.stop();
     }
 
+    /** 
+     * Subscribe to the input.
+     * @throws Error if no input is set.
+     */
+    async subscribe() {
+        return this.inputInstance.subscribe();
+    }
+
+    /**
+     * Unsubscribe from the input.
+     * @throws Error if no input is set.
+     */
+    async unsubscribe() {
+        return this.inputInstance.unsubscribe();
+    }
+
     /**
      * Connect the input.
      * @throws Error if no input is set.
@@ -124,6 +114,30 @@ export class GazeInputFacade extends EmitterWithFacade<ETHandlerMapping> {
      */
     async calibrate() {
         return this.inputInstance.calibrate();
+    }
+
+    /**
+     * Open the input.
+     * @throws Error if no input is set.
+     */
+    async open() {
+        return this.inputInstance.open();
+    }
+
+    /**
+     * Close the input.
+     * @throws Error if no input is set.
+     */
+    async close() {
+        return this.inputInstance.close();
+    }
+
+    /**
+     * Get the status of the input.
+     * @throws Error if no input is set.
+     */
+    async status() {
+        return this.inputInstance.status();
     }
 
     /**

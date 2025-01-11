@@ -5,142 +5,253 @@ import { GazeInput } from '$lib/GazeInput/GazeInput';
 import { GazeWindowCalibrator } from '../GazeWindowCalibrator/GazeWindowCalibrator';
 import { createGazeWindowCalibrator, type GazeWindowCalibratorConfigMouseEventFields, type GazeWindowCalibratorConfigWindowFields } from '../GazeWindowCalibrator/GazeWindowCalibratorConfig';
 import type { GazeInputConfigDummy } from './GazeInputConfig';
+import { createISO8601Timestamp } from '$lib/utils/timeUtils';
 
 /**
  * Dummy input for testing purposes which does not require any hardware.
  * Mouse position is used as gaze input in the given frequency.
  * It has its precision and frequency configurable.
- * TODO: Input classes simpler, more consistent, and more robust to handle high-frequency data.
  */
 export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	private readonly boundUpdateMousePosition: (event: MouseEvent) => void;
-	lastMouseCoordinates: { x: number; y: number } = { x: 0, y: 0 };
-	intervalId: number | null = null;
-	precisionError: number | null = null;
-	windowCalibrator: GazeWindowCalibrator | null = null;
-	private gazePointFactory: ((x: number, y: number) => GazeDataPoint) | null = null;
+	private lastMouseCoordinates: { x: number; y: number } = { x: 0, y: 0 };
+	private intervalId: number | null = null;
+	private precisionError: number | null = null;
+	private windowCalibrator: GazeWindowCalibrator | null = null;
+	private fixationDetector: GazeFixationDetector | null = null;
+	private correlationId: number = 0;
 
 	constructor(config: GazeInputConfigDummy) {
 		super(config);
 		this.precisionError = config.precisionMinimalError;
 		this.boundUpdateMousePosition = this.updateMousePosition.bind(this);
+		this.fixationDetector = createGazeFixationDetector(config.fixationDetection);
 	}
 
-	connect(): Promise<void> {
+	protected createCorrelationId(): number {
+		return this.correlationId++;
+	}
 
-		if (!this.windowCalibrator) return Promise.reject('Window calibrator is not set.');
+	private async sendError(error: string): Promise<never> {
+		await this.emit('inputError', {
+			type: 'inputError',
+			content: error,
+			timestamp: createISO8601Timestamp()
+		});
+		return Promise.reject(new Error(error));
+	}
 
-		this.handleConnected({ sessionId: this.createSessionId() });
+	async connect(): Promise<this> {
+		if (!this.windowCalibrator) {
+			return this.sendError('Window calibrator is not set.');
+		}
 
 		document.addEventListener('mousemove', this.boundUpdateMousePosition);
+		
+		this.setStatusValues({
+			type: 'response',
+			status: 'trackerConnected',
+			trackerCalibration: null,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'connect'
+		});
 
-		return Promise.resolve();
+		return this;
 	}
 
-	start(): Promise<void> {
-		if (this.isEmitting) {
-			return Promise.reject('Already emitting.');
-		}
-		if (!this.sessionId) {
-			return Promise.reject('Session ID is not set. Connect first.');
-		}
-		if (!this.windowCalibrator) {
-			return Promise.reject('Window calibrator is not set.');
+	async start(): Promise<this> {
+		if (!this.windowCalibrator || !this.fixationDetector) {
+			return this.sendError('Window calibrator or fixation detector is not set.');
 		}
 
-		if (!this.gazePointFactory) {
-			this.gazePointFactory = createGazePointFactory(
-				this.sessionId,
-				this.windowCalibrator,
-				createGazeFixationDetector(this.config.fixationDetection)
-			);
+		if (this._lastStatus?.status !== 'trackerConnected' && this._lastStatus?.status !== 'trackerEmitting') {
+			return this.sendError('Cannot start: tracker is not connected.');
 		}
 
 		const interval = 1000 / this.config.frequency;
 		this.intervalId = window.setInterval(() => {
-			if (this.config && this.isConnected) {
-				const { x, y } = this.calculateCoordinates();
-				this.emit('data', this.gazePointFactory!(x, y));
-			}
+			const { x, y } = this.calculateCoordinates();
+			const gazePoint = this.createGazePoint(x, y);
+			const processedPoint = this.fixationDetector!.processGazePoint(gazePoint);
+			this.emit('inputData', processedPoint);
 		}, interval);
-		this.handleStarted();
-		return Promise.resolve();
+
+		this.setStatusValues({
+			type: 'response',
+			status: 'trackerEmitting',
+			trackerCalibration: null,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'start'
+		});
+
+		return this;
 	}
 
-	stop(): Promise<void> {
-		if (!this.isEmitting) return Promise.reject('Already not emitting.');
+	async stop(): Promise<this> {
 		if (this.intervalId != null) {
 			clearInterval(this.intervalId);
 		}
-		this.handleStopped();
-		return Promise.resolve();
+
+		const nextStatus = this._lastStatus?.status === 'trackerEmitting' ? 'trackerConnected' : 'trackerDisconnected';
+		const nextTrackerCalibration = this._lastStatus?.status ? this._lastStatus?.status : null;
+
+		this.setStatusValues({
+			type: 'response',
+			status: nextStatus,
+			trackerCalibration: nextTrackerCalibration,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'stop'
+		});
+
+		return this;
 	}
 
-	disconnect(): Promise<void> {
-		if (!this.isConnected) return Promise.resolve();
-		if (this.isEmitting) this.stop();
+	async disconnect(): Promise<this> {
+		if (this.intervalId != null) {
+			await this.stop();
+		}
 		document.removeEventListener('mousemove', this.boundUpdateMousePosition);
-		this.gazePointFactory = null;
-		this.handleDisconnected();
-		return Promise.resolve();
+
+		this.setStatusValues({
+			type: 'response',
+			status: 'trackerDisconnected',
+			trackerCalibration: null,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'disconnect'
+		});
+
+		return this;
 	}
 
-	calibrate(): Promise<void> {
+	async calibrate(): Promise<this> {
 		const precisionError = this.config?.precisionMinimalError;
 		if (precisionError) {
 			this.precisionError = precisionError;
 		}
-		return Promise.resolve();
+
+		const previousStatus = this._lastStatus;
+		if (!previousStatus) {
+			return this.sendError('No previous status found.');
+		}
+
+		this.setStatusValues({
+			type: 'response',
+			status: 'trackerCalibrating',
+			trackerCalibration: previousStatus.trackerCalibration,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'calibrate'
+		});
+
+		// wait for 1 second
+		await new Promise(resolve => setTimeout(resolve, 1000));
+
+		this.setStatusValues({
+			type: 'response',
+			status: 'trackerConnected',
+			trackerCalibration: createISO8601Timestamp(),
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'calibrate'
+		});
+
+		return this;
 	}
 
-	send(msg: string): void {
-		console.log(msg);
+	async message(content: string): Promise<this> {
+		this.emit('inputMessage', {
+			type: 'inputMessage',
+			content,
+			timestamp: createISO8601Timestamp(),
+			fromInitiator: this.inputId
+		});
+		return this;
 	}
 
-	updateMousePosition(event: MouseEvent): void {
+	async status(): Promise<this> {
+		return this;
+	}
+
+	async open(): Promise<this> {
+		return this;
+	}
+
+	async close(): Promise<this> {
+		return this;
+	}
+
+	async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<this> {
+		const calibrationConfig = createGazeWindowCalibrator(mouseEvent, window);
+		this.windowCalibrator = new GazeWindowCalibrator(calibrationConfig);
+		this.setWindowCalibrationValues(calibrationConfig);
+		return this;
+	}
+
+	async subscribe(): Promise<this> {
+		const nextStatus = this._lastStatus?.status ? this._lastStatus?.status : 'trackerDisconnected';
+		const nextTrackerCalibration = this._lastStatus?.trackerCalibration ? this._lastStatus?.trackerCalibration : null;
+		this.setStatusValues({
+			type: 'response',
+			status: nextStatus,
+			trackerCalibration: nextTrackerCalibration,
+			correlationId: this.createCorrelationId(),
+			initiatorId: this.inputId,
+			timestamp: createISO8601Timestamp(),
+			responseTo: 'subscribe'
+		});
+		return this;
+	}
+
+	async unsubscribe(): Promise<this> {
+		this.setStatusValues(null);
+		return this;
+	}
+
+	async refreshStatus(): Promise<this> {
+		if (this._lastStatus) {
+			this.setStatusValues(this._lastStatus);
+		}
+		return this;
+	}
+
+	private updateMousePosition(event: MouseEvent): void {
 		this.lastMouseCoordinates = { x: event.clientX, y: event.clientY };
 	}
 
-	setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, windowConfig: GazeWindowCalibratorConfigWindowFields): Promise<void> {
-		const calibrationObject = createGazeWindowCalibrator(mouseEvent, windowConfig);
-		this.windowCalibrator = new GazeWindowCalibrator(calibrationObject);
-		this.handleWindowCalibrated(calibrationObject);
-		return Promise.resolve();
-	}
-
-	/**
-	 * Calculate the coordinates of the fake gaze point.
-	 * Based on mouse position and precision error.
-	 */
-	calculateCoordinates(): { x: number; y: number } {
+	private calculateCoordinates(): { x: number; y: number } {
 		const x = this.simulateCoordinate(this.lastMouseCoordinates.x);
 		const y = this.simulateCoordinate(this.lastMouseCoordinates.y);
 		this.precisionError = Math.min(
-			this.precisionError! + this.config!.precisionDecayRate,
-			this.config!.precisionMaximumError
+			this.precisionError! + this.config.precisionDecayRate,
+			this.config.precisionMaximumError
 		);
 		return { x, y };
 	}
 
-	/**
-	 * Simulate the precision error of the dummy input.
-	 * @param coordinate - The coordinate to simulate.
-	 * @returns The simulated coordinate.
-	 */
-	simulateCoordinate(coordinate: number): number {
+	private simulateCoordinate(coordinate: number): number {
 		return coordinate + (Math.random() - 0.5) * 2 * (this.precisionError || 0);
 	}
-}
 
-export const createGazePointFactory = (
-	sessionId: string,
-	windowCalibrator: GazeWindowCalibrator,
-	fixationDetector: GazeFixationDetector
-): (x: number, y: number) => GazeDataPoint => {
-	return (x: number, y: number) => {
-		const xScreenRelative = windowCalibrator.toScreenRelativeX(x);
-		const yScreenRelative = windowCalibrator.toScreenRelativeY(y);
-		const point: GazeDataPoint = {
+	private createGazePoint(x: number, y: number): GazeDataPoint {
+		if (!this.windowCalibrator) {
+			this.sendError('Window calibrator is not set.');
+			throw new Error('Window calibrator is not set.');
+		}
+
+		const xScreenRelative = this.windowCalibrator.toScreenRelativeX(x);
+		const yScreenRelative = this.windowCalibrator.toScreenRelativeY(y);
+
+		return {
 			x,
 			xL: x,
 			xR: x,
@@ -151,15 +262,14 @@ export const createGazePointFactory = (
 			yR: y,
 			yLScreenRelative: yScreenRelative,
 			yRScreenRelative: yScreenRelative,
-			sessionId,
-			timestamp: Date.now(),
+			sessionId: this.inputId,
+			timestamp: createISO8601Timestamp(),
 			validityL: true,
 			validityR: true,
-			parseValidity: true, // todo: implement validity check on window coordinates decorrelation
-			type: 'point',
+			parseValidity: true,
+			type: 'gaze',
 			pupilDiameterL: 0,
-			pupilDiameterR: 0,
+			pupilDiameterR: 0
 		};
-		return fixationDetector.processGazePoint(point);
-	};
+	}
 }

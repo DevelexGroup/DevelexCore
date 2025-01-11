@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
-import type { GazeInputMessage } from '$lib/GazeInput/GazeInputEvent';
+import type { GazeInputEventError, GazeInputEventState } from '$lib/GazeInput/GazeInputEvent';
 import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event';
 import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/GazeInteractionObjectFixation.event';
 import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.event';
@@ -23,7 +23,9 @@ import pointRepository from '../database/repositories/point.repository';
 
 export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
 
-export const sceneStateStore = writable<GazeInputMessage[]>([]);
+export const sceneStateStore = writable<GazeInputEventState[]>([]);
+
+export const sceneErrorStore = writable<GazeInputEventError[]>([]);
 
 // Define the writable store with a custom update function
 export const sceneObjectDwellStore = writable<Dwell[]>([]);

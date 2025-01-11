@@ -38,10 +38,16 @@ export class GazeIndicator {
 		this.canvas.style.top = '0';
 		this.canvas.style.left = '0';
 		this.canvas.style.pointerEvents = 'none';
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
+		this.resize(document);
 		document.body.appendChild(this.canvas);
 		this.draw = this.getNewDrawFunction();
+	}
+
+	resize(document: Document) {
+		if (this.canvas) {
+			this.canvas.width = document.documentElement.clientWidth;
+			this.canvas.height = document.documentElement.clientHeight;
+		}
 	}
 
 	/**

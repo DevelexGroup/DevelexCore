@@ -1,5 +1,5 @@
 export interface GazeDataPoint {
-    type: 'point';
+    type: 'gaze';
 
     x: number;
     xL: number;
@@ -13,7 +13,7 @@ export interface GazeDataPoint {
     yR: number;
     yRScreenRelative: number;
 
-    timestamp: number;
+    timestamp: string; // ISO date-time
     sessionId: string;
 
     validityL: boolean;

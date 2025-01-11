@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GazeIndicator } from "$lib/GazeIndicator/GazeIndicator";
-	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
+	import type { GazeInputEventMessage, GazeInputEventState } from "$lib/GazeInput/GazeInputEvent";
     import type { GazeDataPoint } from "$lib/GazeData/GazeData";
     import { gazeManagerStore, setGazeInput } from "../store/gazeInputStore";
 	import Button from "./Button.svelte";
@@ -15,31 +15,26 @@
     let isStoppedProcessing = false;
     let isDisconnectedProcessing = false;
     let isCalibratedProcessing = false;
+    let isSubscribedProcessing = false;
+    let isUnsubscribedProcessing = false;
+    let isOpenedProcessing = false;
+    let isClosedProcessing = false;
+    let isStatusProcessing = false;
 
-    const handleGazeInputMessage = (data: GazeInputMessage) => {
+    const handleGazeInputEventState = (data: GazeInputEventState) => {
         sceneStateStore.update((store) => {
             store.push(data);
             return store;
         });
-        switch (data.type) {
-            case "emit":
-                handleEmitEvent(data);
-                break;
-        }
-    };
-
-    const handleEmitEvent = (data: GazeInputMessage) => {
         if (!$gazeManagerStore) return;
-        if (data.value && isGazeIndicatorVisible) {
+        if (data.trackerStatus?.status === "trackerEmitting" && isGazeIndicatorVisible) {
             initIndicator();
         } else {
             destroyIndicator();
         }
     };
 
-        $gazeManagerStore.on("state", (data) => {
-            handleGazeInputMessage(data);
-        });
+    $gazeManagerStore.on("inputState", handleGazeInputEventState);
 
     const drawGaze = (gaze: GazeDataPoint) => {
         indicator.draw(gaze);
@@ -50,14 +45,14 @@
             return;
         }
         indicator.init(document);
-        $gazeManagerStore.on("data", drawGaze);
+        $gazeManagerStore.on("inputData", drawGaze);
     };
 
     const destroyIndicator = () => {
         if ($gazeManagerStore === null) {
             return;
         }
-        $gazeManagerStore.off("data", drawGaze);
+        $gazeManagerStore.off("inputData", drawGaze);
         indicator.remove();
     };
 
@@ -82,8 +77,9 @@
             await $gazeManagerStore.connect();
         } catch (error) {
             console.error(error);
+        } finally {
+            isConnectedProcessing = false;
         }
-        isConnectedProcessing = false;
     };
 
     const disconnect = async () => {
@@ -95,8 +91,9 @@
             await $gazeManagerStore.disconnect();
         } catch (error) {
             console.error(error);
+        } finally {
+            isDisconnectedProcessing = false;
         }
-        isDisconnectedProcessing = false;
     };
 
     const start = async () => {
@@ -108,8 +105,9 @@
             await $gazeManagerStore.start();
         } catch (error) {
             console.error(error);
+        } finally {
+            isStartedProcessing = false;
         }
-        isStartedProcessing = false;
     };
 
     const stop = async () => {
@@ -121,8 +119,9 @@
             await $gazeManagerStore.stop();
         } catch (error) {
             console.error(error);
+        } finally {
+            isStoppedProcessing = false;
         }
-        isStoppedProcessing = false;
     };
 
     const calibrate = async () => {
@@ -134,17 +133,63 @@
             await $gazeManagerStore.calibrate();
         } catch (error) {
             console.error(error);
+        } finally {
+            isCalibratedProcessing = false;
         }
-        isCalibratedProcessing = false;
+    };
+
+    const subscribe = async () => {
+        isSubscribedProcessing = true;
+        try {
+            await $gazeManagerStore?.subscribe();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isSubscribedProcessing = false;
+        }
+    };
+
+    const unsubscribe = async () => {
+        isUnsubscribedProcessing = true;
+        try {
+            await $gazeManagerStore?.unsubscribe();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isUnsubscribedProcessing = false;
+        }
+    };
+
+    const open = async () => {
+        isOpenedProcessing = true;
+        await $gazeManagerStore?.open();
+        isOpenedProcessing = false;
+    };
+
+    const close = async () => {
+        isClosedProcessing = true;
+        await $gazeManagerStore?.close();
+        isClosedProcessing = false;
+    };
+
+    const status = async () => {
+        isStatusProcessing = true;
+        await $gazeManagerStore?.status();
+        isStatusProcessing = false;
     };
 </script>
 
 <div class="container">
+        <Button disabled={disabled || isOpenedProcessing} text={"Open"} on:click={open} />
+        <Button disabled={disabled || isStatusProcessing} text={"Get status"} on:click={status} />
+        <!-- <Button disabled={disabled || isSubscribedProcessing} text={"Subscribe"} on:click={subscribe} /> -->
         <Button disabled={disabled || isConnectedProcessing} text={"Connect"} on:click={connect} />
         <Button disabled={disabled || isCalibratedProcessing} text={"Calibrate"} on:click={calibrate} />
         <Button disabled={disabled || isStartedProcessing} text={"Start"} on:click={start} />
         <Button disabled={disabled || isStoppedProcessing} text={"Stop"} on:click={stop} />
         <Button disabled={disabled || isDisconnectedProcessing} text={"Disconnect"} on:click={disconnect} />
+        <!-- <Button disabled={disabled || isUnsubscribedProcessing} text={"Unsubscribe"} on:click={unsubscribe} /> -->
+        <Button disabled={disabled || isDisconnectedProcessing} text={"Close"} on:click={close} />
         <Button {disabled} text={isGazeIndicatorVisible ? "Hide gaze indicator" : "Show gaze indicator"} on:click={() => {
             toggleGazeIndicator(!isGazeIndicatorVisible);
         }} />

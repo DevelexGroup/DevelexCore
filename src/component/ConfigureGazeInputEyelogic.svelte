@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { GazeInputConfigEyelogic } from "$lib";
+    import type { GazeInputConfigEyelogic } from "$lib/index";
     import InputSelect from "./InputSelect.svelte";
     import InputText from "./InputText.svelte";
     import InputSubmit from "./InputSubmit.svelte";

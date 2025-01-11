@@ -8,11 +8,13 @@
     export let data: DataRow[] = [];
     export let headers: string[] = [];
 
-    const getNestedValue = (obj: any, path: string): any =>{
+    const getNestedValue = (obj: any, path: string): any => {
+      if (!obj || !path) return undefined;
       return path.split('.').reduce((acc, part) => acc && acc[part], obj);
     }
 
     const getTime = (timestamp: number) => {
+      if (!timestamp) return '';
       const date = new Date(timestamp);
       const pad = (num: number, size: number) => num.toString().padStart(size, '0');
     
@@ -25,9 +27,10 @@
     }
 
     function formatJSON(obj: object) {
+      if (!obj) return '';
       // Format JSON with line breaks and indentation
       const entries = Object.entries(obj);
-      return entries.map(([key, value]) => `${key}: ${value}`).join('\n');
+      return entries.map(([key, value]) => `${key}: ${value ?? ''}`).join('\n');
     }
   </script>
   
@@ -46,10 +49,10 @@
             {#each headers as header}
               <td class="table-cell w-full">
                 {#if header === 'timestamp'}
-                  {getTime(row[header])}
+                  {getTime(row?.[header])}
                 {:else}
                   {@const value = getNestedValue(row, header)}
-                  {#if value !== undefined && value !== ''}
+                  {#if value != null && value !== ''}
                     {#if typeof value === 'object'}
                       {formatJSON(value)}
                     {:else}

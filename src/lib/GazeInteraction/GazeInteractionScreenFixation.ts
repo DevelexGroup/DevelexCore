@@ -101,7 +101,7 @@ export class GazeInteractionScreenFixation extends GazeInteraction<GazeInteracti
 	 */
 	createFixationEvent(
 		type: GazeInteractionScreenFixationEvent["type"],
-		timestamp: number,
+		timestamp: string,
 		duration: number,
 		data: GazeDataPointWithFixation
 	): GazeInteractionScreenFixationEvent {

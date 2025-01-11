@@ -1,69 +1,51 @@
 <script lang="ts">
-	import type { GazeInputMessage } from "$lib/GazeInput/GazeInputEvent";
 	import Group from "./GenericGroup.svelte";
 	import GenericTable from "./GenericTable.svelte";
-    import { sceneStateStore } from "../store/sceneStores";
+    import { sceneStateStore, sceneErrorStore } from "../store/sceneStores";
 	import { gazeManagerStore } from "../store/gazeInputStore";
-
-    const getGazeInputStates = () => {
-        return [
-            { variable: "Connected", value: $gazeManagerStore !== null ? $gazeManagerStore.isConnected : null },
-            { variable: "Emitting", value: $gazeManagerStore !== null ? $gazeManagerStore.isEmitting : null },
-            { variable: "Calibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isDeviceCalibrated : null },
-            { variable: "WindowCalibrated", value: $gazeManagerStore !== null ? $gazeManagerStore.isWindowCalibrated : null },
-            { variable: "WindowCalibration ClientX", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.clientX : null },
-            { variable: "WindowCalibration ScreenX", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.screenX : null },
-            { variable: "WindowCalibration ClientY", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.clientY : null },
-            { variable: "WindowCalibration ScreenY", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.screenY : null },
-            { variable: "WindowCalibration Width", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.windowScreenWidth : null },
-            { variable: "WindowCalibration Height", value: $gazeManagerStore !== null ? $gazeManagerStore.windowCalibration?.windowScreenHeight : null }
-        ]   
-    };
+	import { onDestroy } from "svelte";
+	import type { GazeInputEventState } from "$lib/index";
 
     const getGazeInputConfig = () => {
         if ($gazeManagerStore.input === null) return [];
         return Object.entries($gazeManagerStore.input.config).map(([key, value]) => ({ variable: key, value }));
     };
 
-    let gazeInputStates = getGazeInputStates();
     let gazeInputConfig = getGazeInputConfig();
 
-    const handleGazeInputMessage = (data: GazeInputMessage) => {
-        gazeInputStates = getGazeInputStates();
+    const updateGazeInputConfig = (event: GazeInputEventState) => {
+        console.log(event);
+        gazeInputConfig = getGazeInputConfig();
     };
-    
-    $gazeManagerStore.on("state", handleGazeInputMessage);
-    // if gazeInputState, listen for messages
-    $: if ($gazeManagerStore !== null) {
-        gazeInputStates = getGazeInputStates();
-        gazeInputConfig = getGazeInputConfig();
-    } else {
-        gazeInputStates = getGazeInputStates();
-        gazeInputConfig = getGazeInputConfig();
-    }
 
+    // on every state change, update the config
+    $gazeManagerStore.on("inputState", updateGazeInputConfig);
+
+    onDestroy(() => {
+        $gazeManagerStore.off("inputState", updateGazeInputConfig);
+    });
 
 </script>
 
 <div class="state-container">
-    <Group heading="Gaze input configuration">
-        <GenericTable data={gazeInputConfig} headers={["variable", "value"]} />
-    </Group>
-    <Group heading="Gaze input states">
-        <GenericTable data={gazeInputStates} headers={["variable", "value"]} />
-    </Group>
+    <div class="grid col-2">
+        <Group heading="Gaze input configuration">
+            <GenericTable data={gazeInputConfig} headers={["variable", "value"]} />
+        </Group>
+        <Group heading="Gaze input error log">
+            <GenericTable data={$sceneErrorStore} headers={["timestamp", "content"]} />
+        </Group>
+    </div>
     <Group heading="Gaze input log">
-        <GenericTable data={$sceneStateStore} headers={["timestamp", "type", "value"]} />
+        <GenericTable data={$sceneStateStore} headers={["timestamp", "trackerStatus", "viewportCalibration"]} />
     </Group>
 </div>
 
 <style>
     .state-container {
         display: grid;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        grid-template-columns:300px 1fr;
         gap: 1rem;
-        grid-template-columns: 250px 250px 1fr;
         min-width: 800px;
         width: 100%;
     }

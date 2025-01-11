@@ -1,6 +1,7 @@
 import { GazeFixationDetector } from "./GazeFixationDetector"
 import { type GazeDataPointWithFixation, type GazeDataPoint, isGazeDataPointWithFixation } from "$lib/GazeData/GazeData";
 import { calculatePointDistance } from "$lib/utils/geometryUtils";
+import { getDifferenceInMilliseconds } from "$lib/utils/timeUtils";
 
 /**
  * Default parameters are from Andersson et al. (2017):
@@ -70,7 +71,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
 
     getDuration(gazePoint: GazeDataPoint): number {
         const { timestamp } = gazePoint;
-        const timeFromLastFullfilledDispersionGazeDataPoint = this.windowGazePoints[this.windowGazePoints.length - 1] ? timestamp - this.windowGazePoints[this.windowGazePoints.length - 1].timestamp : 0;
+        const timeFromLastFullfilledDispersionGazeDataPoint = this.windowGazePoints[this.windowGazePoints.length - 1] ? getDifferenceInMilliseconds(timestamp, this.windowGazePoints[this.windowGazePoints.length - 1].timestamp) : 0;
         return this.durationOfFullfilledDispersionGazeDataPoints + timeFromLastFullfilledDispersionGazeDataPoint;
     }
 

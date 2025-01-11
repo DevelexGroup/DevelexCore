@@ -1,3 +1,5 @@
+import { createISO8601Timestamp } from "$lib/utils/timeUtils";
+
 /**
  * Type that defines the structure of the configuration object that is passed to the GazeWindowCalibrator class.
  * @property event - The pointer move event.
@@ -5,6 +7,7 @@
  * @property windowScreenHeight - window.screen.height
  */
 export type GazeWindowCalibratorConfig = {
+    timestamp: string; // ISO 8601 timestamp to track when the calibration was made
     clientX: number; //event.clientX
     clientY: number; //event.clientY
     screenX: number; //event.screenX
@@ -40,6 +43,7 @@ export const createGazeWindowCalibrator = (
     window: GazeWindowCalibratorConfigWindowFields
 ): GazeWindowCalibratorConfig => {
     return {
+        timestamp: createISO8601Timestamp(),
         clientX: event.clientX,
         clientY: event.clientY,
         screenX: event.screenX,

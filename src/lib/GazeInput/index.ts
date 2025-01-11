@@ -18,7 +18,7 @@ export const createGazeInput = <T extends GazeInputConfig>(
 	switch (config.tracker) {
 		case 'dummy':
 			return new GazeInputDummy(config) as unknown as GazeInput<T>;
-		case 'opengaze':
+		case 'gazepoint':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
 		case 'smi':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
