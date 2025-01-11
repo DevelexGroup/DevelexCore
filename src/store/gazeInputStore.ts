@@ -26,7 +26,7 @@ interface Input {
 export const setGazeInput = (input: Input | null) => {
     gazeManagerStore.update((gazeManager) => {
         if (gazeManager !== null) {
-            gazeManager.disconnect();
+            gazeManager.close();
         }
         if (input !== null) {
             gazeManager.createInput(input.inputConfig);

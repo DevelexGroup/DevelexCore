@@ -11,6 +11,8 @@ export type CommandType =
   | 'stop'
   | 'response';
 
+export type InnerCommandType = CommandType | 'open' | 'close';
+
 interface CorrelationId {
   correlationId: number;
 }
@@ -21,6 +23,10 @@ interface InitiatorId {
 
 interface Timestamp {
   timestamp: string; // ISO date-time string
+}
+
+export interface InnerCommandPayloadBase extends CorrelationId, InitiatorId, Timestamp {
+  type: InnerCommandType;
 }
 
 interface CommandPayloadBase extends CorrelationId, InitiatorId {
@@ -37,7 +43,7 @@ interface CommandPayloadConnect extends CommandPayloadBase {
 }
 
 export interface CommandPayloadGeneric extends CommandPayloadBase {
-  type: Exclude<CommandType, 'connect'>;
+  type: Exclude<CommandType, 'connect' | 'status'>;
 }
 
 export type CommandPayload = CommandPayloadConnect | CommandPayloadGeneric;
@@ -88,7 +94,7 @@ export interface ReceiveMessagePayload extends CorrelationId, InitiatorId, Times
   content: string;
 }
 
-export interface ReceiveErrorPayload extends CorrelationId, InitiatorId, Timestamp {
+export interface ReceiveErrorPayload extends Timestamp {
   type: 'error';
   content: string;
 }
@@ -106,7 +112,7 @@ export interface ReadyPayload extends InitiatorId {
   type: 'ready';
 }
 
-export type SendToWorkerAsyncMessages = CommandPayload | MessagePayload | ViewportCalibrationPayload;
+export type SendToWorkerAsyncMessages = CommandPayload | MessagePayload | ViewportCalibrationPayload | InnerCommandPayloadBase;
 
 export type SendToWorkerSyncMessages = SetupPayload;
 

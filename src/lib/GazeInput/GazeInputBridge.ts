@@ -5,7 +5,8 @@ import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
 import BridgeWebWorker from '$lib/GazeInput/GazeInputBridge.worker.ts?worker&inline';
-import type { CommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, ViewportCalibrationPayload } from "./GazeInputBridge.types";
+import type { InnerCommandPayloadBase, InnerCommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, ViewportCalibrationPayload } from "./GazeInputBridge.types";
+import { createISO8601Timestamp } from "$lib/utils/timeUtils";
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
@@ -44,7 +45,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
 
         // Set up permanent listener for messages from the worker.
-        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload>) => {
+        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload | InnerCommandPayloadBase>) => {
             const { type, timestamp } = event.data;
             
             switch (type) {
@@ -53,22 +54,24 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                     break;
                 case 'response':
                     // resolve the promise with the status
-                    this.setStatusValues(event.data);
+                    this.setStatusValues(event.data as ReceiveResponsePayload);
                     this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     break;
                 case 'viewportCalibration':
                     this.setWindowCalibrationValues(event.data);
                     this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     break;
-                case 'error':
-                    // resolve the promise with the error
-                    this.pendingPromises.get(event.data.correlationId)?.reject(event.data.content);
+                case 'error': {
+                    // reject all promises with the error
+                    const data = event.data as ReceiveErrorPayload;
+                    this.pendingPromises.forEach((promise) => promise.reject(data.content));
                     this.emit('inputError', {
                         type: 'inputError',
                         timestamp,
                         content: event.data.content,
                     });
                     break;
+                }
                 case 'message':
                     // resolve the promise with the message
                     this.pendingPromises.get(event.data.correlationId)?.resolve(this);
@@ -78,6 +81,12 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                         content: event.data.content,
                         fromInitiator: event.data.initiatorId
                     });
+                    break;
+                case 'open':
+                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
+                    break;
+                case 'close':
+                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     break;
             }
         };
@@ -127,6 +136,14 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         return this.sendGenericCommand('calibrate');
     }
 
+    open(): Promise<this> {
+        return this.sendGenericCommand('open');
+    }
+
+    close(): Promise<this> {
+        return this.sendGenericCommand('close');
+    }
+
     message(content: string): Promise<this> {
         const correlationId = this.createCorrelationId();
         return this.send({
@@ -148,11 +165,12 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
     }
 
-    protected sendGenericCommand(commandType: Exclude<CommandType, 'connect'>): Promise<this> {
+    protected sendGenericCommand(commandType: Exclude<InnerCommandType, 'connect'>): Promise<this> {
         return this.send({
             type: commandType,
             correlationId: this.createCorrelationId(),
             initiatorId: this.inputId,
+            timestamp: createISO8601Timestamp(),
         });
     }
 

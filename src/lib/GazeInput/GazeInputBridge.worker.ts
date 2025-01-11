@@ -1,7 +1,7 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
-import type { CommandPayloadGeneric, GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload } from "./GazeInputBridge.types";
+import type { GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload, InnerCommandPayloadBase } from "./GazeInputBridge.types";
 import { GazeWindowCalibrator } from "$lib/GazeWindowCalibrator/GazeWindowCalibrator";
 import type { GazeFixationDetector } from "$lib/GazeFixationDetector/GazeFixationDetector";
 import { createGazeFixationDetector } from "$lib/GazeFixationDetector";
@@ -21,7 +21,7 @@ let fixationDetector: GazeFixationDetector | null = null;
 let gazeDataProcessor: (data: GazeDataPayload) => void = () => {
     console.warn('No gaze data processor set up.');
 };
-let isSubscribed = false;
+/* let isSubscribed = false; */
 
 apiClient.on('gaze', (data: GazeDataPayload) => {
     gazeDataProcessor(data);
@@ -29,6 +29,7 @@ apiClient.on('gaze', (data: GazeDataPayload) => {
 
 apiClient.on('error', (data: ReceiveErrorPayload) => {
     sendToTheMainThread(data);
+    console.log('Error received:', data);
 });
 
 apiClient.on('response', (data: ReceiveResponsePayload) => {
@@ -48,12 +49,14 @@ self.addEventListener('message', (event: MessageEvent<SendToWorkerMessages>) => 
         case 'viewportCalibration':
             setupViewportCalibration(event.data);
             break;
-        case 'subscribe':
-            setupWebSocket(event.data);
+        case 'open':
+            openWebSocket(event.data);
             break;
-        case 'unsubscribe':
+        case 'close':
             closeWebSocket(event.data);
             break;
+        case 'subscribe':
+        case 'unsubscribe':
         case 'connect':
         case 'disconnect':
         case 'calibrate':
@@ -124,18 +127,18 @@ const createBridgeProcessor = (
     }
 }
 
-const setupWebSocket = async (subscribePayload: CommandPayloadGeneric) => {
+const setupWebSocket = async () => {
     // check first if we have a valid setup payload
     if (!setupPayload) {
-        sendWorkerErrorToTheMainThread('No setup payload found.', subscribePayload.correlationId, subscribePayload.initiatorId);
+        sendWorkerErrorToTheMainThread('No setup payload found.', null);
         return;
     }
     if (!gazeWindowCalibrator) {
-        sendWorkerErrorToTheMainThread('No gaze window calibrator found.', subscribePayload.correlationId, subscribePayload.initiatorId);
+        sendWorkerErrorToTheMainThread('No gaze window calibrator found.', null);
         return;
     }
     if (!fixationDetector) {
-        sendWorkerErrorToTheMainThread('No fixation detector found.', subscribePayload.correlationId, subscribePayload.initiatorId);
+        sendWorkerErrorToTheMainThread('No fixation detector found.', null);
         return;
     }
     // prepare the gaze data processor
@@ -144,44 +147,47 @@ const setupWebSocket = async (subscribePayload: CommandPayloadGeneric) => {
     try {
         // attempt to open the websocket connection
         await apiClient.openConnection(setupPayload.config.uri);
-        // send the subscribe message
-        apiClient.send(subscribePayload);
     } catch {
         sendWorkerErrorToTheMainThread(
             `Failed to connect to WebSocket server at ${setupPayload.config.uri}`,
-            subscribePayload.correlationId,
-            subscribePayload.initiatorId
+            null
         );
         return;
     }
 }
 
-const closeWebSocket = (unsubscribePayload: CommandPayloadGeneric) => {
-    if (!isSubscribed) {
-        sendNotSubscribedErrorToTheMainThread(unsubscribePayload.correlationId, unsubscribePayload.initiatorId);
-        return;
-    }
-    isSubscribed = false;
-    apiClient.send(unsubscribePayload);
-    // TODO: close the websocket connection after the message is sent and received with the correct correlationId
+const openWebSocket = async (openPayload: InnerCommandPayloadBase) => {
+    await setupWebSocket();
+    // send back the open payload with the correct correlationId
+    sendToTheMainThread({ type: 'open', correlationId: openPayload.correlationId, initiatorId: openPayload.initiatorId, timestamp: createISO8601Timestamp() });
+}
+
+const closeWebSocket = (closePayload: InnerCommandPayloadBase) => {
+    apiClient.closeConnection();
+    // send back the close payload with the correct correlationId
+    sendToTheMainThread({ type: 'close', correlationId: closePayload.correlationId, initiatorId: closePayload.initiatorId, timestamp: createISO8601Timestamp() });
 }
 
 const transmitToWebSocket = (payload: SendToWorkerAsyncMessages) => {
-
-    apiClient.send(payload);
+    try {
+        apiClient.send(payload);
+    } catch (error) {
+        const reason = error instanceof Error ? error.message : 'Unknown error';
+        sendWorkerErrorToTheMainThread(`Failed to send message to Bridge: ${reason}`, null);
+    }
 }
 
-const sendToTheMainThread = (payload: ReceiveFromWorkerMessages) => {
+const sendToTheMainThread = (payload: ReceiveFromWorkerMessages | InnerCommandPayloadBase) => {
     self.postMessage(payload);
 }
 
-const sendWorkerErrorToTheMainThread = (message: string, correlationId: number, initiatorId: string) => {
-    sendToTheMainThread({ type: 'error', content: message, correlationId, initiatorId, timestamp: createISO8601Timestamp() });
+const sendWorkerErrorToTheMainThread = (message: string, timestamp: string | null) => {
+    sendToTheMainThread({ type: 'error', content: message, timestamp: timestamp ?? createISO8601Timestamp() });
 }
 
-const sendNotSubscribedErrorToTheMainThread = (correlationId: number, initiatorId: string) => {
+/* const sendNotSubscribedErrorToTheMainThread = (correlationId: number, initiatorId: string) => {
     sendWorkerErrorToTheMainThread('Not subscribed to the WebSocket server.', correlationId, initiatorId);
-}
+} */
 /**
  * WORK IN PROGRESS
  */

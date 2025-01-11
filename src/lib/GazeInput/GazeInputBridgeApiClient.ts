@@ -1,5 +1,6 @@
 import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveResponsePayload, GazeDataPayload, ReceiveFromWebSocketMessages } from './GazeInputBridge.types';
 import { Emitter, type EventMap } from '$lib/Emitter/Emitter';
+import { createISO8601Timestamp } from '$lib/utils/timeUtils';
 
 interface WebSocketEvents extends EventMap {
     message: ReceiveMessagePayload;
@@ -24,7 +25,27 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
 
             // Add connection error handler
             this.websocket.onerror = (error) => {
+                const timestamp = createISO8601Timestamp();
+                const message = error instanceof Error ? error.message : 'Unknown error';
+                this.emit('error', {
+                    type: 'error',
+                    content: message,
+                    timestamp
+                });
                 reject(error);
+            };
+
+            this.websocket.onclose = (event) => {
+                // 1000 is the code for a normal close
+                if (event?.code !== 1000) {
+                    const content = event?.reason ?? 'Connection to Bridge closed for unknown reason';
+                    const timestamp = createISO8601Timestamp();
+                    this.emit('error', {
+                        type: 'error',
+                        content,
+                        timestamp
+                    });
+                }
             };
 
             this.websocket.onmessage = (event) => {
@@ -42,7 +63,7 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
     public async closeConnection(): Promise<this> {
         return new Promise((resolve) => {
             if (this.websocket) {
-                this.websocket.close();
+                this.websocket.close(1000, 'Close from client');
                 this.websocket = null;
             }
             resolve(this);

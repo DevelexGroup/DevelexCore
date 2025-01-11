@@ -17,6 +17,8 @@
     let isCalibratedProcessing = false;
     let isSubscribedProcessing = false;
     let isUnsubscribedProcessing = false;
+    let isOpenedProcessing = false;
+    let isClosedProcessing = false;
 
     const handleGazeInputEventState = (data: GazeInputEventState) => {
         sceneStateStore.update((store) => {
@@ -156,9 +158,22 @@
             isUnsubscribedProcessing = false;
         }
     };
+
+    const open = async () => {
+        isOpenedProcessing = true;
+        await $gazeManagerStore?.open();
+        isOpenedProcessing = false;
+    };
+
+    const close = async () => {
+        isClosedProcessing = true;
+        await $gazeManagerStore?.close();
+        isClosedProcessing = false;
+    };
 </script>
 
 <div class="container">
+        <Button disabled={disabled || isOpenedProcessing} text={"Open"} on:click={open} />
         <Button disabled={disabled || isSubscribedProcessing} text={"Subscribe"} on:click={subscribe} />
         <Button disabled={disabled || isConnectedProcessing} text={"Connect"} on:click={connect} />
         <Button disabled={disabled || isCalibratedProcessing} text={"Calibrate"} on:click={calibrate} />
@@ -166,6 +181,7 @@
         <Button disabled={disabled || isStoppedProcessing} text={"Stop"} on:click={stop} />
         <Button disabled={disabled || isDisconnectedProcessing} text={"Disconnect"} on:click={disconnect} />
         <Button disabled={disabled || isUnsubscribedProcessing} text={"Unsubscribe"} on:click={unsubscribe} />
+        <Button disabled={disabled || isDisconnectedProcessing} text={"Close"} on:click={close} />
         <Button {disabled} text={isGazeIndicatorVisible ? "Hide gaze indicator" : "Show gaze indicator"} on:click={() => {
             toggleGazeIndicator(!isGazeIndicatorVisible);
         }} />
