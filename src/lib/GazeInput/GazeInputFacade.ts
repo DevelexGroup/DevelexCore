@@ -133,6 +133,14 @@ export class GazeInputFacade extends EmitterWithFacade<GazeInputEvents> {
     }
 
     /**
+     * Get the status of the input.
+     * @throws Error if no input is set.
+     */
+    async status() {
+        return this.inputInstance.status();
+    }
+
+    /**
      * Set the window calibration.
      * @param mouseEvent - The mouse event.
      * @param window - The window.

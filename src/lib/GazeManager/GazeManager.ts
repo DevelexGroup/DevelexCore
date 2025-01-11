@@ -207,6 +207,10 @@ export class GazeManager extends EmitterGroup<
         return this._input.close();
     }
 
+    async status() {
+        return this._input.status();
+    }
+
     async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields) {
         return this._input.setWindowCalibration(mouseEvent, window);
     }
