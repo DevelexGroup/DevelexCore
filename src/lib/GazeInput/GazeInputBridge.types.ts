@@ -9,7 +9,8 @@ export type CommandType =
   | 'calibrate'
   | 'start'
   | 'stop'
-  | 'response';
+  | 'response'
+  | 'status';
 
 export type InnerCommandType = CommandType | 'open' | 'close';
 

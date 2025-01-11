@@ -178,6 +178,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		return this;
 	}
 
+	async status(): Promise<this> {
+		return this;
+	}
+
+	async open(): Promise<this> {
+		return this;
+	}
+
+	async close(): Promise<this> {
+		return this;
+	}
+
 	async setWindowCalibration(mouseEvent: GazeWindowCalibratorConfigMouseEventFields, window: GazeWindowCalibratorConfigWindowFields): Promise<this> {
 		const calibrationConfig = createGazeWindowCalibrator(mouseEvent, window);
 		this.windowCalibrator = new GazeWindowCalibrator(calibrationConfig);
@@ -251,7 +263,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			yLScreenRelative: yScreenRelative,
 			yRScreenRelative: yScreenRelative,
 			sessionId: this.inputId,
-			timestamp: Date.now(),
+			timestamp: createISO8601Timestamp(),
 			validityL: true,
 			validityR: true,
 			parseValidity: true,

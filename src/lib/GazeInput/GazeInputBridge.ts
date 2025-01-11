@@ -144,6 +144,10 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         return this.sendGenericCommand('close');
     }
 
+    status(): Promise<this> {
+        return this.sendGenericCommand('status');
+    }
+
     message(content: string): Promise<this> {
         const correlationId = this.createCorrelationId();
         return this.send({

@@ -49,6 +49,7 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<GazeI
 	abstract unsubscribe(): Promise<this>;
 	abstract open(): Promise<this>;
 	abstract close(): Promise<this>;
+	abstract status(): Promise<this>;
 
 	protected setWindowCalibrationValues(calibration: GazeWindowCalibratorConfig | null) {
 		this._windowCalibration = calibration;

@@ -64,6 +64,7 @@ self.addEventListener('message', (event: MessageEvent<SendToWorkerMessages>) => 
         case 'stop':
         case 'response':
         case 'message':
+        case 'status':
             transmitToWebSocket(event.data);
             break;
     }
