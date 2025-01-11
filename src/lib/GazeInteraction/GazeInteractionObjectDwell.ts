@@ -3,6 +3,7 @@ import type { GazeInteractionObjectDwellListener, GazeInteractionObjectDwellPayl
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectDwellEvent, GazeInteractionObjectDwellEvents } from './GazeInteractionObjectDwell.event';
 import type { GazeInteractionDwellSettingsType } from './GazeInteractionObjectDwell.settings';
+import { getISO8601TimestampFromUnix } from '$lib/utils/timeUtils';
 
 /**
  * Manages dwell events from the given eye-tracker input for elements,
@@ -35,7 +36,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 				const startDwellEvent = this.createDwellEvent(
 					'dwellProgress',
 					listener,
-					currentTime,
+					getISO8601TimestampFromUnix(currentTime),
 					0,
 					data
 				);
@@ -53,7 +54,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 				const finishDwellEvent = this.createDwellEvent(
 					'dwellFinish',
 					listener,
-					currentTime,
+					getISO8601TimestampFromUnix(currentTime),
 					timeElapsed,
 					data
 				);
@@ -67,7 +68,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 			const progressDwellEvent = this.createDwellEvent(
 				'dwellProgress',
 				listener,
-				currentTime,
+				getISO8601TimestampFromUnix(currentTime),
 				timeElapsed,
 				data
 			);
@@ -82,7 +83,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 			const cancelDwellEvent = this.createDwellEvent(
 				'dwellCancel',
 				listener,
-				currentTime,
+				getISO8601TimestampFromUnix(currentTime),
 				timeElapsed,
 				data
 			);
@@ -105,7 +106,7 @@ export class GazeInteractionObjectDwell extends GazeInteractionObject<GazeIntera
 	createDwellEvent(
 		type: 'dwellProgress' | 'dwellFinish' | 'dwellCancel',
 		listener: GazeInteractionObjectDwellListener,
-		timestamp: number,
+		timestamp: string,
 		duration: number,
 		data: GazeDataPoint
 	): GazeInteractionObjectDwellEvent {

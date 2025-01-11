@@ -1,5 +1,6 @@
 import type { GazeDataPoint } from "$lib/GazeData/GazeData";
 import { calculatePointDistance } from "$lib/utils/geometryUtils";
+import { getISO8601TimestampFromUnix } from "$lib/utils/timeUtils";
 import { GazeInteractionObject } from "./GazeInteractionObject";
 import type { GazeInteractionObjectValidationEvent, GazeInteractionObjectValidationEvents } from "./GazeInteractionObjectValidation.event";
 import type { GazeInteractionObjectValidationListener, GazeInteractionObjectValidationPayload, GazeInteractionObjectValidationSettings } from "./GazeInteractionObjectValidation.settings";
@@ -58,7 +59,7 @@ export class GazeInteractionObjectValidation extends GazeInteractionObject<
                     validDataPointsCount,
                     validDataPointsPercentage,
                     sessionId,
-                    timestamp,
+                    timestamp: getISO8601TimestampFromUnix(timestamp),
                     gazeDataPoints: listener.gazeDataPoints
                 };
                 listener.settings.onValidation(validationEvent);

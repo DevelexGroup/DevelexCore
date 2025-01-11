@@ -20,7 +20,7 @@ export class GazeInteractionObjectIntersect extends GazeInteractionObject<GazeIn
 
 	private preAllocatedEvent: GazeInteractionObjectIntersectEvent = {
 		sessionId: '',
-		timestamp: 0,
+		timestamp: '',
 		type: 'intersect',
 		target: [],
 		settings: [],
@@ -58,7 +58,7 @@ export class GazeInteractionObjectIntersect extends GazeInteractionObject<GazeIn
 		this.emit('intersect', this.preAllocatedEvent);
 	}
 
-	updateIntersectEvent(listeners: GazeInteractionObjectIntersectListener[], timestamp: number, data: GazeDataPoint): void {
+	updateIntersectEvent(listeners: GazeInteractionObjectIntersectListener[], timestamp: string, data: GazeDataPoint): void {
 		this.preAllocatedEvent.timestamp = timestamp;
 		this.preAllocatedEvent.sessionId = data.sessionId;
 		this.preAllocatedEvent.gazeData = data;
