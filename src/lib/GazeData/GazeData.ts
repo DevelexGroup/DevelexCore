@@ -13,7 +13,7 @@ export interface GazeDataPoint {
     yR: number;
     yRScreenRelative: number;
 
-    timestamp: number;
+    timestamp: string; // ISO date-time
     sessionId: string;
 
     validityL: boolean;

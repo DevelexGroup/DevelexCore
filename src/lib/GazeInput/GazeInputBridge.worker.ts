@@ -91,7 +91,7 @@ const createBridgeProcessor = (
         data.xR = Number(data.xR);
         data.yL = Number(data.yL);
         data.yR = Number(data.yR);
-        data.timestamp = Number(data.timestamp);
+        // dont convert data.timestamp to number, it is a ISO date-time
 
         const windowXL = windowCalibrator.toWindowX(data.xL);
         const windowXR = windowCalibrator.toWindowX(data.xR);

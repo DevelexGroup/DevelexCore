@@ -47,9 +47,8 @@ export interface MessagePayload extends CorrelationId, InitiatorId {
   content: string;
 }
 
-export interface GazeDataPayload {
+export interface GazeDataPayload extends Timestamp {
   type: 'gaze';
-  timestamp: number; // milliseconds
   // Left eye data
   xL: number;
   yL: number;
