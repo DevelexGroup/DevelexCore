@@ -1,6 +1,6 @@
 {
 	"name": "@473783/develex-core",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"publishConfig": {
 		"@473783:registry": "https://gitlab.ics.muni.cz/api/v4/projects/7015/packages/npm/"
 	},
