@@ -52,9 +52,5 @@
 			"import": "./dist/develex-core.js",
 			"require": "./dist/develex-core.umd.cjs"
 		}
-	},
-	"dependencies": {
-		"@xstate/svelte": "^4.0.2",
-		"xstate": "^5.19.1"
 	}
 }
