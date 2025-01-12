@@ -50,12 +50,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		
 		this.setStatusValues({
 			type: 'response',
-			status: 'trackerConnected',
-			trackerCalibration: null,
+			tracker: {
+				status: 'trackerConnected',
+				calibration: null,
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'connect'
+			response: {
+				to: 'connect',
+				status: 'resolved',
+				message: 'Tracker connected',
+			},
 		});
 
 		return this;
@@ -66,7 +72,7 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			return this.sendError('Window calibrator or fixation detector is not set.');
 		}
 
-		if (this._lastStatus?.status !== 'trackerConnected' && this._lastStatus?.status !== 'trackerEmitting') {
+		if (this._lastStatus?.tracker.status !== 'trackerConnected' && this._lastStatus?.tracker.status !== 'trackerEmitting') {
 			return this.sendError('Cannot start: tracker is not connected.');
 		}
 
@@ -80,12 +86,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 		this.setStatusValues({
 			type: 'response',
-			status: 'trackerEmitting',
-			trackerCalibration: null,
+			tracker: {
+				status: 'trackerEmitting',
+				calibration: null,
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'start'
+			response: {
+				to: 'start',
+				status: 'resolved',
+				message: 'Tracker emitting',
+			},
 		});
 
 		return this;
@@ -96,17 +108,23 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			clearInterval(this.intervalId);
 		}
 
-		const nextStatus = this._lastStatus?.status === 'trackerEmitting' ? 'trackerConnected' : 'trackerDisconnected';
-		const nextTrackerCalibration = this._lastStatus?.status ? this._lastStatus?.status : null;
+		const nextStatus = this._lastStatus?.tracker.status === 'trackerEmitting' ? 'trackerConnected' : 'trackerDisconnected';
+		const nextTrackerCalibration = this._lastStatus?.tracker.calibration ? this._lastStatus?.tracker.calibration : null;
 
 		this.setStatusValues({
 			type: 'response',
-			status: nextStatus,
-			trackerCalibration: nextTrackerCalibration,
+			tracker: {
+				status: nextStatus,
+				calibration: nextTrackerCalibration,
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'stop'
+			response: {
+				to: 'stop',
+				status: 'resolved',
+				message: 'Tracker stopped',
+			},
 		});
 
 		return this;
@@ -120,12 +138,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 		this.setStatusValues({
 			type: 'response',
-			status: 'trackerDisconnected',
-			trackerCalibration: null,
+			tracker: {
+				status: 'trackerDisconnected',
+				calibration: null,
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'disconnect'
+			response: {
+				to: 'disconnect',
+				status: 'resolved',
+				message: 'Tracker disconnected',
+			},
 		});
 
 		return this;
@@ -144,12 +168,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 		this.setStatusValues({
 			type: 'response',
-			status: 'trackerCalibrating',
-			trackerCalibration: previousStatus.trackerCalibration,
+			tracker: {
+				status: 'trackerCalibrating',
+				calibration: previousStatus.tracker.calibration,
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'calibrate'
+			response: {
+				to: 'calibrate',
+				status: 'resolved',
+				message: 'Tracker calibrating',
+			},
 		});
 
 		// wait for 1 second
@@ -157,12 +187,18 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 
 		this.setStatusValues({
 			type: 'response',
-			status: 'trackerConnected',
-			trackerCalibration: createISO8601Timestamp(),
+			tracker: {
+				status: 'trackerConnected',
+				calibration: createISO8601Timestamp(),
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'calibrate'
+			response: {
+				to: 'calibrate',
+				status: 'resolved',
+				message: 'Tracker calibrated',
+			},
 		});
 
 		return this;
@@ -198,16 +234,22 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	}
 
 	async subscribe(): Promise<this> {
-		const nextStatus = this._lastStatus?.status ? this._lastStatus?.status : 'trackerDisconnected';
-		const nextTrackerCalibration = this._lastStatus?.trackerCalibration ? this._lastStatus?.trackerCalibration : null;
+		const nextStatus = this._lastStatus?.tracker.status ? this._lastStatus?.tracker.status : 'trackerDisconnected';
+		const nextTrackerCalibration = this._lastStatus?.tracker.calibration ? this._lastStatus?.tracker.calibration : null;
 		this.setStatusValues({
 			type: 'response',
-			status: nextStatus,
-			trackerCalibration: nextTrackerCalibration,
+			tracker: {
+				status: nextStatus,
+				calibration: nextTrackerCalibration,
+			},
 			correlationId: this.createCorrelationId(),
 			initiatorId: this.inputId,
 			timestamp: createISO8601Timestamp(),
-			responseTo: 'subscribe'
+			response: {
+				to: 'subscribe',
+				status: 'resolved',
+				message: 'Tracker subscribed',
+			},
 		});
 		return this;
 	}

@@ -23,11 +23,11 @@
 
     const handleGazeInputEventState = (data: GazeInputEventState) => {
         sceneStateStore.update((store) => {
-            store.push(data);
+            store.unshift(data);
             return store;
         });
         if (!$gazeManagerStore) return;
-        if (data.trackerStatus?.status === "trackerEmitting" && isGazeIndicatorVisible) {
+        if (data.trackerStatus?.tracker.status === "trackerEmitting" && isGazeIndicatorVisible) {
             initIndicator();
         } else {
             destroyIndicator();
@@ -162,20 +162,35 @@
 
     const open = async () => {
         isOpenedProcessing = true;
-        await $gazeManagerStore?.open();
-        isOpenedProcessing = false;
+        try {
+            await $gazeManagerStore?.open();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isOpenedProcessing = false;
+        }
     };
 
     const close = async () => {
         isClosedProcessing = true;
-        await $gazeManagerStore?.close();
-        isClosedProcessing = false;
+        try {
+            await $gazeManagerStore?.close();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isClosedProcessing = false;
+        }
     };
 
     const status = async () => {
         isStatusProcessing = true;
-        await $gazeManagerStore?.status();
-        isStatusProcessing = false;
+        try {
+            await $gazeManagerStore?.status();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            isStatusProcessing = false;
+        }
     };
 </script>
 

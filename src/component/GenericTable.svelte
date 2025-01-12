@@ -26,11 +26,17 @@
       return `${hours}:${minutes}:${seconds}.${milliseconds}`;
     }
 
-    function formatJSON(obj: object) {
+    function formatJSON(obj: object, indentLevel: number = 0): string {
       if (!obj) return '';
-      // Format JSON with line breaks and indentation
+      const indent = '  '.repeat(indentLevel);
       const entries = Object.entries(obj);
-      return entries.map(([key, value]) => `${key}: ${value ?? ''}`).join('\n');
+      return entries.map(([key, value]) => {
+        if (typeof value === 'object' && value !== null) {
+          return `${indent}${key}:\n${formatJSON(value, indentLevel + 1)}`;
+        } else {
+          return `${indent}${key}: ${value ?? ''}`;
+        }
+      }).join('\n');
     }
   </script>
   
