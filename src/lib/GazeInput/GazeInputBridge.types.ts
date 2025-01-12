@@ -27,7 +27,7 @@ interface Timestamp {
 }
 
 export interface InnerCommandPayloadBase extends CorrelationId, InitiatorId, Timestamp {
-  type: InnerCommandType;
+  type: 'open' | 'close';
 }
 
 interface CommandPayloadBase extends CorrelationId, InitiatorId {
@@ -44,7 +44,7 @@ interface CommandPayloadConnect extends CommandPayloadBase {
 }
 
 export interface CommandPayloadGeneric extends CommandPayloadBase {
-  type: Exclude<CommandType, 'connect' | 'status'>;
+  type: Exclude<CommandType, 'connect'>;
 }
 
 export type CommandPayload = CommandPayloadConnect | CommandPayloadGeneric;
@@ -71,7 +71,15 @@ export interface GazeDataPayload extends Timestamp {
   fixationId?: number;
 }
 
-export interface GazeInputStatus {
+/**
+ * Type that defines the structure of the status object that is sent to the worker.
+ * @example
+ * {
+ *   status: 'trackerDisconnected',
+ *   calibration: '2024-01-01T00:00:00.000Z'
+ * }
+ */
+export interface TrackerStatus {
   status:
     | 'trackerDisconnected'
     | 'trackerConnected'
@@ -82,12 +90,19 @@ export interface GazeInputStatus {
    * Time of the last device calibration.
    * Null if unknown, probably not calibrated at all.
    */
-  trackerCalibration: string | null; // nullable ISO date-time
+  calibration: string | null; // nullable ISO date-time
 }
 
-export interface ReceiveResponsePayload extends CorrelationId, InitiatorId, Timestamp, GazeInputStatus {
+export interface ResponseStatus {
+  to: CommandType;
+  status: 'resolved' | 'rejected' | 'pending';
+  message: string;
+}
+
+export interface ReceiveResponsePayload extends CorrelationId, InitiatorId, Timestamp {
   type: 'response';
-  responseTo: CommandType;
+  tracker: TrackerStatus;
+  response: ResponseStatus;
 }
 
 export interface ReceiveMessagePayload extends CorrelationId, InitiatorId, Timestamp {

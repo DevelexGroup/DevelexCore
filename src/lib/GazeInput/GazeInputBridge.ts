@@ -46,45 +46,27 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
 
         // Set up permanent listener for messages from the worker.
         this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload | InnerCommandPayloadBase>) => {
-            const { type, timestamp } = event.data;
+            const { type } = event.data;
             
             switch (type) {
                 case 'gaze':
-                    this.emit('inputData', event.data);
+                    this.processMessageGaze(event.data);
                     break;
                 case 'response':
-                    // resolve the promise with the status
-                    this.setStatusValues(event.data as ReceiveResponsePayload);
-                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
+                    this.processMessageResponse(event.data);
                     break;
                 case 'viewportCalibration':
                     this.setWindowCalibrationValues(event.data);
                     this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     break;
                 case 'error': {
-                    // reject all promises with the error
-                    const data = event.data as ReceiveErrorPayload;
-                    this.pendingPromises.forEach((promise) => promise.reject(data.content));
-                    this.emit('inputError', {
-                        type: 'inputError',
-                        timestamp,
-                        content: event.data.content,
-                    });
+                    this.processMessageError(event.data);
                     break;
                 }
                 case 'message':
-                    // resolve the promise with the message
-                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
-                    this.emit('inputMessage', {
-                        type: 'inputMessage',
-                        timestamp,
-                        content: event.data.content,
-                        fromInitiator: event.data.initiatorId
-                    });
+                    this.processMessageMessage(event.data);
                     break;
                 case 'open':
-                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
-                    break;
                 case 'close':
                     this.pendingPromises.get(event.data.correlationId)?.resolve(this);
                     break;
@@ -92,8 +74,69 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         };
     }
 
+    /**
+     * Create a correlation ID for the message.
+     * @returns The correlation ID.
+     */
     protected createCorrelationId(): number {
         return this.correlationId++;
+    }
+
+    /**
+     * Process a gaze data message from the worker.
+     * @param data - The gaze data.
+     */
+    protected processMessageGaze(data: GazeDataPoint): void {
+        this.emit('inputData', data);
+    }
+
+    /**
+     * Process a response message from the worker.
+     * @param data - The response message.
+     */
+    protected processMessageResponse(data: ReceiveResponsePayload): void {
+        this.setStatusValues(data);
+        if (data.response.status === 'resolved') {
+            this.pendingPromises.get(data.correlationId)?.resolve(this);
+        } else if (data.response.status === 'rejected') {
+            this.pendingPromises.get(data.correlationId)?.reject(data.response.message);
+        }
+    }
+
+    /**
+     * Process an error message from the worker. Reject all pending promises with the error.
+     * @param data - The error message.
+     */
+    protected processMessageError(data: ReceiveErrorPayload): void {
+        this.pendingPromises.forEach((promise) => promise.reject(data.content));
+        this.emit('inputError', {
+            type: 'inputError',
+            timestamp: data.timestamp,
+            content: data.content,
+        });
+    }
+
+    /**
+     * Process a message message from the worker. Resolve the promise with the message.
+     * @param data - The message.
+     */
+    protected processMessageMessage(data: ReceiveMessagePayload): void {
+        this.pendingPromises.get(data.correlationId)?.resolve(this);
+        this.emit('inputMessage', {
+            type: 'inputMessage',
+            timestamp: data.timestamp,
+            content: data.content,
+            fromInitiator: data.initiatorId,
+        });
+    }
+
+    /**
+     * Process a viewport calibration message from the worker. Set the window calibration values and resolve the promise.
+     * @param data - The viewport calibration message.
+     */
+    protected processMessageViewportCalibration(data: ViewportCalibrationPayload): void {
+        this.setWindowCalibrationValues(data);
+        this.pendingPromises.get(data.correlationId)?.resolve(this);
     }
 
     subscribe(): Promise<this> {
