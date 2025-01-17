@@ -21,11 +21,15 @@
   {/each}
   <style>
     .box {
+      position: relative;
       margin-bottom: 10px;
       padding: 20px;
       border: 1px solid #dee2e6;
+      background-color: #fff;
       border-radius: 0 0 .5rem .5rem;
       border-top: 0;
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+      z-index: 2;
     }
     ul {
       display: flex;
@@ -47,6 +51,7 @@
       display: block;
       padding: 0.5rem 1rem;
       cursor: pointer;
+      position: relative;
     }
   
     span:hover {
@@ -57,5 +62,7 @@
       color: #495057;
       background-color: #fff;
       border-color: #dee2e6 #dee2e6 #fff;
+      box-shadow: 0 -3px 7px -3px rgba(0, 0, 0, 0.1);
+      z-index: 3;
     }
   </style>

@@ -11,7 +11,7 @@
     button {
         border-radius: 5px;
         padding: 5px;
-        background-color: #007bff;
+        background-color: #0071bc;
         color: white;
         border: none;
         cursor: pointer;

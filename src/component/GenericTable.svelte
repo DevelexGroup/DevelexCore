@@ -108,12 +108,12 @@
     }
 
     th {
-        background-color: #f2f2f2;
+        background-color: #f8f9fa;
         text-align: left;
         vertical-align: top;
     }
 
     tr:hover {
-        background-color: #f5f5f5;
+        background-color: #f8f9fa;
     }
 </style>
