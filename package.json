@@ -52,5 +52,8 @@
 			"import": "./dist/develex-core.js",
 			"require": "./dist/develex-core.umd.cjs"
 		}
+	},
+	"dependencies": {
+		"vite-plugin-pwa": "^0.21.1"
 	}
 }
