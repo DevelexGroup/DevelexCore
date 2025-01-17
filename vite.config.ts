@@ -41,8 +41,8 @@ export default defineConfig(({ command, mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         manifest: {
-          name: 'Develex Core',
-          short_name: 'Develex',
+          name: 'Develex Test Controls',
+          short_name: 'Develex Test',
           description: 'Eye tracking integration and gaze-based interactions for web applications',
           theme_color: '#007bff',
           background_color: '#ffffff',
