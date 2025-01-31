@@ -20,7 +20,7 @@ export const createGazeInput = <T extends GazeInputConfig>(
 			return new GazeInputDummy(config) as unknown as GazeInput<T>;
 		case 'gazepoint':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
-		case 'smi':
+		case 'asee':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
 		case 'eyelogic':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;

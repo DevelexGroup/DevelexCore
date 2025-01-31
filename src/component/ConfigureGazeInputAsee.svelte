@@ -1,11 +1,11 @@
 <script lang="ts">
-    import type { GazeInputConfigSMI } from "$lib";
+    import type { GazeInputConfigAsee } from "$lib/index";
     import InputSelect from "./InputSelect.svelte";
     import InputText from "./InputText.svelte";
     import InputSubmit from "./InputSubmit.svelte";
     import { setGazeInput } from "../store/gazeInputStore";
-    const tracker = "smi";
-    const config: GazeInputConfigSMI = {
+    const tracker = "asee";
+    const config: GazeInputConfigAsee = {
         tracker,
         fixationDetection: "none",
         uri: "ws://localhost:13892",

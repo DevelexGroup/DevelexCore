@@ -2,7 +2,7 @@
     import ConfigureInputDummy from "./ConfigureGazeInputDummy.svelte";
 	import ConfigureGazeInputEyelogic from "./ConfigureGazeInputEyelogic.svelte";
     import ConfigureInputGazePoint from "./ConfigureGazeInputGazePoint.svelte";
-	import ConfigureGazeInputSmi from "./ConfigureGazeInputSMI.svelte";
+	import ConfigureGazeInputAsee from "./ConfigureGazeInputAsee.svelte";
     import Tabs from "./Tabs.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -20,9 +20,9 @@
             component: ConfigureGazeInputEyelogic
         },
         {
-            label: "SMI",
+            label: "Asee",
             value: 4,
-            component: ConfigureGazeInputSmi
+            component: ConfigureGazeInputAsee
         }
     ];
 </script>

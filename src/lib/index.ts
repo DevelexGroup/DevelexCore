@@ -43,6 +43,7 @@ export type {
     GazeInputConfig,
     GazeInputConfigGazePoint,
     GazeInputConfigEyelogic,
+    GazeInputConfigAsee,
     GazeInputConfigDummy,
     GazeInputConfigWithFixations 
 } from '$lib/GazeInput/GazeInputConfig.js';

@@ -6,7 +6,7 @@ export type GazeInputConfig = GazeInputConfigBridge | GazeInputConfigDummy;
  */
 export type GazeInputConfigWithFixations = GazeInputConfig & { fixationDetection: 'device' | 'idt' };
 
-export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigEyelogic;
+export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigEyelogic | GazeInputConfigAsee;
 
 /**
  * Configuration for the input of GazePoint remote eye tracker.
@@ -28,6 +28,18 @@ export type GazeInputConfigGazePoint = {
  */ 
 export type GazeInputConfigEyelogic = {
     tracker: 'eyelogic';
+    uri: string;
+    fixationDetection: 'none' | 'idt';
+};
+
+/**
+ * Configuration for the input of asee remote eye tracker.
+ * @property type - The type of the input, 'asee'.
+ * @property uri - The URI of the DeveLex Bridge WebSocket server.
+ * @property fixationDetection - The fixation detection method, either 'none' or 'idt'.
+ */ 
+export type GazeInputConfigAsee = {
+    tracker: 'asee';
     uri: string;
     fixationDetection: 'none' | 'idt';
 };
