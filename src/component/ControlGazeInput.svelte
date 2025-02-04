@@ -27,7 +27,7 @@
             return store;
         });
         if (!$gazeManagerStore) return;
-        if (data.trackerStatus?.tracker.status === "trackerEmitting" && isGazeIndicatorVisible) {
+        if (data.trackerStatus?.tracker?.status === "trackerEmitting" && isGazeIndicatorVisible) {
             initIndicator();
         } else {
             destroyIndicator();

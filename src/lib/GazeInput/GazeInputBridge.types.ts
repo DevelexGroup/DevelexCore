@@ -35,7 +35,7 @@ interface CommandPayloadBase extends CorrelationId, InitiatorId {
 }
 
 interface TrackerConfig {
-  trackerType: 'gazepoint' | 'eyelogic';
+  trackerType: 'gazepoint' | 'eyelogic' | 'asee';
 }
 
 interface CommandPayloadConnect extends CommandPayloadBase {

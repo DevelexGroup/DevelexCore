@@ -96,10 +96,12 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      */
     protected processMessageResponse(data: ReceiveResponsePayload): void {
         this.setStatusValues(data);
-        if (data.response.status === 'resolved') {
+        if (data.response && data.response.status === 'resolved') {
             this.pendingPromises.get(data.correlationId)?.resolve(this);
-        } else if (data.response.status === 'rejected') {
+        } else if (data.response && data.response.status === 'rejected') {
             this.pendingPromises.get(data.correlationId)?.reject(data.response.message);
+        } else {
+            this.pendingPromises.get(data.correlationId)?.reject(new Error('Received an invalid response payload: ' + JSON.stringify(data)));
         }
     }
 
