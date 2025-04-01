@@ -9,174 +9,71 @@ export type EventReceiver<T> = (params: T) => void;
  * @template T - The event map type.
  */
 export abstract class Emitter<T extends EventMap> {
+    /**
+     * Object storing event handlers for each event.
+     */
     handlers: {
-        [K in keyof T]?: {
+        [K in keyof T]?: Array<{
             fn: EventReceiver<T[K]>,
             priority: number
-        }[];
+        }>;
     } = {};
 
-    private _listenerCount: number = 0;
-    private _pendingEmitUpdate: boolean = false;
-
     /**
-     * Checks if the emitter has any registered listeners.
-     * @returns True if there are listeners, false otherwise.
+     * Checks if the gaze interaction has any listeners.
+     * It can be used for optimization purposes.
+     * @returns True if the gaze interaction has listeners, false otherwise.
      */
     hasListeners(): boolean {
-        return this._listenerCount > 0;
+        return Object.keys(this.handlers).length > 0;
     }
 
     /**
      * Registers an event handler for the specified event.
      * @param eventName - The name of the event.
      * @param fn - The event handler function.
-     * @param priority - The priority of the handler (default: 0). Higher priority handlers are executed first.
+     * @param priority - The priority category (higher number means higher priority).
      */
     on<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>, priority: number = 0): void {
-        let handlers = this.handlers[eventName];
-
-        if (!handlers) {
-            handlers = [];
-            this.handlers[eventName] = handlers;
-        }
-
-        // Insert in sorted order to avoid sorting overhead later
-        let inserted = false;
-        for (let i = 0; i < handlers.length; i++) {
-            if (handlers[i].priority < priority) {
-                handlers.splice(i, 0, { fn, priority });
-                inserted = true;
-                break;
-            }
-        }
-
-        if (!inserted) {
-            handlers.push({ fn, priority });
-        }
-
-        this._listenerCount++;
-        this._scheduleEmitMethodUpdate();
+        const handler = { fn, priority };
+        this.handlers[eventName] = (this.handlers[eventName] || []);
+        this.handlers[eventName].push(handler);
+        // Sort handlers by priority
+        this.handlers[eventName].sort((a, b) => b.priority - a.priority);
     }
 
     /**
      * Unregisters an event handler for the specified event.
      * @param eventName - The name of the event.
-     * @param fn - The event handler function to remove.
+     * @param fn - The event handler function.
      */
     off<K extends EventKey<T>>(eventName: K, fn: EventReceiver<T[K]>): void {
-        const handlers = this.handlers[eventName];
-        if (!handlers) return;
-
-        for (let i = 0; i < handlers.length; i++) {
-            if (handlers[i].fn === fn) {
-                // Swap and pop for fast removal without shifting
-                const lastIndex = handlers.length - 1;
-                if (i !== lastIndex) {
-                    handlers[i] = handlers[lastIndex]; // Swap with last
-                }
-                handlers.pop(); // Remove last
-                this._listenerCount--;
-
-                // If no more handlers, remove reference
-                if (handlers.length === 0) {
-                    delete this.handlers[eventName];
-                }
-
-                this._scheduleEmitMethodUpdate();
-                return;
-            }
-        }
-    }
-
-    /**
-     * Schedules an update to the emit method to ensure it's always up to date.
-     * This is necessary because the emit method is dynamically generated based on the handlers.
-     */
-    private _scheduleEmitMethodUpdate(): void {
-        if (!this._pendingEmitUpdate) {
-            this._pendingEmitUpdate = true;
-            queueMicrotask(() => {
-                this._pendingEmitUpdate = false;
-                this._updateEmitMethod();
-            });
-        }
-    }
-
-    /**
-     * Updates the emit method to ensure it's always up to date.
-     * This is necessary because the emit method is dynamically generated based on the handlers.
-     */
-    private _updateEmitMethod(): void {
-        if (this._listenerCount === 0) {
-            this.emit = this._emitNoop;
-            return;
-        }
-
-        try {
-            let emitFnBody = '';
-            for (const eventName in this.handlers) {
-                const handlers = this.handlers[eventName];
-                if (!handlers || handlers.length === 0) continue;
-
-                emitFnBody += `if (eventName === "${eventName}") {`;
-
-                for (let i = 0; i < handlers.length; i++) {
-                    emitFnBody += `this.handlers["${eventName}"][${i}].fn(params);`;
-                }
-
-                emitFnBody += ` return; }`;
-            }
-
-            type EventEmitFunction = <K extends EventKey<T>>(eventName: K, params: T[K]) => void;
-            const specializedEmitFn = new Function('eventName', 'params', emitFnBody) as EventEmitFunction;
-            this.emit = specializedEmitFn.bind(this);
-        } catch {
-            this.emit = this._emitStandard;
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private _emitNoop<K extends EventKey<T>>(_eventName: K, _params: T[K]): void {}
-
-    /**
-     * Standard emit implementation.
-     * @param eventName - The name of the event.
-     * @param params - The parameters to pass to the event handlers.
-     */
-    private _emitStandard<K extends EventKey<T>>(eventName: K, params: T[K]): void {
-        const handlers = this.handlers[eventName];
-        if (!handlers?.length) return;
-
-        for (let i = 0; i < handlers.length; i++) {
-            handlers[i].fn(params);
+        if (this.handlers[eventName]) {
+            this.handlers[eventName] = this.handlers[eventName].filter(handler => handler.fn !== fn);
         }
     }
 
     /**
      * Emits an event with the specified name and parameters.
-     * 
-     * This is the default implementation of the emit method.
-     * It is used when the emit method is not dynamically generated.
-     * However, it is automatically regenerated when the number of listeners changes.
-     * 
-     * @param eventName - The name of the event.
+     * Event handlers are executed in descending order of priority.
+     * @param eventName - The name of the event to emit.
      * @param params - The parameters to pass to the event handlers.
      */
     emit<K extends EventKey<T>>(eventName: K, params: T[K]): void {
-        this._emitStandard(eventName, params);
+        const handlers = this.handlers[eventName];
+        if (!handlers?.length) return;  // Early return if no handlers
+        
+        // Cache length and use regular for loop for better performance
+        const len = handlers.length;
+        for (let i = 0; i < len; i++) {
+            handlers[i].fn(params);
+        }
     }
 
-    /**
-     * Clears all event handlers from the emitter.
-     */
     clear(): void {
         this.handlers = {};
-        this._listenerCount = 0;
-        this._updateEmitMethod();
     }
 }
-
 
 export abstract class EmitterWithFacade<T extends EventMap> extends Emitter<T> {
     internalEmitter: Emitter<T> | null = null;
