@@ -100,6 +100,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             this.pendingPromises.get(data.correlationId)?.resolve(this);
         } else if (data.response && data.response.status === 'rejected') {
             this.pendingPromises.get(data.correlationId)?.reject(data.response.message);
+        } else if (data.response && data.response.status === 'processing') {
+            return; // DO NOTHING, the promise is still pending
         } else {
             this.pendingPromises.get(data.correlationId)?.reject(new Error('Received an invalid response payload: ' + JSON.stringify(data)));
         }

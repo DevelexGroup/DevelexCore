@@ -95,7 +95,7 @@ export interface TrackerStatus {
 
 export interface ResponseStatus {
   to: CommandType;
-  status: 'resolved' | 'rejected' | 'pending';
+  status: 'resolved' | 'rejected' | 'processing';
   message: string;
 }
 
