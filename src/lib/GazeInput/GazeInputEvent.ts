@@ -1,4 +1,4 @@
-import type {GazeDataPoint} from "../GazeData/GazeData.js";
+import type {FixationDataPoint, GazeDataPoint} from "../GazeData/GazeData.js";
 import type { GazeWindowCalibratorConfig } from "$lib/GazeWindowCalibrator/GazeWindowCalibratorConfig.js";
 import type { ReceiveResponsePayload } from "./GazeInputBridge.types.js";
 
@@ -23,6 +23,8 @@ export interface GazeInputEventError extends GazeInputEvent {
 
 export type GazeInputEvents = {
     "inputData": GazeDataPoint;
+    "inputFixationStart": FixationDataPoint;
+    "inputFixationEnd": FixationDataPoint;
     "inputState": GazeInputEventState;
     "inputMessage": GazeInputEventMessage;
     "inputError": GazeInputEventError;

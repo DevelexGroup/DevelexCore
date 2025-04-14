@@ -1,23 +1,22 @@
-import type { GazeDataPointWithFixation } from "$lib/GazeData/GazeData";
+import type { FixationDataPoint } from "$lib/GazeData/GazeData";
 import { calculatePointDistance } from "$lib/utils/geometryUtils";
 import { getDifferenceInMilliseconds, getUnixTimestampFromISO8601 } from "$lib/utils/timeUtils";
 import { GazeInteraction } from "./GazeInteraction";
-import type { GazeInteractionScreenFixationEvent } from "./GazeInteractionScreenFixation.event";
 import type { GazeInteractionScreenSaccadeEvents } from "./GazeInteractionScreenSaccade.event";
 
-export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractionScreenSaccadeEvents, GazeInteractionScreenFixationEvent> {
+export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractionScreenSaccadeEvents, FixationDataPoint> {
     
-    endOfFirstFixation: GazeDataPointWithFixation | null = null;
+    endOfFirstFixation: FixationDataPoint | null = null;
     lastSaccadeData: GazeInteractionScreenSaccadeEvents["saccade"] | null = null;
 
-    evaluate(data: (GazeInteractionScreenFixationEvent)): void {
+    evaluate(data: FixationDataPoint): void {
         // TODO: Implement saccade invalidation on invalid data.
         if (data.type === "fixationEnd") {
-            this.endOfFirstFixation = data.gazeData;
+            this.endOfFirstFixation = data;
             return;
         }
         if (data.type === "fixationStart" && this.endOfFirstFixation !== null) {
-            const lastSaccadeData = this.createSaccadeEvent(this.endOfFirstFixation, data.gazeData)
+            const lastSaccadeData = this.createSaccadeEvent(this.endOfFirstFixation, data)
             this.emit("saccade", lastSaccadeData);
             this.lastSaccadeData = lastSaccadeData;
             this.endOfFirstFixation = null;
@@ -47,7 +46,7 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
         return (angleTwo - angleOne + 180) % 360 - 180;
     }
 
-    createSaccadeEvent(fixationOne: GazeDataPointWithFixation, fixationTwo: GazeDataPointWithFixation): GazeInteractionScreenSaccadeEvents["saccade"] {
+    createSaccadeEvent(fixationOne: FixationDataPoint, fixationTwo: FixationDataPoint): GazeInteractionScreenSaccadeEvents["saccade"] {
         const angleToScreen = this.calculateAngleToScreen(fixationOne.x, fixationOne.y, fixationTwo.x, fixationTwo.y);
         const distance = calculatePointDistance(fixationOne, fixationTwo);
         const duration = getDifferenceInMilliseconds(fixationTwo.timestamp, fixationOne.timestamp);
@@ -62,13 +61,13 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
                 duration,
                 distance,
                 angleToScreen,
-                gazeData: fixationTwo,
-                originGazeData: fixationOne
+                targetFixation: fixationTwo,
+                originFixation: fixationOne
             };
         }
 
         const angleToPrevious = this.calculateAngleToPrevious(this.lastSaccadeData.angleToScreen, angleToScreen);
-        const angleToPreviousInvalidityTime = (getUnixTimestampFromISO8601(fixationOne.timestamp) - fixationOne.fixationDuration) - getUnixTimestampFromISO8601(this.lastSaccadeData.timestamp);
+        const angleToPreviousInvalidityTime = (getUnixTimestampFromISO8601(fixationOne.timestamp) - fixationOne.duration) - getUnixTimestampFromISO8601(this.lastSaccadeData.timestamp);
 
         return {
             type,
@@ -79,8 +78,8 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
             angleToScreen,
             angleToPrevious,
             angleToPreviousInvalidityTime,
-            gazeData: fixationTwo,
-            originGazeData: fixationOne
+            targetFixation: fixationTwo,
+            originFixation: fixationOne
         };
     }
 }
