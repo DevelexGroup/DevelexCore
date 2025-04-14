@@ -1,4 +1,4 @@
-import { FixationDataPoint } from "$lib/GazeData/GazeData.js";
+import type { FixationDataPoint } from "$lib/GazeData/GazeData.js";
 import type { GazeInteractionObjecListener, GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings.js";
 import type { GazeInteractionObjectFixationEvent } from "./GazeInteractionObjectFixation.event.js";
 
