@@ -27,10 +27,10 @@ const fixationRepository = {
     }
   },
   csvHeader(): string {
-    return 'sessionId, timestamp, type, duration, aoi, x, y, deviceId, fixationId';
+    return 'sessionId, timestamp, deviceTimestamp, type, duration, aoi, x, y, deviceId, fixationId';
   },
   toCsv(data: Fixation): string {
-    return `${data.sessionId},${data.timestamp},${data.type},${data.duration},${data.aoi},${data.x},${data.y},${data.deviceId},${data.fixationId}`;
+    return `${data.sessionId},${data.timestamp},${data.deviceTimestamp},${data.type},${data.duration},${data.aoi},${data.x},${data.y},${data.deviceId},${data.fixationId}`;
   },
 };
 
