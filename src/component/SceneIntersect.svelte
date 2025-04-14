@@ -38,7 +38,7 @@
         </div>
     </Group>
     <Group heading="Intersect Interaction Log">
-        <GenericTable data={$sceneIntersectStore} headers={["timestamp", "gazeData.xL", "gazeData.xR", "gazeData.yL", "gazeData.yR", "gazeData.fixationDuration", "aoi"]} />
+        <GenericTable data={$sceneIntersectStore} headers={["timestamp", "gazeData.xL", "gazeData.xR", "gazeData.yL", "gazeData.yR", "aoi"]} />
     </Group>
 </div>
 
