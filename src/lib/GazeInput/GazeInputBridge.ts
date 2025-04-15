@@ -1,7 +1,7 @@
 import type { GazeInputConfigBridge } from "./GazeInputConfig";
 import { createGazeWindowCalibrator, type GazeWindowCalibratorConfigMouseEventFields, type GazeWindowCalibratorConfigWindowFields } from "../GazeWindowCalibrator/GazeWindowCalibratorConfig";
 import { GazeInput } from "./GazeInput";
-import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+import type { FixationDataPoint, GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
 import BridgeWebWorker from '$lib/GazeInput/GazeInputBridge.worker.ts?worker&inline';
@@ -45,12 +45,18 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
 
         // Set up permanent listener for messages from the worker.
-        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload | InnerCommandPayloadBase>) => {
+        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | FixationDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload | InnerCommandPayloadBase>) => {
             const { type } = event.data;
             
             switch (type) {
                 case 'gaze':
-                    this.processMessageGaze(event.data);
+                    this.emit('inputData', event.data);
+                    break;
+                case 'fixationEnd':
+                    this.emit('inputFixationEnd', event.data);
+                    break;
+                case 'fixationStart':
+                    this.emit('inputFixationStart', event.data);
                     break;
                 case 'response':
                     this.processMessageResponse(event.data);
@@ -80,14 +86,6 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      */
     protected createCorrelationId(): number {
         return this.correlationId++;
-    }
-
-    /**
-     * Process a gaze data message from the worker.
-     * @param data - The gaze data.
-     */
-    protected processMessageGaze(data: GazeDataPoint): void {
-        this.emit('inputData', data);
     }
 
     /**
