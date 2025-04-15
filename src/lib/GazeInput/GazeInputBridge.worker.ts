@@ -144,6 +144,7 @@ const createBridgeGazeSampleProcessor = (
             pupilDiameterL: data.pupilDiameterL,
             pupilDiameterR: data.pupilDiameterR
         };
+        sendToTheMainThread(windowCalibratedData);
         fixationDetector.processGazePoint(windowCalibratedData);
     }
 }
