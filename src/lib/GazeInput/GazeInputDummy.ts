@@ -1,4 +1,4 @@
-import type { GazeDataPoint } from '$lib/GazeData/GazeData';
+import type { FixationDataPoint, GazeDataPoint } from '$lib/GazeData/GazeData';
 import { createGazeFixationDetector } from '$lib/GazeFixationDetector';
 import type { GazeFixationDetector } from '$lib/GazeFixationDetector/GazeFixationDetector';
 import { GazeInput } from '$lib/GazeInput/GazeInput';
@@ -11,6 +11,7 @@ import { createISO8601Timestamp } from '$lib/utils/timeUtils';
  * Dummy input for testing purposes which does not require any hardware.
  * Mouse position is used as gaze input in the given frequency.
  * It has its precision and frequency configurable.
+ * It also emits fixation start and end events.
  */
 export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	private readonly boundUpdateMousePosition: (event: MouseEvent) => void;
@@ -20,12 +21,20 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 	private windowCalibrator: GazeWindowCalibrator | null = null;
 	private fixationDetector: GazeFixationDetector | null = null;
 	private correlationId: number = 0;
+	private sampleId: number = 0;
 
 	constructor(config: GazeInputConfigDummy) {
 		super(config);
 		this.precisionError = config.precisionMinimalError;
 		this.boundUpdateMousePosition = this.updateMousePosition.bind(this);
 		this.fixationDetector = createGazeFixationDetector(config.fixationDetection);
+		this.fixationDetector.on('fixationStart', (data: FixationDataPoint) => {
+			console.log('fixationStart', data);
+			this.emit('inputFixationStart', data);
+		});
+		this.fixationDetector.on('fixationEnd', (data: FixationDataPoint) => {
+			this.emit('inputFixationEnd', data);
+		});
 	}
 
 	protected createCorrelationId(): number {
@@ -80,8 +89,9 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		this.intervalId = window.setInterval(() => {
 			const { x, y } = this.calculateCoordinates();
 			const gazePoint = this.createGazePoint(x, y);
-			const processedPoint = this.fixationDetector!.processGazePoint(gazePoint);
-			this.emit('inputData', processedPoint);
+			this.fixationDetector!.processGazePoint(gazePoint);
+			this.emit('inputData', gazePoint);
+			this.sampleId++;
 		}, interval);
 
 		this.setStatusValues({
@@ -306,6 +316,8 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 			yRScreenRelative: yScreenRelative,
 			sessionId: this.inputId,
 			timestamp: createISO8601Timestamp(),
+			deviceId: this.sampleId.toString(),
+			deviceTimestamp: createISO8601Timestamp(),
 			validityL: true,
 			validityR: true,
 			parseValidity: true,

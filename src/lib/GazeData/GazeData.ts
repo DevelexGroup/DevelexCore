@@ -1,38 +1,20 @@
-export interface GazeDataPoint {
-    type: 'gaze';
+import { FixationDataPayload, GazeDataPayload } from "$lib/GazeInput/GazeInputBridge.types";
 
-    x: number;
-    xL: number;
-    xLScreenRelative: number;
-    xR: number;
-    xRScreenRelative: number;
-
-    y: number;
-    yL: number;
-    yLScreenRelative: number;
-    yR: number;
-    yRScreenRelative: number;
-
-    timestamp: string; // ISO date-time
+export interface GazeDataPoint extends GazeDataPayload {
     sessionId: string;
-
-    validityL: boolean;
-    validityR: boolean;
-
     parseValidity: boolean;
-
-    pupilDiameterL: number;
-    pupilDiameterR: number;
-
-    fixationDuration?: number;
-    fixationId?: number;
+    x: number;
+    y: number;
+    xLScreenRelative: number;
+    yLScreenRelative: number;
+    xRScreenRelative: number;
+    yRScreenRelative: number;
 }
 
-export interface GazeDataPointWithFixation extends GazeDataPoint {
-    fixationDuration: number;
+export interface FixationDataPoint extends FixationDataPayload {
+    sessionId: string;
+    parseValidity: boolean;
+    xScreenRelative: number;
+    yScreenRelative: number;
     fixationId: number;
-}
-
-export const isGazeDataPointWithFixation = (point: GazeDataPoint): point is GazeDataPointWithFixation => {
-    return (point as GazeDataPointWithFixation)?.fixationDuration !== undefined;
 }

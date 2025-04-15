@@ -1,4 +1,4 @@
-import type { GazeInteractionScreenFixationEvent } from "$lib/GazeInteraction/GazeInteractionScreenFixation.event.js";
+import type { FixationDataPoint } from "$lib/GazeData/GazeData.js";
 import type { GazeInteractionObjecListener, GazeInteractionObjectListenerPayload } from "./GazeInteractionObject.settings.js";
 import type { GazeInteractionObjectFixationEvent } from "./GazeInteractionObjectFixation.event.js";
 
@@ -15,7 +15,7 @@ export interface GazeInteractionObjectFixationListener extends GazeInteractionOb
 }
 
 export interface GazeInteractionObjectFixationPayload extends GazeInteractionObjectListenerPayload {
-	data: GazeInteractionScreenFixationEvent;
+	data: FixationDataPoint;
 	listener: GazeInteractionObjectFixationListener;
 }
 

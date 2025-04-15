@@ -1,4 +1,4 @@
-import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveResponsePayload, GazeDataPayload, ReceiveFromWebSocketMessages } from './GazeInputBridge.types';
+import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveResponsePayload, GazeDataPayload, ReceiveFromWebSocketMessages, FixationDataPayload } from './GazeInputBridge.types';
 import { Emitter, type EventMap } from '$lib/Emitter/Emitter';
 import { createISO8601Timestamp } from '$lib/utils/timeUtils';
 
@@ -7,6 +7,8 @@ interface WebSocketEvents extends EventMap {
     error: ReceiveErrorPayload;
     response: ReceiveResponsePayload;
     gaze: GazeDataPayload;
+    fixationStart: FixationDataPayload;
+    fixationEnd: FixationDataPayload;
 }
 
 export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {

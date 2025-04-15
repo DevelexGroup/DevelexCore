@@ -1,7 +1,8 @@
-import type { GazeDataPoint } from "../GazeData/GazeData";
+import type { FixationDataPoint } from "../GazeData/GazeData";
 import { GazeFixationDetector } from "./GazeFixationDetector";
 
 export class GazeFixationDetectorDevice extends GazeFixationDetector {
+    fixationId: number = 0;
     /**
      * Assumption that the points from DeveLex Bridge has already fixation information.
      * Therefore, this method simply returns the gaze point without any modifications.
@@ -10,11 +11,20 @@ export class GazeFixationDetectorDevice extends GazeFixationDetector {
      * fixation detection method is taking effect in Python DeveLex Bridge code, where
      * it is decided whether to send fixation information or not.
      * 
-     * Warnig! Some devices implemented in the DeveLex Bridge may not have fixation information
+     * Warning! Some devices implemented in the DeveLex Bridge may not have fixation information
      * and disallow the "device" fixation detection method and only "none" or other methods are allowed.
      */
-    processGazePoint(gazePoint: GazeDataPoint): GazeDataPoint {
-        return gazePoint;
+    processGazePoint(): void {
+        // nothing to do
+    }
+
+    processFixationPoint(fixationPoint: Omit<FixationDataPoint, 'fixationId'>): void {
+        if (fixationPoint.type === "fixationStart") {
+            this.emit("fixationStart", { ...fixationPoint, fixationId: this.fixationId });
+        } else if (fixationPoint.type === "fixationEnd") {
+            this.emit("fixationEnd", { ...fixationPoint, fixationId: this.fixationId });
+            this.fixationId++;
+        }
     }
 
     reset(): void {

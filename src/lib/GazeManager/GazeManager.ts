@@ -1,5 +1,5 @@
 import { EmitterGroup } from "$lib/Emitter/Emitter";
-import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+import type { FixationDataPoint, GazeDataPoint } from "$lib/GazeData/GazeData";
 import type { GazeInput } from "$lib/GazeInput/GazeInput";
 import type { ReceiveResponsePayload } from "$lib/GazeInput/GazeInputBridge.types";
 import type { GazeInputConfig } from "$lib/GazeInput/GazeInputConfig";
@@ -15,8 +15,6 @@ import { GazeInteractionObjectSaccade } from "$lib/GazeInteraction/GazeInteracti
 import type { GazeInteractionObjectSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionObjectSaccade.event";
 import { GazeInteractionObjectValidation } from "$lib/GazeInteraction/GazeInteractionObjectValidation";
 import type { GazeInteractionObjectValidationEvents } from "$lib/GazeInteraction/GazeInteractionObjectValidation.event";
-import { GazeInteractionScreenFixation } from "$lib/GazeInteraction/GazeInteractionScreenFixation";
-import type { GazeInteractionScreenFixationEvent, GazeInteractionScreenFixationEvents } from "$lib/GazeInteraction/GazeInteractionScreenFixation.event";
 import { GazeInteractionScreenSaccade } from "$lib/GazeInteraction/GazeInteractionScreenSaccade";
 
 import type { GazeInteractionScreenSaccadeEvent, GazeInteractionScreenSaccadeEvents } from "$lib/GazeInteraction/GazeInteractionScreenSaccade.event";
@@ -48,7 +46,6 @@ import type { GazeWindowCalibratorConfig, GazeWindowCalibratorConfigMouseEventFi
  * });
  */
 export class GazeManager extends EmitterGroup<
-    GazeInteractionScreenFixationEvents &
     GazeInteractionScreenSaccadeEvents &
     GazeInteractionObjectSaccadeEvents &
     GazeInteractionObjectFixationEvents &
@@ -58,7 +55,6 @@ export class GazeManager extends EmitterGroup<
     GazeInputEvents
 > {
     _input: GazeInputFacade;
-    fixation: GazeInteractionScreenFixation;
     fixationObject: GazeInteractionObjectFixation;
     saccade: GazeInteractionScreenSaccade;
     saccadeObject: GazeInteractionObjectSaccade;
@@ -78,12 +74,11 @@ export class GazeManager extends EmitterGroup<
     }
 
     private boundLinkData: (data: GazeDataPoint) => void;
-    private boundLinkFixation: (data: GazeInteractionScreenFixationEvent) => void;
+    private boundLinkFixation: (data: FixationDataPoint) => void;
     private boundLinkSaccade: (data: GazeInteractionScreenSaccadeEvent) => void;
 
     constructor() {
         const dwell = new GazeInteractionObjectDwell();
-        const fixation = new GazeInteractionScreenFixation();
         const fixationObject = new GazeInteractionObjectFixation();
         const saccade = new GazeInteractionScreenSaccade();
         const saccadeObject = new GazeInteractionObjectSaccade();
@@ -100,10 +95,6 @@ export class GazeManager extends EmitterGroup<
             dwellProgress: dwell,
             dwellFinish: dwell,
             dwellCancel: dwell,
-            fixation: fixation,
-            fixationStart: fixation,
-            fixationEnd: fixation,
-            fixationProgress: fixation,
             fixationObjectEnd: fixationObject,
             fixationObjectStart: fixationObject,
             fixationObjectProgress: fixationObject,
@@ -118,6 +109,8 @@ export class GazeManager extends EmitterGroup<
             windowCalibrated: input,
             windowCalibrationContested: input,
             calibrated: input,
+            inputFixationStart: input,
+            inputFixationEnd: input,
         };
 
         /**
@@ -128,7 +121,6 @@ export class GazeManager extends EmitterGroup<
         /**
          * Store the input and interaction objects for later use.
          */
-        this.fixation = fixation;
         this.fixationObject = fixationObject;
         this.saccade = saccade;
         this.saccadeObject = saccadeObject;
@@ -157,13 +149,12 @@ export class GazeManager extends EmitterGroup<
     }
 
     private linkData(data: GazeDataPoint): void {
-        this.fixation.evaluate(data);
         this.dwell.evaluate(data);
         this.intersect.evaluate(data);
         this.validation.evaluate(data);
     }
 
-    private linkFixation(data: GazeInteractionScreenFixationEvent): void {
+    private linkFixation(data: FixationDataPoint): void {
         this.fixationObject.evaluate(data);
         this.saccade.evaluate(data);
     }
@@ -174,8 +165,14 @@ export class GazeManager extends EmitterGroup<
 
     private link() {
         this._input.on('inputData', this.boundLinkData);
-        this.fixation.on('fixationStart', this.boundLinkFixation);
-        this.fixation.on('fixationEnd', this.boundLinkFixation);
+        this._input.on('inputFixationStart', this.boundLinkFixation);
+        this._input.on('inputFixationEnd', this.boundLinkFixation);
+        this._input.on('inputFixationStart', (data: FixationDataPoint) => {
+            console.log('inputFixationStart', data);
+        });
+        this._input.on('inputFixationEnd', (data: FixationDataPoint) => {
+            console.log('inputFixationEnd', data);
+        });
         this.saccade.on('saccade', this.boundLinkSaccade);
     }
 
