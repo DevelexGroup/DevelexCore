@@ -65,7 +65,8 @@ export const sceneObjectFixationStore = writable<Fixation[]>([]);
 
 export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixationEvent) => {
     // Extract the relevant information from the event
-    const { type, sessionId, timestamp, duration, gazeData, target, fixationId } = unprocessedEvent;
+    // leave out target and settings, keep everything else
+    const { type, sessionId, parseValidity, timestamp, deviceTimestamp, duration, x, y, xScreenRelative, yScreenRelative, deviceId, fixationId, target } = unprocessedEvent;
     // convert target, which is array of Elements, id to string delimited by ;
     // check if Array.isArray(target) is true
     const aoi = Array.isArray(target) ? target.map((t) => t.id.toString()).join(';') : '';
@@ -74,10 +75,16 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixation
         type,
         sessionId,
         timestamp,
+        deviceTimestamp,
         aoi,
         duration,
-        gazeData,
-        fixationId
+        x,
+        y,
+        xScreenRelative,
+        yScreenRelative,
+        deviceId,
+        fixationId,
+        parseValidity
     };
 
     void fixationRepository.create(event);
@@ -124,7 +131,7 @@ export const sceneObjectSaccadeStore = writable<Saccade[]>([]);
 
 export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEvent) => {
     // Extract the relevant information from the event
-    const { type, sessionId, timestamp, duration, distance, gazeData, target, originGazeData, angleToScreen, angleToPrevious, angleToPreviousInvalidityTime } = unprocessedEvent;
+    const { type, sessionId, angleToScreen, timestamp, duration, distance, target, originFixation, targetFixation } = unprocessedEvent;
     // convert target, which is array of Elements, id to string delimited by ;
     // check if Array.isArray(target) is true
     const aoi = Array.isArray(target) ? target.map((t) => t.id.toString()).join(';') : '';
@@ -136,11 +143,9 @@ export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEv
         aoi,
         duration,
         distance,
-        gazeData,
-        originGazeData,
         angleToScreen,
-        angleToPrevious,
-        angleToPreviousInvalidityTime
+        originFixation,
+        targetFixation
     };
 
     void saccadeRepository.create(event);

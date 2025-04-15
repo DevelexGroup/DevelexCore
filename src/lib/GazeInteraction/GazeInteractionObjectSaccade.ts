@@ -40,10 +40,10 @@ export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInte
 	 * @param listener The listener to evaluate for saccade events.
 	 */
 	evaluateListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSaccadePayload['listener']) {
-		const isTo = this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize);
-		const isFrom = this.isInside(listener.element, data.originGazeData.x, data.originGazeData.y, listener.settings.bufferSize);
+		const isTo = this.isInside(listener.element, data.targetFixation.x, data.targetFixation.y, listener.settings.bufferSize);
+		const isFrom = this.isInside(listener.element, data.originFixation.x, data.originFixation.y, listener.settings.bufferSize);
 		if (!isTo && !isFrom) return;
-		this.evaluateActiveListener(data, listener, isTo);
+		this.evaluateActiveListener(data, listener, isTo, isFrom);
 	}
 
 	evaluate(data: GazeInteractionScreenSaccadeEvent): void {
@@ -65,11 +65,12 @@ export class GazeInteractionObjectSaccade extends GazeInteractionObject<GazeInte
 		
 	}
 
-	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSaccadePayload['listener'], isTo: boolean) {
+	evaluateActiveListener(data: GazeInteractionScreenSaccadeEvent, listener: GazeInteractionObjectSaccadePayload['listener'], isTo: boolean, isFrom: boolean) {
 		if (isTo) {
 			this.triggeredTargetsTo.push(listener.element);
 			this.triggeredSettingsTo.push(listener.settings);
-		} else {
+		} 
+		if (isFrom) {
 			this.triggeredTargetsFrom.push(listener.element);
 			this.triggeredSettingsFrom.push(listener.settings);
 		}
