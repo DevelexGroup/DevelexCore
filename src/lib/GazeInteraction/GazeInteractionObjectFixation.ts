@@ -1,13 +1,13 @@
 import type { GazeInteractionObjectFixationPayload } from './GazeInteractionObjectFixation.settings';
 import { GazeInteractionObject } from './GazeInteractionObject';
 import type { GazeInteractionObjectFixationEvent, GazeInteractionObjectFixationEvents} from './GazeInteractionObjectFixation.event';
-import type { GazeInteractionScreenFixationEvent } from './GazeInteractionScreenFixation.event';
+import type { FixationDataPoint } from '$lib/GazeData/GazeData';
 
 /**
  * Manages fixation events from the given eye-tracker input for elements,
  * that have been registered with the given settings.
  */
-export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationEvents, GazeInteractionScreenFixationEvent, GazeInteractionObjectFixationPayload> {
+export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInteractionObjectFixationEvents, FixationDataPoint, GazeInteractionObjectFixationPayload> {
 
 	triggeredTargets: Element[] = [];
 	triggeredSettings: GazeInteractionObjectFixationPayload["listener"]["settings"][] = [];
@@ -38,12 +38,12 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
 	 * @param data The eye-tracker data to evaluate.
 	 * @param listener The listener to evaluate for fixation events.
 	 */
-	evaluateListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectFixationPayload['listener']) {
-		if (!this.isInside(listener.element, data.gazeData.x, data.gazeData.y, listener.settings.bufferSize)) return
+	evaluateListener(data: FixationDataPoint, listener: GazeInteractionObjectFixationPayload['listener']) {
+		if (!this.isInside(listener.element, data.x, data.y, listener.settings.bufferSize)) return
 		this.evaluateActiveListener(data, listener);
 	}
 
-	evaluate(data: GazeInteractionScreenFixationEvent): void {
+	evaluate(data: FixationDataPoint): void {
 		this.triggeredTargets = [];
 		this.triggeredSettings = [];
 
@@ -58,7 +58,7 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
 		this.emit(eventType, event);
 	}
 
-	evaluateActiveListener(data: GazeInteractionScreenFixationEvent, listener: GazeInteractionObjectFixationPayload['listener']): void {
+	evaluateActiveListener(data: FixationDataPoint, listener: GazeInteractionObjectFixationPayload['listener']): void {
 		this.triggeredTargets.push(listener.element);
 		this.triggeredSettings.push(listener.settings);
 	}
@@ -76,14 +76,14 @@ export class GazeInteractionObjectFixation extends GazeInteractionObject<GazeInt
 			type: GazeInteractionObjectFixationEvent["type"],
 			elements: Element[],
 			settings: GazeInteractionObjectFixationPayload["listener"]["settings"][],
-			data: GazeInteractionScreenFixationEvent
+			data: FixationDataPoint
 		): GazeInteractionObjectFixationEvent {
 			return {
 				...data,
 				type,
 				target: elements,
 				settings,
-				fixationId: data.fixationId,
+				fixationId: parseInt(data.deviceId),
 			};
 		}
 

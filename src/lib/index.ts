@@ -96,15 +96,6 @@ export type {
 export type { GazeInteractionObjectFixationSettings } from '$lib/GazeInteraction/GazeInteractionObjectFixation.settings.js';
 
 /**
- * Screen-level fixation detection
- */
-export { GazeInteractionScreenFixation } from '$lib/GazeInteraction/GazeInteractionScreenFixation.js';
-export type { 
-    GazeInteractionScreenFixationEvents,
-    GazeInteractionScreenFixationEvent
-} from '$lib/GazeInteraction/GazeInteractionScreenFixation.event.js';
-
-/**
  * Saccade-based interaction implementation
  * Detects rapid eye movements between fixation points
  */
@@ -159,7 +150,7 @@ export { GazeIndicator } from '$lib/GazeIndicator/GazeIndicator.js';
  * ================================
  * Core data types and utilities for handling gaze data points
  */
-export { type GazeInput, isGazeInputWithFixations } from '$lib/GazeInput/GazeInput.js';
+export { type GazeInput } from '$lib/GazeInput/GazeInput.js';
 export { 
     type GazeDataPoint,
     type FixationDataPoint,

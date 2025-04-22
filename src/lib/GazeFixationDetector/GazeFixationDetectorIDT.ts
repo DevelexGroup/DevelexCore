@@ -1,5 +1,5 @@
 import { GazeFixationDetector } from "./GazeFixationDetector"
-import { type GazeDataPointWithFixation, type GazeDataPoint, isGazeDataPointWithFixation } from "$lib/GazeData/GazeData";
+import { type GazeDataPoint, type FixationDataPoint } from "$lib/GazeData/GazeData";
 import { calculatePointDistance } from "$lib/utils/geometryUtils";
 import { getDifferenceInMilliseconds } from "$lib/utils/timeUtils";
 
@@ -16,8 +16,20 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
 
     windowGazePoints: GazeDataPoint[] = [];
     durationOfFullfilledDispersionGazeDataPoints: number = 0;
+    wasPreviousPointValidFixation: boolean = false;
 
     fixationId: number = 0;
+    currentFixationId: number = 0;
+
+    // Track sums for calculating averages
+    sumXL: number = 0;
+    sumXR: number = 0;
+    sumYL: number = 0;
+    sumYR: number = 0;
+    sumXLScreenRelative: number = 0;
+    sumXRScreenRelative: number = 0;
+    sumYLScreenRelative: number = 0;
+    sumYRScreenRelative: number = 0;
 
     constructor(
         // IDT specific parameters
@@ -32,41 +44,103 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         this.minimumFixationDuration = minimumFixationDuration;
     }
     
+    processFixationPoint(): void {
+        // do nothing as nothing from Bridge is relevant
+    }
+
     /**
-     * It takes a gaze point and processes it to determine if it is a fixation or not. If so, it returns a GazeDataPointWithFixation object.
+     * It takes a gaze point and processes it to determine if it is a fixation or not. If so, it emits a fixationStart or fixationEnd event.
      * @param gazePoint 
-     * @returns data point with fixation information GazeDataPoint || GazeDataPointWithFixation
      */
-    processGazePoint(gazePoint: GazeDataPoint): GazeDataPoint {
+    processGazePoint(gazePoint: GazeDataPoint): void {
         const dispersion = getMaxDispersion([...this.windowGazePoints, gazePoint]);
         const duration = this.getDuration(gazePoint);
         const isValidDispersionWise = dispersion <= this.pixelTolerance;
         const isValidDurationWise = duration >= this.minimumFixationDuration;
-        const wasPreviousPointValidFixation = isGazeDataPointWithFixation(this.windowGazePoints[this.windowGazePoints.length - 1]);
-
-        let result = gazePoint;
 
         if (isValidDispersionWise) {
             this.durationOfFullfilledDispersionGazeDataPoints = duration;
             this.windowGazePoints.push(gazePoint);
-        } else {
-            this.reset();
+            
+            // Add to running sums
+            this.sumXL += gazePoint.xL;
+            this.sumXR += gazePoint.xR;
+            this.sumYL += gazePoint.yL;
+            this.sumYR += gazePoint.yR;
+            this.sumXLScreenRelative += gazePoint.xLScreenRelative;
+            this.sumXRScreenRelative += gazePoint.xRScreenRelative;
+            this.sumYLScreenRelative += gazePoint.yLScreenRelative;
+            this.sumYRScreenRelative += gazePoint.yRScreenRelative;
         }
 
         if (isValidDurationWise && isValidDispersionWise) {
-            if (!wasPreviousPointValidFixation) {
+            if (!this.wasPreviousPointValidFixation) {
                 this.fixationId++;
+                this.currentFixationId = this.fixationId;
+                // Get average coordinates for fixation start
+                const averageCoords = this.getAverageCoordinates();
+                
+                // Emit fixation start event
+                const fixationPoint: FixationDataPoint = {
+                    type: 'fixationStart',
+                    deviceId: gazePoint.deviceId,
+                    timestamp: gazePoint.timestamp,
+                    deviceTimestamp: gazePoint.deviceTimestamp,
+                    duration: duration,
+                    x: averageCoords.x,
+                    y: averageCoords.y,
+                    xScreenRelative: averageCoords.xScreenRelative,
+                    yScreenRelative: averageCoords.yScreenRelative,
+                    sessionId: gazePoint.sessionId,
+                    parseValidity: gazePoint.parseValidity,
+                    fixationId: this.currentFixationId
+                };
+                this.emit('fixationStart', fixationPoint);
             }
-            const gazePointWithFixation: GazeDataPointWithFixation = {
-                ...gazePoint,
-                fixationId: this.fixationId,
-                fixationDuration: duration
-            };
-            this.windowGazePoints[this.windowGazePoints.length - 1] = gazePointWithFixation; // replace last point with fixation point
-            result = gazePointWithFixation;
+            this.wasPreviousPointValidFixation = true;
+        } else {
+            if (this.wasPreviousPointValidFixation) {
+                // Get average coordinates for fixation end BEFORE resetting window data
+                const averageCoords = this.getAverageCoordinates();
+                
+                // Emit fixation end event
+                const fixationPoint: FixationDataPoint = {
+                    type: 'fixationEnd',
+                    deviceId: gazePoint.deviceId, 
+                    timestamp: gazePoint.timestamp,
+                    deviceTimestamp: gazePoint.deviceTimestamp,
+                    duration: duration,
+                    x: averageCoords.x,
+                    y: averageCoords.y,
+                    xScreenRelative: averageCoords.xScreenRelative,
+                    yScreenRelative: averageCoords.yScreenRelative,
+                    sessionId: gazePoint.sessionId,
+                    parseValidity: gazePoint.parseValidity,
+                    fixationId: this.currentFixationId
+                };
+                this.emit('fixationEnd', fixationPoint);
+            }
+            // Only reset after we've generated fixation end event
+            if (!isValidDispersionWise) {
+                this.reset();
+            }
+            this.wasPreviousPointValidFixation = false;
         }
+    }
 
-        return result;
+    /**
+     * Calculate the average coordinates from all points in the current fixation window
+     */
+    getAverageCoordinates() {
+        const count = this.windowGazePoints.length;
+        if (count === 0) return { x: 0, y: 0, xScreenRelative: 0, yScreenRelative: 0 };
+        
+        return {
+            x: (this.sumXL + this.sumXR) / (2 * count),
+            y: (this.sumYL + this.sumYR) / (2 * count),
+            xScreenRelative: (this.sumXLScreenRelative + this.sumXRScreenRelative) / (2 * count),
+            yScreenRelative: (this.sumYLScreenRelative + this.sumYRScreenRelative) / (2 * count)
+        };
     }
 
     getDuration(gazePoint: GazeDataPoint): number {

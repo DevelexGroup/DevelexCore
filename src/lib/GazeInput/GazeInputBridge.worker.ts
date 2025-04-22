@@ -1,7 +1,7 @@
-import type { GazeDataPoint } from "$lib/GazeData/GazeData";
+import type { FixationDataPoint, GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
-import type { GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload, InnerCommandPayloadBase } from "./GazeInputBridge.types";
+import type { GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload, InnerCommandPayloadBase, FixationDataPayload } from "./GazeInputBridge.types";
 import { GazeWindowCalibrator } from "$lib/GazeWindowCalibrator/GazeWindowCalibrator";
 import type { GazeFixationDetector } from "$lib/GazeFixationDetector/GazeFixationDetector";
 import { createGazeFixationDetector } from "$lib/GazeFixationDetector";
@@ -21,10 +21,21 @@ let fixationDetector: GazeFixationDetector | null = null;
 let gazeDataProcessor: (data: GazeDataPayload) => void = () => {
     console.warn('No gaze data processor set up.');
 };
+let fixationDataProcessor: (data: FixationDataPayload) => void = () => {
+    console.warn('No fixation data processor set up.');
+};
 /* let isSubscribed = false; */
 
 apiClient.on('gaze', (data: GazeDataPayload) => {
     gazeDataProcessor(data);
+});
+
+apiClient.on('fixationStart', (data: FixationDataPayload) => {
+    fixationDataProcessor(data);
+});
+
+apiClient.on('fixationEnd', (data: FixationDataPayload) => {
+    fixationDataProcessor(data);
 });
 
 apiClient.on('error', (data: ReceiveErrorPayload) => {
@@ -70,10 +81,21 @@ self.addEventListener('message', (event: MessageEvent<SendToWorkerMessages>) => 
     }
 });
 
+const sendFixationDataToTheMainThread = (data: FixationDataPayload) => {
+    sendToTheMainThread(data);
+}
+
 const setupInitialisation = (incomingSetupPayload: SetupPayload) => {
     setupPayload = incomingSetupPayload;
     const { config, initiatorId } = setupPayload;
+    if (fixationDetector) {
+        fixationDetector.reset();
+        fixationDetector.off('fixationStart', sendFixationDataToTheMainThread);
+        fixationDetector.off('fixationEnd', sendFixationDataToTheMainThread);
+    }
     fixationDetector = createGazeFixationDetector(config.fixationDetection);
+    fixationDetector.on('fixationStart', sendFixationDataToTheMainThread);
+    fixationDetector.on('fixationEnd', sendFixationDataToTheMainThread);
     sendToTheMainThread({ type: 'ready', initiatorId });
 }
 
@@ -83,11 +105,10 @@ const setupViewportCalibration = (incomingViewportCalibrationPayload: ViewportCa
     self.postMessage(incomingViewportCalibrationPayload);
 }
 
-const createBridgeProcessor = (
+const createBridgeGazeSampleProcessor = (
     windowCalibrator: GazeWindowCalibrator,
     fixationDetector: GazeFixationDetector,
     sessionId: string,
-    postMessage: (data: GazeDataPoint) => void
 ) => {
     return (data: GazeDataPayload) => {
 
@@ -123,8 +144,29 @@ const createBridgeProcessor = (
             pupilDiameterL: data.pupilDiameterL,
             pupilDiameterR: data.pupilDiameterR
         };
-        const fixation = fixationDetector.processGazePoint(windowCalibratedData);
-        postMessage(fixation);
+        sendToTheMainThread(windowCalibratedData);
+        fixationDetector.processGazePoint(windowCalibratedData);
+    }
+}
+
+const createBridgeFixationSampleProcessor = (
+    windowCalibrator: GazeWindowCalibrator,
+    fixationDetector: GazeFixationDetector,
+    sessionId: string,
+) => {
+    return (data: FixationDataPayload) => {
+
+        const windowFixationPoint: Omit<FixationDataPoint, 'fixationId'> = {
+            ...data,
+            x: windowCalibrator.toWindowX(data.x),
+            y: windowCalibrator.toWindowY(data.y),
+            xScreenRelative: data.x,
+            yScreenRelative: data.y,
+            sessionId,
+            parseValidity: true
+        };
+
+        fixationDetector.processFixationPoint(windowFixationPoint);
     }
 }
 
@@ -143,8 +185,9 @@ const setupWebSocket = async () => {
         return;
     }
     // prepare the gaze data processor
-    gazeDataProcessor = createBridgeProcessor(gazeWindowCalibrator, fixationDetector, setupPayload.initiatorId, sendToTheMainThread);
-    
+    gazeDataProcessor = createBridgeGazeSampleProcessor(gazeWindowCalibrator, fixationDetector, setupPayload.initiatorId);
+    fixationDataProcessor = createBridgeFixationSampleProcessor(gazeWindowCalibrator, fixationDetector, setupPayload.initiatorId);
+
     try {
         // attempt to open the websocket connection
         await apiClient.openConnection(setupPayload.config.uri);

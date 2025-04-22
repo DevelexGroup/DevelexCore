@@ -1,4 +1,4 @@
-import type { GazeDataPointWithFixation } from '$lib/GazeData/GazeData';
+import type { FixationDataPoint } from '$lib/GazeData/GazeData';
 import type { GazeInteractionEvent } from './GazeInteraction.event';
 
 export type GazeInteractionScreenSaccadeEvents = {
@@ -9,13 +9,14 @@ export type GazeInteractionScreenSaccadeEvents = {
  * Fired when a saccade event occurs.
  * @property {'saccadeEnd'} type of the event.
  * @property {number} duration time since the saccade started.
+ * @property {number} distance of the saccade event.
  * @property {number} angleToScreen of the saccade event. Always present.
  * @property {number} angleToPrevious of the saccade event.
  * @property {number} angleToPreviousInvalidityTime of the saccade event.
  * @property {Element} target of the saccade event.
  * @property {Element} originTarget of the saccade event.
- * @property {GazeDataPoint} gazeData of the saccade event. I.e. the first gaze data point of the saccade.
- * @property {GazeDataPoint} originGazeData of the saccade event.
+ * @property {FixationDataPoint} targetFixation of the saccade event.
+ * @property {FixationDataPoint} originFixation of the saccade event.
  * @property {GazeInteractionSaccadeSettingsType} settings for the saccade event, including the saccade time and callbacks.
  */
 export type GazeInteractionScreenSaccadeEvent = {
@@ -25,6 +26,6 @@ export type GazeInteractionScreenSaccadeEvent = {
     angleToScreen: number;
     angleToPrevious?: number;
     angleToPreviousInvalidityTime?: number;
-	gazeData: GazeDataPointWithFixation;
-    originGazeData: GazeDataPointWithFixation;
+	targetFixation: FixationDataPoint;
+    originFixation: FixationDataPoint;
 } & GazeInteractionEvent;

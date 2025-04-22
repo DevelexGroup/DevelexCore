@@ -54,8 +54,9 @@ export interface MessagePayload extends CorrelationId, InitiatorId {
   content: string;
 }
 
-export interface GazeDataPayload extends Timestamp {
+export interface GazeDataPayload {
   type: 'gaze';
+  deviceId: string; // id of the gaze sample from the device
   // Left eye data
   xL: number;
   yL: number;
@@ -66,9 +67,18 @@ export interface GazeDataPayload extends Timestamp {
   yR: number;
   validityR: boolean;
   pupilDiameterR: number;
-  // Optional fixation data
-  fixationDuration?: number;
-  fixationId?: number;
+  deviceTimestamp: string; // ISO date-time
+  timestamp: string; // ISO date-time
+}
+
+export interface FixationDataPayload {
+  type: 'fixationStart' | 'fixationEnd';
+  deviceId: string; // id of the fixation sample from the device
+  timestamp: string; // ISO date-time ... if from JS SDK filter, take from the gaze data payload
+  deviceTimestamp: string; // ISO date-time ... if from JS SDK filter, take from the gaze data payload
+  duration: number; // duration of the fixation in milliseconds
+  x: number;
+  y: number;
 }
 
 /**
@@ -134,6 +144,6 @@ export type SendToWorkerSyncMessages = SetupPayload;
 
 export type SendToWorkerMessages = SendToWorkerAsyncMessages | SendToWorkerSyncMessages;
 
-export type ReceiveFromWebSocketMessages = ReceiveResponsePayload | ReceiveMessagePayload | ReceiveErrorPayload | GazeDataPayload;
+export type ReceiveFromWebSocketMessages = ReceiveResponsePayload | ReceiveMessagePayload | ReceiveErrorPayload | GazeDataPayload | FixationDataPayload;
 
 export type ReceiveFromWorkerMessages = ReceiveFromWebSocketMessages | ReadyPayload;

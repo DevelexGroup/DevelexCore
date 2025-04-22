@@ -38,10 +38,10 @@ const intersectRepository = {
     }
   },
   csvHeader(): string {
-    return 'sessionId, timestamp, aoi, gazeData.x, gazeData.y, gazeData.xL, gazeData.yL, gazeData.xR, gazeData.yR, gazeData.fixationId, gazeData.fixationDuration';
+    return 'sessionId, timestamp, aoi, gazeData.x, gazeData.y, gazeData.xL, gazeData.yL, gazeData.xR, gazeData.yR';
   },
   toCsv(data: Intersect): string {
-    return `${data.sessionId},${data.timestamp},${data.aoi},${data.gazeData.x},${data.gazeData.y},${data.gazeData.xL},${data.gazeData.yL},${data.gazeData.xR},${data.gazeData.yR},${data.gazeData.fixationId},${data.gazeData.fixationDuration}`;
+    return `${data.sessionId},${data.timestamp},${data.aoi},${data.gazeData.x},${data.gazeData.y},${data.gazeData.xL},${data.gazeData.yL},${data.gazeData.xR},${data.gazeData.yR}`;
   },
 };
 
