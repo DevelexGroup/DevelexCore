@@ -152,8 +152,6 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
     reset(): void {
         this.windowGazePoints = [];
         this.durationOfFullfilledDispersionGazeDataPoints = 0;
-<<<<<<< Updated upstream
-=======
         this.wasPreviousPointValidFixation = false;
         // Reset coordinate sums
         this.sumXL = 0;
@@ -165,7 +163,6 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         this.sumYLScreenRelative = 0;
         this.sumYRScreenRelative = 0;
         // Don't reset the currentFixationId here - we want to keep it until the next fixation starts
->>>>>>> Stashed changes
     }
 
 }
