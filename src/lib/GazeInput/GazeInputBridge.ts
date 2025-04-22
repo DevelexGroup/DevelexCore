@@ -9,6 +9,12 @@ import type { InnerCommandPayloadBase, InnerCommandType, ReceiveErrorPayload, Re
 import { createISO8601Timestamp } from "$lib/utils/timeUtils";
 
 /**
+ * Default timeout for requests in milliseconds.
+ * After this duration, pending promises will be rejected.
+ */
+const REQUEST_TIMEOUT_MS = 15000; // 15 seconds
+
+/**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
  * Gaze data is received from the worker from WebSocket server and emitted here as messages.
  * Every parsing of the data and communication with eye-tracker is done in the worker for performance reasons.
@@ -20,7 +26,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
     private workerReady: Promise<void>;
     private pendingPromises: Map<number, { 
         resolve: (value: GazeInputBridge) => void, 
-        reject: (reason?: unknown) => void 
+        reject: (reason?: unknown) => void,
+        timeout: number
     }> = new Map();
     private correlationId: number = 0;
 
@@ -63,7 +70,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                     break;
                 case 'viewportCalibration':
                     this.setWindowCalibrationValues(event.data);
-                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
+                    this.resolvePendingPromise(event.data.correlationId);
                     break;
                 case 'error': {
                     this.processMessageError(event.data);
@@ -74,7 +81,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
                     break;
                 case 'open':
                 case 'close':
-                    this.pendingPromises.get(event.data.correlationId)?.resolve(this);
+                    this.resolvePendingPromise(event.data.correlationId);
                     break;
             }
         };
@@ -95,13 +102,13 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
     protected processMessageResponse(data: ReceiveResponsePayload): void {
         this.setStatusValues(data);
         if (data.response && data.response.status === 'resolved') {
-            this.pendingPromises.get(data.correlationId)?.resolve(this);
+            this.resolvePendingPromise(data.correlationId);
         } else if (data.response && data.response.status === 'rejected') {
-            this.pendingPromises.get(data.correlationId)?.reject(data.response.message);
+            this.rejectPendingPromise(data.correlationId, data.response.message);
         } else if (data.response && data.response.status === 'processing') {
             return; // DO NOTHING, the promise is still pending
         } else {
-            this.pendingPromises.get(data.correlationId)?.reject(new Error('Received an invalid response payload: ' + JSON.stringify(data)));
+            this.rejectPendingPromise(data.correlationId, new Error('Received an invalid response payload: ' + JSON.stringify(data)));
         }
     }
 
@@ -110,7 +117,9 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      * @param data - The error message.
      */
     protected processMessageError(data: ReceiveErrorPayload): void {
-        this.pendingPromises.forEach((promise) => promise.reject(data.content));
+        this.pendingPromises.forEach((promise, correlationId) => {
+            this.rejectPendingPromise(correlationId, data.content);
+        });
         this.emit('inputError', {
             type: 'inputError',
             timestamp: data.timestamp,
@@ -123,7 +132,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      * @param data - The message.
      */
     protected processMessageMessage(data: ReceiveMessagePayload): void {
-        this.pendingPromises.get(data.correlationId)?.resolve(this);
+        this.resolvePendingPromise(data.correlationId);
         this.emit('inputMessage', {
             type: 'inputMessage',
             timestamp: data.timestamp,
@@ -138,7 +147,34 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      */
     protected processMessageViewportCalibration(data: ViewportCalibrationPayload): void {
         this.setWindowCalibrationValues(data);
-        this.pendingPromises.get(data.correlationId)?.resolve(this);
+        this.resolvePendingPromise(data.correlationId);
+    }
+
+    /**
+     * Resolves a pending promise and cleans up associated resources.
+     * @param correlationId - The correlation ID of the promise to resolve.
+     */
+    private resolvePendingPromise(correlationId: number): void {
+        const promise = this.pendingPromises.get(correlationId);
+        if (promise) {
+            clearTimeout(promise.timeout);
+            promise.resolve(this);
+            this.pendingPromises.delete(correlationId);
+        }
+    }
+
+    /**
+     * Rejects a pending promise and cleans up associated resources.
+     * @param correlationId - The correlation ID of the promise to reject.
+     * @param reason - The reason for rejection.
+     */
+    private rejectPendingPromise(correlationId: number, reason?: unknown): void {
+        const promise = this.pendingPromises.get(correlationId);
+        if (promise) {
+            clearTimeout(promise.timeout);
+            promise.reject(reason);
+            this.pendingPromises.delete(correlationId);
+        }
     }
 
     subscribe(): Promise<this> {
@@ -226,8 +262,21 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
     protected async send(payload: SendToWorkerAsyncMessages): Promise<this> {
         await this.workerReady;
         const correlationId = payload.correlationId;
+        
         return new Promise<this>((resolve, reject) => {
-            this.pendingPromises.set(correlationId, { resolve: resolve as (value: GazeInputBridge) => void, reject });
+            // Create a timeout that will reject the promise if it's not resolved/rejected within REQUEST_TIMEOUT_MS
+            const timeoutId = window.setTimeout(() => {
+                this.rejectPendingPromise(correlationId, new Error(`Request timed out after ${REQUEST_TIMEOUT_MS}ms`));
+            }, REQUEST_TIMEOUT_MS);
+
+            // Store the promise handlers and timeout ID
+            this.pendingPromises.set(correlationId, {
+                resolve: resolve as (value: GazeInputBridge) => void,
+                reject,
+                timeout: timeoutId
+            });
+
+            // Send the message to the worker
             this.worker.postMessage(payload);
         });
     }

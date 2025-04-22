@@ -29,7 +29,6 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		this.boundUpdateMousePosition = this.updateMousePosition.bind(this);
 		this.fixationDetector = createGazeFixationDetector(config.fixationDetection);
 		this.fixationDetector.on('fixationStart', (data: FixationDataPoint) => {
-			console.log('fixationStart', data);
 			this.emit('inputFixationStart', data);
 		});
 		this.fixationDetector.on('fixationEnd', (data: FixationDataPoint) => {

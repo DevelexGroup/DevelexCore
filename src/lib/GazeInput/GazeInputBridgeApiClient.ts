@@ -53,7 +53,6 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
             this.websocket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data) as ReceiveFromWebSocketMessages;
-                    console.log('Received message:', data);
                     this.emit(data.type, data);
                 } catch (error) {
                     console.error('Failed to parse WebSocket message:', error);
@@ -73,7 +72,6 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
     }
 
     public send(message: SendToWorkerMessages) {
-        console.log('Sending message:', message);
         if (!this.websocket) {
             throw new Error('WebSocket is not connected');
         }

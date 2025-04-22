@@ -40,7 +40,6 @@ apiClient.on('fixationEnd', (data: FixationDataPayload) => {
 
 apiClient.on('error', (data: ReceiveErrorPayload) => {
     sendToTheMainThread(data);
-    console.log('Error received:', data);
 });
 
 apiClient.on('response', (data: ReceiveResponsePayload) => {
@@ -101,7 +100,6 @@ const setupInitialisation = (incomingSetupPayload: SetupPayload) => {
 
 const setupViewportCalibration = (incomingViewportCalibrationPayload: ViewportCalibrationPayload) => {
     gazeWindowCalibrator = new GazeWindowCalibrator(incomingViewportCalibrationPayload);
-    console.log('Viewport calibration received.', incomingViewportCalibrationPayload);
     self.postMessage(incomingViewportCalibrationPayload);
 }
 
