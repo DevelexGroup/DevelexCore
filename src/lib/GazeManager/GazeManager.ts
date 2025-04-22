@@ -174,8 +174,13 @@ export class GazeManager extends EmitterGroup<
 
     private link() {
         this._input.on('inputData', this.boundLinkData);
+<<<<<<< Updated upstream
         this.fixation.on('fixationStart', this.boundLinkFixation);
         this.fixation.on('fixationEnd', this.boundLinkFixation);
+=======
+        this._input.on('inputFixationStart', this.boundLinkFixation);
+        this._input.on('inputFixationEnd', this.boundLinkFixation);
+>>>>>>> Stashed changes
         this.saccade.on('saccade', this.boundLinkSaccade);
     }
 

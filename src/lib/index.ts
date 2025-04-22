@@ -35,6 +35,7 @@ export { createGazeInput } from '$lib/GazeInput/index.js';
  * Main interface for interacting with eye tracking devices
  */
 export { GazeInputFacade } from '$lib/GazeInput/GazeInputFacade.js';
+export { GazeInputError } from '$lib/GazeInput/GazeInputError.js';
 
 /**
  * Configuration types for different eye tracking devices and scenarios
@@ -72,13 +73,15 @@ export type { GazeInteraction } from '$lib/GazeInteraction/GazeInteraction.js';
 export type { GazeInteractionObject } from '$lib/GazeInteraction/GazeInteractionObject.js';
 export type { GazeInteractionEvent } from '$lib/GazeInteraction/GazeInteraction.event.js';
 
-
 /**
  * Dwell-based interaction implementation
  * Tracks how long a user's gaze remains on an element
  */
 export { GazeInteractionObjectDwell } from '$lib/GazeInteraction/GazeInteractionObjectDwell.js';
-export type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event.js';
+export type { 
+    GazeInteractionObjectDwellEvents,
+    GazeInteractionObjectDwellEvent 
+} from '$lib/GazeInteraction/GazeInteractionObjectDwell.event.js';
 export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/GazeInteractionObjectDwell.settings.js';
 
 /**
@@ -88,7 +91,7 @@ export type { GazeInteractionDwellSettingsType } from '$lib/GazeInteraction/Gaze
 export { GazeInteractionObjectFixation } from '$lib/GazeInteraction/GazeInteractionObjectFixation.js';
 export type { 
     GazeInteractionObjectFixationEvents,
-    GazeInteractionObjectFixationEvent
+    GazeInteractionObjectFixationEvent 
 } from '$lib/GazeInteraction/GazeInteractionObjectFixation.event.js';
 export type { GazeInteractionObjectFixationSettings } from '$lib/GazeInteraction/GazeInteractionObjectFixation.settings.js';
 
@@ -137,7 +140,10 @@ export type { GazeInteractionObjectValidationSettings } from '$lib/GazeInteracti
  * Detects when a user's gaze intersects with elements
  */
 export { GazeInteractionObjectIntersect } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.js';
-export type { GazeInteractionObjectIntersectEvent } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.event.js';
+export type { 
+    GazeInteractionObjectIntersectEvents,
+    GazeInteractionObjectIntersectEvent 
+} from '$lib/GazeInteraction/GazeInteractionObjectIntersect.event.js';
 export type { GazeInteractionObjectIntersectSettingsType } from '$lib/GazeInteraction/GazeInteractionObjectIntersect.settings.js';
 
 /**
@@ -155,10 +161,10 @@ export { GazeIndicator } from '$lib/GazeIndicator/GazeIndicator.js';
  */
 export { type GazeInput, isGazeInputWithFixations } from '$lib/GazeInput/GazeInput.js';
 export { 
-    type GazeDataPoint, 
-    type GazeDataPointWithFixation, 
-    isGazeDataPointWithFixation 
+    type GazeDataPoint,
+    type FixationDataPoint,
 } from '$lib/GazeData/GazeData.js';
+export { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer.js';
 
 /**
  * @module GazeWindowCalibrator
@@ -177,8 +183,19 @@ export type {
  * ================================
  * Utilities for detecting and analyzing fixations
  */
+export { createGazeFixationDetector } from '$lib/GazeFixationDetector/index.js';
+export { GazeFixationDetector } from '$lib/GazeFixationDetector/GazeFixationDetector.js';
+export { GazeFixationDetectorDevice } from '$lib/GazeFixationDetector/GazeFixationDetectorDevice.js';
+export { GazeFixationDetectorIDT } from '$lib/GazeFixationDetector/GazeFixationDetectorIDT.js';
 export { 
     getMaxDispersion,
     getSizeInCentimetersFromDegrees,
     getSizeInPixelsFromCentimeters 
 } from '$lib/GazeFixationDetector/GazeFixationDetectorIDT.js';
+
+/**
+ * @module Utility
+ * ================================
+ * Utility classes and functions used throughout the library
+ */
+export { UtilityBoundingBoxManager } from '$lib/Utility/UtilityBoundingBoxManager.js';
