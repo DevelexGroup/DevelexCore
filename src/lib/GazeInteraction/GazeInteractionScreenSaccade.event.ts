@@ -8,11 +8,11 @@ export type GazeInteractionScreenSaccadeEvents = {
 /**
  * Fired when a saccade event occurs.
  * @property {'saccadeEnd'} type of the event.
- * @property {number} duration time since the saccade started.
+ * @property {number} duration time since the saccade started (in milliseconds).
  * @property {number} distance of the saccade event.
  * @property {number} angleToScreen of the saccade event. Always present.
  * @property {number} angleToPrevious of the saccade event.
- * @property {number} angleToPreviousInvalidityTime of the saccade event.
+ * @property {number} angleToPreviousInvalidityTime time between end of previous fixation and the last saccade (in milliseconds).
  * @property {Element} target of the saccade event.
  * @property {Element} originTarget of the saccade event.
  * @property {FixationDataPoint} targetFixation of the saccade event.

@@ -1,5 +1,7 @@
 /**
  * Returns the current date and time in ISO 8601 format.
+ * All timestamp functions in this library consistently use milliseconds for numerical timestamps.
+ * 
  * @returns {string} The current date and time in ISO 8601 format.
  * @example
  * const timestamp = createISO8601Timestamp();
@@ -11,8 +13,8 @@ export const createISO8601Timestamp = () => {
 
 /**
  * Returns difference between two ISO 8601 timestamps in milliseconds.
- * @param timestamp1 - The first timestamp.
- * @param timestamp2 - The second timestamp.
+ * @param timestamp1 - The first timestamp in ISO 8601 format.
+ * @param timestamp2 - The second timestamp in ISO 8601 format.
  * @returns {number} The difference between the two timestamps in milliseconds.
  */
 export const getDifferenceInMilliseconds = (timestamp1: string, timestamp2: string) => {
@@ -22,19 +24,28 @@ export const getDifferenceInMilliseconds = (timestamp1: string, timestamp2: stri
 }
 
 /**
- * Returns the ISO 8601 timestamp from UNIX timestamp.
- * @param unixTimestamp - The UNIX timestamp.
+ * Returns the ISO 8601 timestamp from a timestamp in milliseconds.
+ * 
+ * IMPORTANT: This expects input in milliseconds (e.g., from Date.now()),
+ * NOT seconds as in traditional Unix timestamps.
+ * 
+ * @param unixTimestamp - The timestamp in milliseconds (e.g., from Date.now()).
  * @returns {string} The ISO 8601 timestamp.
  */
 export const getISO8601TimestampFromUnix = (unixTimestamp: number) => {
-	return new Date(unixTimestamp * 1000).toISOString();
+	// Date.now() returns timestamp in milliseconds, so we don't need to multiply by 1000
+	// This fixes the issue with invalid dates like +057277-01-08
+	return new Date(unixTimestamp).toISOString();
 }
 
 /**
- * Returns the UNIX timestamp from ISO 8601 timestamp.
+ * Returns the timestamp in milliseconds from an ISO 8601 timestamp.
+ * 
+ * IMPORTANT: This returns milliseconds, NOT seconds as in traditional Unix timestamps.
+ * 
  * @param iso8601Timestamp - The ISO 8601 timestamp.
- * @returns {number} The UNIX timestamp.
+ * @returns {number} The timestamp in milliseconds.
  */
 export const getUnixTimestampFromISO8601 = (iso8601Timestamp: string) => {
-	return Date.parse(iso8601Timestamp) / 1000;
+	return Date.parse(iso8601Timestamp);
 }

@@ -67,7 +67,16 @@ export class GazeInteractionScreenSaccade extends GazeInteraction<GazeInteractio
         }
 
         const angleToPrevious = this.calculateAngleToPrevious(this.lastSaccadeData.angleToScreen, angleToScreen);
-        const angleToPreviousInvalidityTime = (getUnixTimestampFromISO8601(fixationOne.timestamp) - fixationOne.duration) - getUnixTimestampFromISO8601(this.lastSaccadeData.timestamp);
+        
+        /**
+         * Calculate the time between:
+         * 1. The end of the previous fixation (which is when the current saccade started)
+         * 2. The timestamp of the last recorded saccade
+         * This value represents how long after the last saccade this new saccade occurred (in milliseconds)
+         */
+        const startTimeMs = getUnixTimestampFromISO8601(fixationOne.timestamp) - fixationOne.duration;
+        const lastTimeMs = getUnixTimestampFromISO8601(this.lastSaccadeData.timestamp);
+        const angleToPreviousInvalidityTime = startTimeMs - lastTimeMs;
 
         return {
             type,
