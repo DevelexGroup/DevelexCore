@@ -1,6 +1,6 @@
-# develex-core
+# develex-js-sdk
 
-A comprehensive TypeScript/JavaScript library for eye tracking integration and gaze-based interactions in web applications. Part of the develex ecosystem, primarily focused on gaze data processing for dyslexia interventions.
+A comprehensive TypeScript/JavaScript SDK for eye tracking integration and gaze-based interactions in web applications. Part of the develex ecosystem, primarily focused on gaze data processing for dyslexia interventions.
 
 ## Core Components
 
@@ -44,7 +44,7 @@ We provide a testing webpage, built with GitLab Pages, for you to test functiona
 
 1. Start your eye-tracking controller software (e.g., GazePoint Control)
 2. Start develex-bridge
-3. Proceed to the testing website with develex-core
+3. Proceed to the testing website with develex-js-sdk
 
 ## Developing
 
@@ -62,28 +62,27 @@ npm run dev -- --open
 
 ## Publishing
 
-The package is published to the GitLab package registry. To publish the package, you
-need to set the `CI_JOB_TOKEN` environment variable and run the `npm publish` command.
+The package is automatically published to the public npm registry via GitLab CI/CD when changes are pushed to the main branch. You can also publish manually:
 
 ```bash
-set CI_JOB_TOKEN=<your-token>
 npm publish
 ```
 
-## Using the package
+## Installation
 
-To use the package, you need to set the GitLab package registry and pass the token to
-the npm configuration.
+Install the package from npm:
 
 ```bash
-npm config set -- //gitlab.ics.muni.cz/:_authToken=<your-token>
+npm install develex-js-sdk
 ```
 
-```bash
-npm config set @473783:registry=https://gitlab.ics.muni.cz/api/v4/projects/7015/
-packages/npm/
-```
+## Usage
 
-```bash
-npm i @473783/develex-core
+Import the library in your project:
+
+```javascript
+import { GazeManager } from 'develex-js-sdk';
+
+// Initialize the gaze manager
+const gazeManager = new GazeManager();
 ```

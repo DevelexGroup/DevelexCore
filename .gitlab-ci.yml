@@ -35,9 +35,10 @@ pages:
 publish-npm:
   stage: deploy
   script:
-    - echo "registry=https://registry.npmjs.org/" > .npmrc  # Explicitly set npm registry for general installs
-    - echo "@scope:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" >> .npmrc  # Set registry for your scope
-    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc  # Set auth token
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
     - npm publish
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  only:
+    - main
+    - master
