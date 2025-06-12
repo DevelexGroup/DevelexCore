@@ -43,14 +43,14 @@
 	"files": [
 		"dist"
 	],
-	"main": "./dist/develex-core.umd.cjs",
-	"module": "./dist/develex-core.js",
+	"main": "./dist/develex-js-sdk.umd.cjs",
+	"module": "./dist/develex-js-sdk.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/develex-core.js",
-			"require": "./dist/develex-core.umd.cjs"
+			"import": "./dist/develex-js-sdk.js",
+			"require": "./dist/develex-js-sdk.umd.cjs"
 		}
 	},
 	"dependencies": {
