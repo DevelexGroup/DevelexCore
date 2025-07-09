@@ -220,10 +220,21 @@ const closeWebSocket = (closePayload: InnerCommandPayloadBase) => {
 
 const transmitToWebSocket = (payload: SendToWorkerAsyncMessages) => {
     try {
+        if (!setupPayload) {
+            sendWorkerErrorToTheMainThread('[JS001] Cannot send message: Bridge not set up.', createISO8601Timestamp(), payload.correlationId);
+            return;
+        }
+
+        // Validate payload before sending
+        if (!payload.type || !payload.initiatorId) {
+            sendWorkerErrorToTheMainThread('[JS203] Invalid message payload: missing required fields.', createISO8601Timestamp(), payload.correlationId);
+            return;
+        }
+
         apiClient.send(payload);
     } catch (error) {
         const reason = error instanceof Error ? error.message : 'Unknown error';
-        sendWorkerErrorToTheMainThread(`[JS102] Failed to send message to Bridge: ${reason}`, null);
+        sendWorkerErrorToTheMainThread(`[JS102] Failed to send message to Bridge: ${reason}`, createISO8601Timestamp(), payload.correlationId);
     }
 }
 
