@@ -19,7 +19,17 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
             await this.closeConnection();
         }   
         return new Promise((resolve, reject) => {
-            this.websocket = new WebSocket(uri);
+            try {
+                this.websocket = new WebSocket(uri);
+            } catch (error) {
+                const message = error instanceof Error ? error.message : 'Unknown error instantiating WebSocket';
+                this.emit('error', {
+                    type: 'error',
+                    content: message,
+                    timestamp: createISO8601Timestamp()
+                });
+                return reject(error);
+            }
             
             this.websocket.onopen = () => {
                 resolve(this);
@@ -55,7 +65,12 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
                     const data = JSON.parse(event.data) as ReceiveFromWebSocketMessages;
                     this.emit(data.type, data);
                 } catch (error) {
-                    console.error('Failed to parse WebSocket message:', error);
+                    const message = error instanceof Error ? error.message : 'Unknown parsing error';
+                    this.emit('error', {
+                        type: 'error',
+                        content: `Failed to parse WebSocket message: ${message}`,
+                        timestamp: createISO8601Timestamp(),
+                    });
                 }
             };
         });
@@ -72,8 +87,8 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
     }
 
     public send(message: SendToWorkerMessages) {
-        if (!this.websocket) {
-            throw new Error('WebSocket is not connected');
+        if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+            throw new Error('WebSocket is not connected or not in an open state');
         }
         this.websocket.send(JSON.stringify(message));
     }

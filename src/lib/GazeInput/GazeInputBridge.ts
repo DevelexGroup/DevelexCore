@@ -117,9 +117,13 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      * @param data - The error message.
      */
     protected processMessageError(data: ReceiveErrorPayload): void {
-        this.pendingPromises.forEach((promise, correlationId) => {
-            this.rejectPendingPromise(correlationId, data.content);
-        });
+        if (data.correlationId !== undefined) {
+            this.rejectPendingPromise(data.correlationId, data.content);
+        } else {
+            this.pendingPromises.forEach((promise, correlationId) => {
+                this.rejectPendingPromise(correlationId, data.content);
+            });
+        }
         this.emit('inputError', {
             type: 'inputError',
             timestamp: data.timestamp,

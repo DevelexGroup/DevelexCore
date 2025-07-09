@@ -123,6 +123,7 @@ export interface ReceiveMessagePayload extends CorrelationId, InitiatorId, Times
 export interface ReceiveErrorPayload extends Timestamp {
   type: 'error';
   content: string;
+  correlationId?: number;
 }
 
 export interface ViewportCalibrationPayload extends GazeWindowCalibratorConfig, CorrelationId, InitiatorId {

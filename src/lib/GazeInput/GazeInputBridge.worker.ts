@@ -39,7 +39,11 @@ apiClient.on('fixationEnd', (data: FixationDataPayload) => {
 });
 
 apiClient.on('error', (data: ReceiveErrorPayload) => {
-    sendToTheMainThread(data);
+    if (data.content.startsWith('Failed to parse WebSocket message')) {
+        sendToTheMainThread({ ...data, content: `[JS201] ${data.content}` });
+    } else {
+        sendToTheMainThread({ ...data, content: `[BR100] ${data.content}` });
+    }
 });
 
 apiClient.on('response', (data: ReceiveResponsePayload) => {
@@ -171,16 +175,16 @@ const createBridgeFixationSampleProcessor = (
 const setupWebSocket = async () => {
     // check first if we have a valid setup payload
     if (!setupPayload) {
-        sendWorkerErrorToTheMainThread('No setup payload found.', null);
-        return;
+        sendWorkerErrorToTheMainThread('[JS001] No setup payload found.', null);
+        return false;
     }
     if (!gazeWindowCalibrator) {
-        sendWorkerErrorToTheMainThread('No gaze window calibrator found.', null);
-        return;
+        sendWorkerErrorToTheMainThread('[JS002] No gaze window calibrator found.', null);
+        return false;
     }
     if (!fixationDetector) {
-        sendWorkerErrorToTheMainThread('No fixation detector found.', null);
-        return;
+        sendWorkerErrorToTheMainThread('[JS003] No fixation detector found.', null);
+        return false;
     }
     // prepare the gaze data processor
     gazeDataProcessor = createBridgeGazeSampleProcessor(gazeWindowCalibrator, fixationDetector, setupPayload.initiatorId);
@@ -191,15 +195,19 @@ const setupWebSocket = async () => {
         await apiClient.openConnection(setupPayload.config.uri);
     } catch {
         sendWorkerErrorToTheMainThread(
-            `Failed to connect to WebSocket server at ${setupPayload.config.uri}`,
+            `[JS101] Failed to connect to WebSocket server at ${setupPayload.config.uri}`,
             null
         );
-        return;
+        return false;
     }
+    return true;
 }
 
 const openWebSocket = async (openPayload: InnerCommandPayloadBase) => {
-    await setupWebSocket();
+    const isSetup = await setupWebSocket();
+    if (!isSetup) {
+        return;
+    }
     // send back the open payload with the correct correlationId
     sendToTheMainThread({ type: 'open', correlationId: openPayload.correlationId, initiatorId: openPayload.initiatorId, timestamp: createISO8601Timestamp() });
 }
@@ -215,7 +223,7 @@ const transmitToWebSocket = (payload: SendToWorkerAsyncMessages) => {
         apiClient.send(payload);
     } catch (error) {
         const reason = error instanceof Error ? error.message : 'Unknown error';
-        sendWorkerErrorToTheMainThread(`Failed to send message to Bridge: ${reason}`, null);
+        sendWorkerErrorToTheMainThread(`[JS102] Failed to send message to Bridge: ${reason}`, null);
     }
 }
 
@@ -223,8 +231,8 @@ const sendToTheMainThread = (payload: ReceiveFromWorkerMessages | InnerCommandPa
     self.postMessage(payload);
 }
 
-const sendWorkerErrorToTheMainThread = (message: string, timestamp: string | null) => {
-    sendToTheMainThread({ type: 'error', content: message, timestamp: timestamp ?? createISO8601Timestamp() });
+const sendWorkerErrorToTheMainThread = (message: string, timestamp: string | null, correlationId?: number) => {
+    sendToTheMainThread({ type: 'error', content: message, timestamp: timestamp ?? createISO8601Timestamp(), correlationId });
 }
 
 /* const sendNotSubscribedErrorToTheMainThread = (correlationId: number, initiatorId: string) => {
