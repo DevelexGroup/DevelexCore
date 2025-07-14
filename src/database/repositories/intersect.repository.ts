@@ -37,6 +37,15 @@ const intersectRepository = {
       return null;
     }
   },
+  async createMany(data: Intersect[]): Promise<number[] | null> {
+    try {
+      const ids = await db.intersects.bulkAdd(data, { allKeys: true });
+      return ids;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
   csvHeader(): string {
     return 'sessionId, timestamp, aoi, gazeData.x, gazeData.y, gazeData.xL, gazeData.yL, gazeData.xR, gazeData.yR';
   },

@@ -27,6 +27,7 @@
             element,
         });
     };
+
 </script>
 
 <div class="holder">
@@ -38,7 +39,7 @@
         </div>
     </Group>
     <Group heading="Intersect Interaction Log">
-        <GenericTable data={$sceneIntersectStore} headers={["timestamp", "gazeData.xL", "gazeData.xR", "gazeData.yL", "gazeData.yR", "aoi"]} />
+        <GenericTable data={$sceneIntersectStore} headers={["timestamp", "type", "aoi"]} />
     </Group>
 </div>
 

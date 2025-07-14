@@ -5,6 +5,8 @@
 
 </script>
 
-<Group heading="Point of Gaze Data (last 300)">
-    <GenericTable data={$scenePointStore} headers={["timestamp", "xL", "xR", "yL", "yR", "fixationDuration"]} />
-</Group>
+<div class="holder">
+    <Group heading="Point Data Log">
+        <GenericTable data={$scenePointStore} headers={["timestamp", "x", "y", "xL", "yL", "xR", "yR"]} />
+    </Group>
+</div>

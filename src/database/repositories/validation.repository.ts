@@ -26,6 +26,15 @@ const validationRepository = {
       return null;
     }
   },
+  async createMany(data: Validation[]): Promise<number[] | null> {
+    try {
+      const ids = await db.validations.bulkAdd(data, { allKeys: true });
+      return ids;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
   csvHeader(): string {
     return 'sessionId, timestamp, type, isValid, allDataPointsCount, validDataPointsCount, validDataPointsPercentage, accuracy, precision';
   },

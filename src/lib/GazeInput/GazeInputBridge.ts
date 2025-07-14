@@ -12,7 +12,7 @@ import { createISO8601Timestamp } from "$lib/utils/timeUtils";
  * Default timeout for requests in milliseconds.
  * After this duration, pending promises will be rejected.
  */
-const REQUEST_TIMEOUT_MS = 15000; // 15 seconds
+const REQUEST_TIMEOUT_MS = 25000; // 25 seconds
 
 /**
  * Class for the bridge input of remote eye trackers (e.g., Bridge).
@@ -30,6 +30,64 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         timeout: number
     }> = new Map();
     private correlationId: number = 0;
+
+    /**
+     * Bound handler for `message` events from the worker. Keeps the same switch logic that was previously
+     * defined inline in the constructor so that we can add and remove the listener cleanly.
+     */
+    private readonly handleWorkerMessage = (
+        event: MessageEvent<
+            | GazeDataPoint
+            | FixationDataPoint
+            | ReceiveResponsePayload
+            | ReceiveErrorPayload
+            | ReceiveMessagePayload
+            | ViewportCalibrationPayload
+            | InnerCommandPayloadBase
+        >
+    ) => {
+        const { type } = event.data;
+
+        switch (type) {
+            case 'gaze':
+                this.emit('inputData', event.data);
+                break;
+            case 'fixationEnd':
+                this.emit('inputFixationEnd', event.data);
+                break;
+            case 'fixationStart':
+                this.emit('inputFixationStart', event.data);
+                break;
+            case 'response':
+                this.processMessageResponse(event.data as ReceiveResponsePayload);
+                break;
+            case 'viewportCalibration':
+                this.setWindowCalibrationValues(event.data as ViewportCalibrationPayload);
+                this.resolvePendingPromise((event.data as ViewportCalibrationPayload).correlationId);
+                break;
+            case 'error':
+                this.processMessageError(event.data as ReceiveErrorPayload);
+                break;
+            case 'message':
+                this.processMessageMessage(event.data as ReceiveMessagePayload);
+                break;
+            case 'open':
+            case 'close':
+                this.resolvePendingPromise((event.data as InnerCommandPayloadBase).correlationId);
+                break;
+        }
+    };
+
+    /**
+     * Bound handler for general worker errors so the bridge can surface them and reject all pending promises.
+     */
+    private readonly handleWorkerError = (event: ErrorEvent): void => {
+        this.processMessageError({
+            type: 'error',
+            timestamp: createISO8601Timestamp(),
+            content: event.message ?? 'Worker error',
+        });
+    };
 
     constructor(config: GazeInputConfigBridge) {
         super(config);
@@ -52,39 +110,8 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
         });
 
         // Set up permanent listener for messages from the worker.
-        this.worker.onmessage = (event: MessageEvent<GazeDataPoint | FixationDataPoint | ReceiveResponsePayload | ReceiveErrorPayload | ReceiveMessagePayload | ViewportCalibrationPayload | InnerCommandPayloadBase>) => {
-            const { type } = event.data;
-            
-            switch (type) {
-                case 'gaze':
-                    this.emit('inputData', event.data);
-                    break;
-                case 'fixationEnd':
-                    this.emit('inputFixationEnd', event.data);
-                    break;
-                case 'fixationStart':
-                    this.emit('inputFixationStart', event.data);
-                    break;
-                case 'response':
-                    this.processMessageResponse(event.data);
-                    break;
-                case 'viewportCalibration':
-                    this.setWindowCalibrationValues(event.data);
-                    this.resolvePendingPromise(event.data.correlationId);
-                    break;
-                case 'error': {
-                    this.processMessageError(event.data);
-                    break;
-                }
-                case 'message':
-                    this.processMessageMessage(event.data);
-                    break;
-                case 'open':
-                case 'close':
-                    this.resolvePendingPromise(event.data.correlationId);
-                    break;
-            }
-        };
+        this.worker.addEventListener('message', this.handleWorkerMessage);
+        this.worker.addEventListener('error', this.handleWorkerError);
     }
 
     /**
@@ -117,14 +144,21 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
      * @param data - The error message.
      */
     protected processMessageError(data: ReceiveErrorPayload): void {
-        this.pendingPromises.forEach((promise, correlationId) => {
+        const hadPendingPromises = this.pendingPromises.size > 0;
+
+        // Reject all command-level promises so their callers are notified.
+        this.pendingPromises.forEach((_, correlationId) => {
             this.rejectPendingPromise(correlationId, data.content);
         });
-        this.emit('inputError', {
-            type: 'inputError',
-            timestamp: data.timestamp,
-            content: data.content,
-        });
+
+        // Emit the global error only if *none* of the above rejections already did so.
+        if (!hadPendingPromises) {
+            this.emit('inputError', {
+                type: 'inputError',
+                timestamp: data.timestamp,
+                content: data.content,
+            });
+        }
     }
 
     /**
@@ -174,6 +208,14 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             clearTimeout(promise.timeout);
             promise.reject(reason);
             this.pendingPromises.delete(correlationId);
+            // Propagate the error to all listeners so that local promise rejections
+            // are visible at the global event level as well.
+            const message = reason instanceof Error ? reason.message : String(reason);
+            this.emit('inputError', {
+                type: 'inputError',
+                timestamp: createISO8601Timestamp(),
+                content: message,
+            });
         }
     }
 
@@ -279,5 +321,25 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             // Send the message to the worker
             this.worker.postMessage(payload);
         });
+    }
+
+    /**
+     * Terminates the worker and cleans up event listeners and pending promises.
+     */
+    async destroy(): Promise<this> {
+        // Remove listeners to prevent memory leaks
+        this.worker.removeEventListener('message', this.handleWorkerMessage);
+        this.worker.removeEventListener('error', this.handleWorkerError);
+
+        // Terminate worker thread
+        this.worker.terminate();
+
+        // Reject any still-pending promises so callers are informed
+        this.pendingPromises.forEach((_, correlationId) => {
+            this.rejectPendingPromise(correlationId, new Error('Bridge destroyed'));
+        });
+        this.pendingPromises.clear();
+
+        return this;
     }
 }

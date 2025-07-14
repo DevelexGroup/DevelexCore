@@ -26,6 +26,15 @@ const saccadeRepository = {
       return null;
     }
   },
+  async createMany(data: Saccade[]): Promise<number[] | null> {
+    try {
+      const ids = await db.saccades.bulkAdd(data, { allKeys: true });
+      return ids;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
   csvHeader(): string {
     return 'sessionId, timestamp, type, duration, aoi, angleToScreen, angleToPrevious, angleToPreviousInvalidityTime, originFixationX, originFixationY, targetFixationX, targetFixationY';
   },

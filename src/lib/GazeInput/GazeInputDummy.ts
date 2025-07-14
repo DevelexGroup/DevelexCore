@@ -275,6 +275,25 @@ export class GazeInputDummy extends GazeInput<GazeInputConfigDummy> {
 		return this;
 	}
 
+	/**
+	 * Clean up resources: event listeners, intervals and internal references.
+	 */
+	async destroy(): Promise<this> {
+		// Stop emitting gaze points if still running
+		if (this.intervalId != null) {
+			clearInterval(this.intervalId);
+			this.intervalId = null;
+		}
+
+		// Remove the mouse move listener
+		document.removeEventListener('mousemove', this.boundUpdateMousePosition);
+
+		// Clear status so that subscribers know the input was destroyed
+		this.setStatusValues(null);
+
+		return this;
+	}
+
 	private updateMousePosition(event: MouseEvent): void {
 		this.lastMouseCoordinates = { x: event.clientX, y: event.clientY };
 	}

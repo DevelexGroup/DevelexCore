@@ -21,20 +21,20 @@
     let isClosedProcessing = false;
     let isStatusProcessing = false;
 
-    const handleGazeInputEventState = (data: GazeInputEventState) => {
-        sceneStateStore.update((store) => {
-            store.unshift(data);
-            return store;
+    const handleInputState = (event: GazeInputEventState) => {
+        sceneStateStore.update((buffer) => {
+            buffer.push(event);
+            return buffer;
         });
         if (!$gazeManagerStore) return;
-        if (data.trackerStatus?.tracker?.status === "trackerEmitting" && isGazeIndicatorVisible) {
+        if (event.trackerStatus?.tracker?.status === "trackerEmitting" && isGazeIndicatorVisible) {
             initIndicator();
         } else {
             destroyIndicator();
         }
     };
 
-    $gazeManagerStore.on("inputState", handleGazeInputEventState);
+    $gazeManagerStore.on("inputState", handleInputState);
 
     const drawGaze = (gaze: GazeDataPoint) => {
         indicator.draw(gaze);
