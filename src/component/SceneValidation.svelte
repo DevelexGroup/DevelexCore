@@ -23,6 +23,7 @@
     ] as const;
 
     const validator = $gazeManagerStore;
+
 </script>
 
 <div class="holder">
@@ -34,7 +35,7 @@
         </div>
     </Group>
     <Group heading="Validation Interaction Log">
-        <GenericTable data={$sceneObjectValidationStore} headers={["timestamp", "type", "isValid", "allDataPointsCount", "validDataPointsCount", "validDataPointsPercentage", "accuracy", "precision"]} />
+        <GenericTable data={$sceneObjectValidationStore} headers={["timestamp", "type", "aoi"]} />
     </Group>
 </div>
 

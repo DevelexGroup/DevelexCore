@@ -1,9 +1,49 @@
-import { writable } from 'svelte/store';
-import { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer';
+import { writable, type Writable } from 'svelte/store';
 import type { GazeInputEventError, GazeInputEventState } from '$lib/GazeInput/GazeInputEvent';
 import type { GazeInteractionObjectDwellEvent } from '$lib/GazeInteraction/GazeInteractionObjectDwell.event';
 import type { GazeInteractionObjectFixationEvent } from '$lib/GazeInteraction/GazeInteractionObjectFixation.event';
 import type { GazeInteractionObjectSaccadeEvent } from '$lib/GazeInteraction/GazeInteractionObjectSaccade.event';
+import { TimedCircularBuffer } from '$lib/Helper/HelperCircularBuffer';
+
+// ---------------------------------------------------------------------------
+// Constants governing buffer behaviour
+// ---------------------------------------------------------------------------
+
+// Snapshot events are emitted at ~60 FPS for smooth UI updates (≈16 ms)
+const SNAPSHOT_INTERVAL_MS = 1000 / 60;
+
+// Update events – used to persist data to Dexie – run once per second
+const UPDATE_INTERVAL_MS = 1000;
+
+// Internal buffer capacity – large enough to hold all items that may arrive
+// between two update events plus some margin.
+const BUFFER_SIZE = 2048;
+
+// How many items the UI is interested in at once (per snapshot)
+const SNAPSHOT_COUNT = 60;
+
+// ---------------------------------------------------------------------------
+// Helper to wire a TimedCircularBuffer to both UI (snapshot) and Dexie (update)
+// ---------------------------------------------------------------------------
+
+function createTimedStores<T>(
+  repository: { createMany(data: T[]): Promise<unknown>; },
+): { uiStore: Writable<T[]>; buffer: TimedCircularBuffer<T>; }
+{
+  const uiStore = writable<T[]>([]);
+  const buffer  = new TimedCircularBuffer<T>(BUFFER_SIZE, SNAPSHOT_COUNT, SNAPSHOT_INTERVAL_MS, UPDATE_INTERVAL_MS);
+
+  // UI snapshots
+  buffer.on('snapshot', ({ items }) => {
+    const reversedItems = [...items].reverse();
+    uiStore.set(reversedItems as T[]);
+  });
+
+  // Persist to Dexie in bulk
+  buffer.on('update', ({ items }) => { void repository.createMany(items as T[]); });
+
+  return { uiStore, buffer };
+}
 
 import type { Dwell } from '../database/models/Dwell';
 import dwellRepository from '../database/repositories/dwell.repository';
@@ -21,16 +61,18 @@ import intersectRepository from '../database/repositories/intersect.repository';
 import type { Point } from '../database/models/Point';
 import pointRepository from '../database/repositories/point.repository';
 
-export const scenePointDataStore = writable<GazeDataCircularBuffer>(new GazeDataCircularBuffer(300));
-
 export const sceneStateStore = writable<GazeInputEventState[]>([]);
 
 export const sceneErrorStore = writable<GazeInputEventError[]>([]);
 
-// Define the writable store with a custom update function
-export const sceneObjectDwellStore = writable<Dwell[]>([]);
+// --------------------------------------------------------------------------------
+// DWELL EVENTS
+// --------------------------------------------------------------------------------
 
-// Function to add new events to the store
+const dwell = createTimedStores<Dwell>(dwellRepository);
+export const sceneObjectDwellStore = dwell.uiStore;
+
+// Function to add new events to the Dwell buffer
 export const addDwellEvent = (unprocessedEvent: GazeInteractionObjectDwellEvent) => {
     // Extract the relevant information from the event
     const { type, sessionId, timestamp, duration, gazeData, target } = unprocessedEvent;
@@ -46,22 +88,15 @@ export const addDwellEvent = (unprocessedEvent: GazeInteractionObjectDwellEvent)
         type
     };
 
-    void dwellRepository.create(event);
+    dwell.buffer.push(event);
+};
 
-    sceneObjectDwellStore.update(events => {
-        // Add the new event
-        const updatedEvents = [event, ...events];
-        
-        // If there are more than 100 events, remove the oldest one
-        if (updatedEvents.length > 100) {
-            updatedEvents.pop();
-        }
-        
-        return updatedEvents;
-    });
-}
+// --------------------------------------------------------------------------------
+// FIXATION EVENTS
+// --------------------------------------------------------------------------------
 
-export const sceneObjectFixationStore = writable<Fixation[]>([]);
+const fixation = createTimedStores<Fixation>(fixationRepository);
+export const sceneObjectFixationStore = fixation.uiStore;
 
 export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixationEvent) => {
     // Extract the relevant information from the event
@@ -87,22 +122,15 @@ export const addFixationEvent = (unprocessedEvent: GazeInteractionObjectFixation
         parseValidity
     };
 
-    void fixationRepository.create(event);
+    fixation.buffer.push(event);
+};
 
-    sceneObjectFixationStore.update(events => {
-        // Add the new event
-        const updatedEvents = [event, ...events];
-        
-        // If there are more than 100 events, remove the oldest one
-        if (updatedEvents.length > 100) {
-            updatedEvents.pop();
-        }
-        
-        return updatedEvents;
-    });
-}
+// --------------------------------------------------------------------------------
+// INTERSECT EVENTS
+// --------------------------------------------------------------------------------
 
-export const sceneIntersectStore = writable<Intersect[]>([]);
+const intersectB = createTimedStores<Intersect>(intersectRepository);
+export const sceneIntersectStore = intersectB.uiStore;
 
 export const addIntersectEvent = (unprocessedEvent: GazeInteractionObjectIntersectEvent) => {
     const { type, sessionId, timestamp, gazeData, target } = unprocessedEvent;
@@ -116,18 +144,15 @@ export const addIntersectEvent = (unprocessedEvent: GazeInteractionObjectInterse
         gazeData
     };
 
-    void intersectRepository.create(event);
-    
-    sceneIntersectStore.update(events => {
-        const updatedEvents = [event, ...events];
-        if (updatedEvents.length > 100) {
-            updatedEvents.pop();
-        }
-        return updatedEvents;
-    });
-}
+    intersectB.buffer.push(event);
+};
 
-export const sceneObjectSaccadeStore = writable<Saccade[]>([]);
+// --------------------------------------------------------------------------------
+// SACCADE EVENTS
+// --------------------------------------------------------------------------------
+
+const saccadeB = createTimedStores<Saccade>(saccadeRepository);
+export const sceneObjectSaccadeStore = saccadeB.uiStore;
 
 export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEvent) => {
     // Extract the relevant information from the event
@@ -148,52 +173,31 @@ export const addSaccadeEvent = (unprocessedEvent: GazeInteractionObjectSaccadeEv
         targetFixation
     };
 
-    void saccadeRepository.create(event);
+    saccadeB.buffer.push(event);
+};
 
-    sceneObjectSaccadeStore.update(events => {
-        // Add the new event
-        const updatedEvents = [event, ...events];
-        
-        // If there are more than 100 events, remove the oldest one
-        if (updatedEvents.length > 100) {
-            updatedEvents.pop();
-        }
-        
-        return updatedEvents;
-    });
-}
+// --------------------------------------------------------------------------------
+// POINT EVENTS
+// --------------------------------------------------------------------------------
 
-export const scenePointStore = writable<Point[]>([]);
+const pointB = createTimedStores<Point>(pointRepository);
+export const scenePointStore = pointB.uiStore;
 
 export const addPointEvent = (data: GazeDataPoint) => {
-    void pointRepository.create(data);
-    
-    scenePointStore.update(points => {
-        const updatedPoints = [data, ...points];
-        if (updatedPoints.length > 100) {
-            updatedPoints.pop();
-        }
-        return updatedPoints;
-    });
-}
+    pointB.buffer.push(data);
+};
 
-export const sceneObjectValidationStore = writable<Validation[]>([]);
+// --------------------------------------------------------------------------------
+// VALIDATION EVENTS
+// --------------------------------------------------------------------------------
+
+const validationB = createTimedStores<Validation>(validationRepository);
+export const sceneObjectValidationStore = validationB.uiStore;
 
 export const addValidationEvent = (event: GazeInteractionObjectValidationEvent) => {
     // erase gazeDataPoints from the event
     const { gazeDataPoints, ...rest } = event;
     void gazeDataPoints;
-    void validationRepository.create(rest);
 
-    sceneObjectValidationStore.update(events => {
-        // Add the new event
-        const updatedEvents = [event, ...events];
-        
-        // If there are more than 100 events, remove the oldest one
-        if (updatedEvents.length > 100) {
-            updatedEvents.pop();
-        }
-        
-        return updatedEvents;
-    });
-}
+    validationB.buffer.push(rest as Validation);
+};

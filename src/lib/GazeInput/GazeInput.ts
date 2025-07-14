@@ -50,6 +50,11 @@ export abstract class GazeInput<T extends GazeInputConfig> extends Emitter<GazeI
 	abstract open(): Promise<this>;
 	abstract close(): Promise<this>;
 	abstract status(): Promise<this>;
+	/**
+	 * Clean up all resources associated with this input adapter (event listeners, workers, timers, etc.).
+	 * After calling this method the instance should be considered unusable.
+	 */
+	abstract destroy(): Promise<this>;
 
 	protected setWindowCalibrationValues(calibration: GazeWindowCalibratorConfig | null) {
 		this._windowCalibration = calibration;

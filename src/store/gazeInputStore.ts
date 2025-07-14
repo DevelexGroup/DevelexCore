@@ -5,7 +5,6 @@ import { writable, get } from 'svelte/store';
 import type { GazeInputConfig } from '$lib/GazeInput/GazeInputConfig';
 import { GazeManager } from '$lib/GazeManager/GazeManager';
 import { addDwellEvent, addFixationEvent, addIntersectEvent, addPointEvent, addSaccadeEvent, addValidationEvent, sceneErrorStore } from "./sceneStores";
-import type { GazeInputEventError } from '$lib/index';
 
 /**
  * The gaze input store.
@@ -38,13 +37,6 @@ export const setGazeInput = (input: Input | null) => {
     });
 };
 
-const addInputErrorEvent = (error: GazeInputEventError) => {
-    sceneErrorStore.update((errors) => {
-        errors.push(error);
-        return errors;
-    });
-};
-
 get(gazeManagerStore).on("inputData", addPointEvent);
 get(gazeManagerStore).on("dwell", addDwellEvent);
 get(gazeManagerStore).on("fixationObjectStart", addFixationEvent);
@@ -53,4 +45,9 @@ get(gazeManagerStore).on("saccadeObjectTo", addSaccadeEvent);
 get(gazeManagerStore).on("saccadeObjectFrom", addSaccadeEvent);
 get(gazeManagerStore).on("validation", addValidationEvent);
 get(gazeManagerStore).on("intersect", addIntersectEvent);
-get(gazeManagerStore).on("inputError", addInputErrorEvent);
+get(gazeManagerStore).on("inputError", (error) => {
+    sceneErrorStore.update((buffer) => {
+        buffer.push(error);
+        return buffer;
+    });
+});

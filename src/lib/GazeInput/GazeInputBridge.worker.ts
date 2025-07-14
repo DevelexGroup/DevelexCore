@@ -190,10 +190,8 @@ const setupWebSocket = async () => {
         // attempt to open the websocket connection
         await apiClient.openConnection(setupPayload.config.uri);
     } catch {
-        sendWorkerErrorToTheMainThread(
-            `Failed to connect to WebSocket server at ${setupPayload.config.uri}`,
-            null
-        );
+        // The apiClient will already have emitted an 'error' event which is forwarded
+        // to the main thread. Avoid sending another error here to prevent duplicates.
         return;
     }
 }

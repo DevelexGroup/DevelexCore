@@ -26,6 +26,15 @@ const dwellRepository = {
       return null;
     }
   },
+  async createMany(data: Dwell[]): Promise<number[] | null> {
+    try {
+      const ids = await db.dwells.bulkAdd(data, { allKeys: true });
+      return ids;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
   csvHeader(): string {
     return 'sessionId, timestamp, type, duration, aoi, gazeData.x, gazeData.y, gazeData.xL, gazeData.yL, gazeData.xR, gazeData.yR';
   },

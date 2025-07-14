@@ -35,11 +35,20 @@ const pointRepository = {
       return null;
     }
   },
+  async createMany(data: Point[]): Promise<number[] | null> {
+    try {
+      const ids = await db.points.bulkAdd(data, { allKeys: true });
+      return ids;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
   csvHeader(): string {
-    return 'sessionId, timestamp, x, xL, xR, xLScreenRelative, xRScreenRelative, y, yL, yR, yLScreenRelative, yRScreenRelative, validityL, validityR, parseValidity, fixationDuration, fixationId';
+    return 'sessionId, timestamp, x, xL, xR, xLScreenRelative, xRScreenRelative, y, yL, yR, yLScreenRelative, yRScreenRelative, validityL, validityR, parseValidity';
   },
   toCsv(data: Point): string {
-    return `${data.sessionId},${data.timestamp},${data.x},${data.xL},${data.xR},${data.xLScreenRelative},${data.xRScreenRelative},${data.y},${data.yL},${data.yR},${data.yLScreenRelative},${data.yRScreenRelative},${data.validityL},${data.validityR},${data.parseValidity},${data.fixationDuration},${data.fixationId}`;
+    return `${data.sessionId},${data.timestamp},${data.x},${data.xL},${data.xR},${data.xLScreenRelative},${data.xRScreenRelative},${data.y},${data.yL},${data.yR},${data.yLScreenRelative},${data.yRScreenRelative},${data.validityL},${data.validityR},${data.parseValidity}`;
   },
 };
 

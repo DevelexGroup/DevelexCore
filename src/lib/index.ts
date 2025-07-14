@@ -155,7 +155,7 @@ export {
     type GazeDataPoint,
     type FixationDataPoint,
 } from '$lib/GazeData/GazeData.js';
-export { GazeDataCircularBuffer } from '$lib/GazeData/GazeDataCircularBuffer.js';
+export { TimedCircularBuffer } from '$lib/Helper/HelperCircularBuffer.js';
 
 /**
  * @module GazeWindowCalibrator

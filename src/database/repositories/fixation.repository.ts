@@ -26,6 +26,15 @@ const fixationRepository = {
       return null;
     }
   },
+  async createMany(data: Fixation[]): Promise<number[] | null> {
+    try {
+      const ids = await db.fixations.bulkAdd(data, { allKeys: true });
+      return ids;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
   csvHeader(): string {
     return 'sessionId, timestamp, deviceTimestamp, type, duration, aoi, x, y, deviceId, fixationId';
   },
