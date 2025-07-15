@@ -29,7 +29,7 @@ export type GazeInputConfigGazePoint = {
 export type GazeInputConfigEyelogic = {
     tracker: 'eyelogic';
     uri: string;
-    fixationDetection: 'none' | 'idt';
+    fixationDetection: 'none' | 'idt' | 'device';
 };
 
 /**

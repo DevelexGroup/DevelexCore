@@ -53,6 +53,10 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
      * @param gazePoint 
      */
     processGazePoint(gazePoint: GazeDataPoint): void {
+        // Check validity of the gaze point, if both eyes are invalid, do nothing
+        // TODO: OPTIMISE IDT PROCESS 
+        if (!gazePoint.validityL && !gazePoint.validityR) return;
+
         const dispersion = getMaxDispersion([...this.windowGazePoints, gazePoint]);
         const duration = this.getDuration(gazePoint);
         const isValidDispersionWise = dispersion <= this.pixelTolerance;
