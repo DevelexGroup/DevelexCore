@@ -53,9 +53,39 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
      * @param gazePoint 
      */
     processGazePoint(gazePoint: GazeDataPoint): void {
+        // Handle null/undefined samples gracefully: treat as stream break
+        // and close an ongoing fixation, if any, using the last valid sample.
+        if (gazePoint == null) {
+            if (this.wasPreviousPointValidFixation && this.windowGazePoints.length > 0) {
+                const lastPoint = this.windowGazePoints[this.windowGazePoints.length - 1];
+                const averageCoords = this.getAverageCoordinates();
+                const duration = this.getDuration(lastPoint);
+                const fixationPoint: FixationDataPoint = {
+                    type: 'fixationEnd',
+                    deviceId: lastPoint.deviceId,
+                    timestamp: lastPoint.timestamp,
+                    deviceTimestamp: lastPoint.deviceTimestamp,
+                    duration,
+                    x: averageCoords.x,
+                    y: averageCoords.y,
+                    xScreenRelative: averageCoords.xScreenRelative,
+                    yScreenRelative: averageCoords.yScreenRelative,
+                    sessionId: lastPoint.sessionId,
+                    parseValidity: lastPoint.parseValidity,
+                    fixationId: this.currentFixationId
+                };
+                this.emit('fixationEnd', fixationPoint);
+            }
+            this.reset();
+            return;
+        }
+
         // Check validity of the gaze point, if both eyes are invalid, do nothing
         // TODO: OPTIMISE IDT PROCESS 
         if (!gazePoint.validityL && !gazePoint.validityR) return;
+
+        // Guard against non-finite coordinates which could break dispersion calc
+        if (!Number.isFinite(gazePoint.x) || !Number.isFinite(gazePoint.y)) return;
 
         const dispersion = getMaxDispersion([...this.windowGazePoints, gazePoint]);
         const duration = this.getDuration(gazePoint);
@@ -186,7 +216,8 @@ export const getMaxDispersion = (gazePoints: GazeDataPoint[]): number => {
 
 
 export const getSizeInCentimetersFromDegrees = (degrees: number, distanceFromScreen: number): number => {
-    return 2 * distanceFromScreen * Math.tan(degrees / 2);
+    const radians = (degrees * Math.PI) / 180;
+    return 2 * distanceFromScreen * Math.tan(radians / 2);
 }
 
 export const getSizeInPixelsFromCentimeters = (centimeters: number, DPI: number): number => {
