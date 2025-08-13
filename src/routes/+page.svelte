@@ -1,7 +1,8 @@
 <script>
-	import ControlConfigureGazeInput from "../component/ControlConfigureGazeInput.svelte";
+    import ControlConfigureGazeInput from "../component/ControlConfigureGazeInput.svelte";
     import ControlGazeInput from "../component/ControlGazeInput.svelte";
-	import ControlScene from "../component/ControlScene.svelte";
+    import ControlScene from "../component/ControlScene.svelte";
+    import { asset } from "$app/paths";
 </script>
 
 <svelte:head>
@@ -10,8 +11,8 @@
 </svelte:head>
 
 <main>
-	<header class="flex flex-row items-center justify-center">
-		<img src="/favicon.png" alt="develex-core" width="80" height="80" />
+    <header class="flex flex-row items-center justify-center">
+        <img src={asset(`/favicon.png`)} alt="develex-core" width="80" height="80" />
 		<div>
 			<h1>Develex Test Controls</h1>
 			<h2>Test your eye-tracker with the Develex framework</h2>

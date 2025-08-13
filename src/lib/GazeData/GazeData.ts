@@ -1,4 +1,4 @@
-import { FixationDataPayload, GazeDataPayload } from "$lib/GazeInput/GazeInputBridge.types";
+import type { FixationDataPayload, GazeDataPayload } from "$lib/GazeInput/GazeInputBridge.types";
 
 export interface GazeDataPoint extends GazeDataPayload {
     sessionId: string;

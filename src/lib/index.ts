@@ -178,8 +178,7 @@ export { createGazeFixationDetector } from '$lib/GazeFixationDetector/index.js';
 export { GazeFixationDetector } from '$lib/GazeFixationDetector/GazeFixationDetector.js';
 export { GazeFixationDetectorDevice } from '$lib/GazeFixationDetector/GazeFixationDetectorDevice.js';
 export { GazeFixationDetectorIDT } from '$lib/GazeFixationDetector/GazeFixationDetectorIDT.js';
-export { 
-    getMaxDispersion,
+export {
     getSizeInCentimetersFromDegrees,
     getSizeInPixelsFromCentimeters 
 } from '$lib/GazeFixationDetector/GazeFixationDetectorIDT.js';
