@@ -96,6 +96,76 @@ describe('GazeFixationDetectorIDT - null and state handling', () => {
     expect(events.some((e) => e.type === 'fixationEnd')).toBe(true);
   });
 
+  it('fixationEnd uses the last valid snapshot time and averages (not the outlier)', () => {
+    const t0 = Date.now();
+    const idt = new GazeFixationDetectorIDT(60, 100, 0.7, 96);
+    // Override pixel tolerance directly (pixels) for predictable bbox behavior
+    idt.pixelTolerance = 5; // bbox width+height threshold
+
+    const events: FixationDataPoint[] = [];
+    idt.on('fixationStart', (e) => events.push(e));
+    idt.on('fixationEnd', (e) => events.push(e));
+
+    // Build fixation: 0,20,40,60 ms at (100,100)
+    const tA = [0, 20, 40, 60].map((d) => t0 + d);
+    for (const t of tA) {
+      idt.processGazePoint(
+        makeGazePoint({ timestamp: makeISO(t), deviceTimestamp: makeISO(t), x: 100, y: 100, xL: 100, yL: 100, xR: 100, yR: 100 })
+      );
+    }
+
+    // Outlier at 80 ms far away to force trimming below min duration
+    const tOut = t0 + 80;
+    idt.processGazePoint(
+      makeGazePoint({ timestamp: makeISO(tOut), deviceTimestamp: makeISO(tOut), x: 300, y: 100, xL: 300, yL: 100, xR: 300, yR: 100 })
+    );
+
+    const endEvt = events.find((e) => e.type === 'fixationEnd')!;
+    expect(endEvt).toBeTruthy();
+    // End should be at 60 ms (last valid snapshot), not 80 ms
+    expect(endEvt.timestamp).toBe(makeISO(t0 + 60));
+    // Duration should be 60 - 0 = 60 ms
+    expect(endEvt.duration).toBe(60);
+    // Averages should reflect (100,100)
+    expect(Math.round(endEvt.x)).toBe(100);
+    expect(Math.round(endEvt.y)).toBe(100);
+  });
+
+  it('trimming can recover without ending a fixation (no fixationEnd)', () => {
+    const t0 = Date.now();
+    const idt = new GazeFixationDetectorIDT(60, 100, 0.7, 96);
+    idt.pixelTolerance = 5; // bbox width+height threshold
+
+    const events: FixationDataPoint[] = [];
+    idt.on('fixationStart', (e) => events.push(e));
+    idt.on('fixationEnd', (e) => events.push(e));
+
+    // Early cluster at x=0 (0,20,40)
+    for (const d of [0, 20, 40]) {
+      const t = t0 + d;
+      idt.processGazePoint(
+        makeGazePoint({ timestamp: makeISO(t), deviceTimestamp: makeISO(t), x: 0, y: 0, xL: 0, yL: 0, xR: 0, yR: 0 })
+      );
+    }
+    // Later cluster at x=4 (60,80,100) → duration reaches 100ms, start fixation here
+    for (const d of [60, 80, 100]) {
+      const t = t0 + d;
+      idt.processGazePoint(
+        makeGazePoint({ timestamp: makeISO(t), deviceTimestamp: makeISO(t), x: 4, y: 0, xL: 4, yL: 0, xR: 4, yR: 0 })
+      );
+    }
+    expect(events.some((e) => e.type === 'fixationStart')).toBe(true);
+
+    // New sample at x=9 (120 ms) → full window width = 9, exceeds tol=5, so trim off early x=0s
+    const tNew = t0 + 120;
+    idt.processGazePoint(
+      makeGazePoint({ timestamp: makeISO(tNew), deviceTimestamp: makeISO(tNew), x: 9, y: 0, xL: 9, yL: 0, xR: 9, yR: 0 })
+    );
+
+    // After trimming 0s, remaining window should be [60..120] = 60 ms → meets minDuration; fixation continues
+    expect(events.filter((e) => e.type === 'fixationEnd').length).toBe(0);
+  });
+
   it('ignores samples where both eyes invalid', () => {
     const start = Date.now();
     const idt = new GazeFixationDetectorIDT(60, 100, 0.7, 96);

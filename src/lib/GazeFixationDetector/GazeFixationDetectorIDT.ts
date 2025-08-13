@@ -1,6 +1,5 @@
 import { GazeFixationDetector } from "./GazeFixationDetector"
 import { type GazeDataPoint, type FixationDataPoint } from "$lib/GazeData/GazeData";
-import { calculatePointDistance } from "$lib/utils/geometryUtils";
 import { getDifferenceInMilliseconds } from "$lib/utils/timeUtils";
 
 /**
@@ -20,6 +19,12 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
 
     fixationId: number = 0;
     currentFixationId: number = 0;
+
+    // Track last valid fixation snapshot (for precise fixationEnd)
+    private lastValidSnapshotTimestamp: string | null = null;
+    private lastValidSnapshotDuration: number = 0;
+    private lastValidSnapshotAverages: { x: number; y: number; xScreenRelative: number; yScreenRelative: number } | null = null;
+    private lastValidSnapshotSample: GazeDataPoint | null = null;
 
     // Track sums for calculating averages
     sumXL: number = 0;
@@ -54,24 +59,22 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
      */
     processGazePoint(gazePoint: GazeDataPoint): void {
         // Handle null/undefined samples gracefully: treat as stream break
-        // and close an ongoing fixation, if any, using the last valid sample.
+        // and close an ongoing fixation, if any, using the last valid snapshot.
         if (gazePoint == null) {
-            if (this.wasPreviousPointValidFixation && this.windowGazePoints.length > 0) {
-                const lastPoint = this.windowGazePoints[this.windowGazePoints.length - 1];
-                const averageCoords = this.getAverageCoordinates();
-                const duration = this.getDuration(lastPoint);
+            if (this.wasPreviousPointValidFixation && this.lastValidSnapshotSample && this.lastValidSnapshotAverages && this.lastValidSnapshotTimestamp) {
+                const s = this.lastValidSnapshotSample;
                 const fixationPoint: FixationDataPoint = {
                     type: 'fixationEnd',
-                    deviceId: lastPoint.deviceId,
-                    timestamp: lastPoint.timestamp,
-                    deviceTimestamp: lastPoint.deviceTimestamp,
-                    duration,
-                    x: averageCoords.x,
-                    y: averageCoords.y,
-                    xScreenRelative: averageCoords.xScreenRelative,
-                    yScreenRelative: averageCoords.yScreenRelative,
-                    sessionId: lastPoint.sessionId,
-                    parseValidity: lastPoint.parseValidity,
+                    deviceId: s.deviceId,
+                    timestamp: this.lastValidSnapshotTimestamp,
+                    deviceTimestamp: s.deviceTimestamp,
+                    duration: this.lastValidSnapshotDuration,
+                    x: this.lastValidSnapshotAverages.x,
+                    y: this.lastValidSnapshotAverages.y,
+                    xScreenRelative: this.lastValidSnapshotAverages.xScreenRelative,
+                    yScreenRelative: this.lastValidSnapshotAverages.yScreenRelative,
+                    sessionId: s.sessionId,
+                    parseValidity: s.parseValidity,
                     fixationId: this.currentFixationId
                 };
                 this.emit('fixationEnd', fixationPoint);
@@ -87,27 +90,34 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         // Guard against non-finite coordinates which could break dispersion calc
         if (!Number.isFinite(gazePoint.x) || !Number.isFinite(gazePoint.y)) return;
 
-        const dispersion = getMaxDispersion([...this.windowGazePoints, gazePoint]);
-        const duration = this.getDuration(gazePoint);
-        const isValidDispersionWise = dispersion <= this.pixelTolerance;
-        const isValidDurationWise = duration >= this.minimumFixationDuration;
+        // Push new point to window
+        this.windowGazePoints.push(gazePoint);
+        this.sumXL += gazePoint.xL;
+        this.sumXR += gazePoint.xR;
+        this.sumYL += gazePoint.yL;
+        this.sumYR += gazePoint.yR;
+        this.sumXLScreenRelative += gazePoint.xLScreenRelative;
+        this.sumXRScreenRelative += gazePoint.xRScreenRelative;
+        this.sumYLScreenRelative += gazePoint.yLScreenRelative;
+        this.sumYRScreenRelative += gazePoint.yRScreenRelative;
 
-        if (isValidDispersionWise) {
-            this.durationOfFullfilledDispersionGazeDataPoints = duration;
-            this.windowGazePoints.push(gazePoint);
-            
-            // Add to running sums
-            this.sumXL += gazePoint.xL;
-            this.sumXR += gazePoint.xR;
-            this.sumYL += gazePoint.yL;
-            this.sumYR += gazePoint.yR;
-            this.sumXLScreenRelative += gazePoint.xLScreenRelative;
-            this.sumXRScreenRelative += gazePoint.xRScreenRelative;
-            this.sumYLScreenRelative += gazePoint.yLScreenRelative;
-            this.sumYRScreenRelative += gazePoint.yRScreenRelative;
+        // Trim from the front until dispersion (bbox) is within tolerance
+        while (this.windowGazePoints.length > 0 && getBoundingBoxDispersion(this.windowGazePoints) > this.pixelTolerance) {
+            const removed = this.windowGazePoints.shift()!;
+            this.sumXL -= removed.xL;
+            this.sumXR -= removed.xR;
+            this.sumYL -= removed.yL;
+            this.sumYR -= removed.yR;
+            this.sumXLScreenRelative -= removed.xLScreenRelative;
+            this.sumXRScreenRelative -= removed.xRScreenRelative;
+            this.sumYLScreenRelative -= removed.yLScreenRelative;
+            this.sumYRScreenRelative -= removed.yRScreenRelative;
         }
 
-        if (isValidDurationWise && isValidDispersionWise) {
+        const duration = this.getWindowDuration();
+        const meetsDuration = duration >= this.minimumFixationDuration;
+
+        if (meetsDuration && this.windowGazePoints.length > 0) {
             if (!this.wasPreviousPointValidFixation) {
                 this.fixationId++;
                 this.currentFixationId = this.fixationId;
@@ -118,7 +128,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
                 const fixationPoint: FixationDataPoint = {
                     type: 'fixationStart',
                     deviceId: gazePoint.deviceId,
-                    timestamp: gazePoint.timestamp,
+                    timestamp: this.windowGazePoints[this.windowGazePoints.length - 1].timestamp,
                     deviceTimestamp: gazePoint.deviceTimestamp,
                     duration: duration,
                     x: averageCoords.x,
@@ -132,31 +142,35 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
                 this.emit('fixationStart', fixationPoint);
             }
             this.wasPreviousPointValidFixation = true;
+
+            // Update last valid snapshot
+            const averages = this.getAverageCoordinates();
+            const last = this.windowGazePoints[this.windowGazePoints.length - 1];
+            this.lastValidSnapshotAverages = averages;
+            this.lastValidSnapshotTimestamp = last.timestamp;
+            this.lastValidSnapshotDuration = duration;
+            this.lastValidSnapshotSample = last;
         } else {
             if (this.wasPreviousPointValidFixation) {
-                // Get average coordinates for fixation end BEFORE resetting window data
-                const averageCoords = this.getAverageCoordinates();
-                
-                // Emit fixation end event
-                const fixationPoint: FixationDataPoint = {
-                    type: 'fixationEnd',
-                    deviceId: gazePoint.deviceId, 
-                    timestamp: gazePoint.timestamp,
-                    deviceTimestamp: gazePoint.deviceTimestamp,
-                    duration: duration,
-                    x: averageCoords.x,
-                    y: averageCoords.y,
-                    xScreenRelative: averageCoords.xScreenRelative,
-                    yScreenRelative: averageCoords.yScreenRelative,
-                    sessionId: gazePoint.sessionId,
-                    parseValidity: gazePoint.parseValidity,
-                    fixationId: this.currentFixationId
-                };
-                this.emit('fixationEnd', fixationPoint);
-            }
-            // Only reset after we've generated fixation end event
-            if (!isValidDispersionWise) {
-                this.reset();
+                // Emit fixation end using the LAST VALID snapshot
+                if (this.lastValidSnapshotSample && this.lastValidSnapshotAverages && this.lastValidSnapshotTimestamp) {
+                    const s = this.lastValidSnapshotSample;
+                    const fixationPoint: FixationDataPoint = {
+                        type: 'fixationEnd',
+                        deviceId: s.deviceId,
+                        timestamp: this.lastValidSnapshotTimestamp,
+                        deviceTimestamp: s.deviceTimestamp,
+                        duration: this.lastValidSnapshotDuration,
+                        x: this.lastValidSnapshotAverages.x,
+                        y: this.lastValidSnapshotAverages.y,
+                        xScreenRelative: this.lastValidSnapshotAverages.xScreenRelative,
+                        yScreenRelative: this.lastValidSnapshotAverages.yScreenRelative,
+                        sessionId: s.sessionId,
+                        parseValidity: s.parseValidity,
+                        fixationId: this.currentFixationId
+                    };
+                    this.emit('fixationEnd', fixationPoint);
+                }
             }
             this.wasPreviousPointValidFixation = false;
         }
@@ -177,10 +191,11 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         };
     }
 
-    getDuration(gazePoint: GazeDataPoint): number {
-        const { timestamp } = gazePoint;
-        const timeFromLastFullfilledDispersionGazeDataPoint = this.windowGazePoints[this.windowGazePoints.length - 1] ? getDifferenceInMilliseconds(timestamp, this.windowGazePoints[this.windowGazePoints.length - 1].timestamp) : 0;
-        return this.durationOfFullfilledDispersionGazeDataPoints + timeFromLastFullfilledDispersionGazeDataPoint;
+    getWindowDuration(): number {
+        if (this.windowGazePoints.length === 0) return 0;
+        const first = this.windowGazePoints[0];
+        const last = this.windowGazePoints[this.windowGazePoints.length - 1];
+        return getDifferenceInMilliseconds(last.timestamp, first.timestamp);
     }
 
     reset(): void {
@@ -197,21 +212,29 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         this.sumYLScreenRelative = 0;
         this.sumYRScreenRelative = 0;
         // Don't reset the currentFixationId here - we want to keep it until the next fixation starts
+        // Reset last valid snapshot
+        this.lastValidSnapshotAverages = null;
+        this.lastValidSnapshotTimestamp = null;
+        this.lastValidSnapshotDuration = 0;
+        this.lastValidSnapshotSample = null;
     }
 
 }
 
-export const getMaxDispersion = (gazePoints: GazeDataPoint[]): number => {
-    let maxDispersion = 0;
-    for (let i = 0; i < gazePoints.length; i++) {
-        for (let j = i + 1; j < gazePoints.length; j++) {
-            const dispersion = calculatePointDistance(gazePoints[i], gazePoints[j]);
-            if (dispersion > maxDispersion) {
-                maxDispersion = dispersion;
-            }
-        }
+export const getBoundingBoxDispersion = (gazePoints: GazeDataPoint[]): number => {
+    if (gazePoints.length === 0) return 0;
+    let minX = gazePoints[0].x;
+    let maxX = gazePoints[0].x;
+    let minY = gazePoints[0].y;
+    let maxY = gazePoints[0].y;
+    for (let i = 1; i < gazePoints.length; i++) {
+        const gp = gazePoints[i];
+        if (gp.x < minX) minX = gp.x;
+        if (gp.x > maxX) maxX = gp.x;
+        if (gp.y < minY) minY = gp.y;
+        if (gp.y > maxY) maxY = gp.y;
     }
-    return maxDispersion;
+    return (maxX - minX) + (maxY - minY);
 }
 
 
