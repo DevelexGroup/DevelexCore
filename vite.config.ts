@@ -28,7 +28,9 @@ export default defineConfig(({ command, mode }) => {
       plugins: [
         dtsPlugin({
           include: ['src/lib'],
+          exclude: ['**/*.test.ts', '**/*.spec.ts'],
           insertTypesEntry: true,
+          tsconfigPath: resolve(__dirname, 'tsconfig.lib.json')
         }),
       ],
     };

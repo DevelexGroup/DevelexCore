@@ -13,9 +13,7 @@
 		"moduleResolution": "node",
 		"types": ["svelte", "vite/client", "@sveltejs/kit"]
 	},
-	"include": [
-		"src/**/*",
-		"src/app.d.ts"
-	]
+	"include": ["src/**/*", "src/app.d.ts"],
+	"exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"]
 }
   
