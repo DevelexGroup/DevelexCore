@@ -52,19 +52,19 @@ Configures the gaze input with the specified configuration. For hardware tracker
 ```typescript
 // Hardware tracker (requires the Develex Bridge to be running)
 gazeManager.createInput({
-  tracker: 'gazepoint',
-  uri: 'ws://localhost:4242',  // WebSocket URI for the Bridge server
-  fixationDetection: 'device'  // Use the eye tracker's built-in fixation detection
+    tracker: 'gazepoint',
+    uri: 'ws://localhost:4242',  // WebSocket URI for the Bridge server
+    fixationDetection: 'device'  // Use the eye tracker's built-in fixation detection
 });
 
 // Dummy tracker (for development and testing)
 gazeManager.createInput({
-  tracker: 'dummy',
-  fixationDetection: 'idt',
-  frequency: 60,
-  precisionMinimalError: 2,
-  precisionDecayRate: 0.1,
-  precisionMaximumError: 10
+    tracker: 'dummy',
+    fixationDetection: 'idt',
+    frequency: 60,
+    precisionMinimalError: 2,
+    precisionDecayRate: 0.1,
+    precisionMaximumError: 10
 });
 ```
 
@@ -137,8 +137,8 @@ Sets up window calibration to map screen coordinates to window pixel coordinates
 
 ```typescript
 await gazeManager.setWindowCalibration(
-  { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },
-  { screen: { width: 1920, height: 1080 } }
+    { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },
+    { screen: { width: 1920, height: 1080 } }
 );
 ```
 
@@ -196,33 +196,33 @@ const windowX = (gazeX * 1920) + (100 - 150); // = 960 - 50 = 910px
 ```typescript
 // GazePoint configuration
 const gazepointConfig: GazeInputConfigGazePoint = {
-  tracker: 'gazepoint',
-  uri: 'ws://localhost:4242',  // Bridge WebSocket server
-  fixationDetection: 'device'  // Use hardware fixation detection
+    tracker: 'gazepoint',
+    uri: 'ws://localhost:4242',  // Bridge WebSocket server
+    fixationDetection: 'device'  // Use hardware fixation detection
 };
 
 // EyeLogic configuration
 const eyelogicConfig: GazeInputConfigEyeLogic = {
-  tracker: 'eyelogic',
-  uri: 'ws://localhost:4242',
-  fixationDetection: 'idt'     // Use IDT algorithm for fixation detection
+    tracker: 'eyelogic',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'idt'     // Use IDT algorithm for fixation detection
 };
 
 // ASEE configuration
 const aseeConfig: GazeInputConfigAsee = {
-  tracker: 'asee',
-  uri: 'ws://localhost:4242',
-  fixationDetection: 'idt'
+    tracker: 'asee',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'idt'
 };
 
 // Dummy tracker configuration
 const dummyConfig: GazeInputConfigDummy = {
-  tracker: 'dummy',
-  fixationDetection: 'idt',
-  frequency: 60,
-  precisionMinimalError: 2,
-  precisionDecayRate: 0.1,
-  precisionMaximumError: 10
+    tracker: 'dummy',
+    fixationDetection: 'idt',
+    frequency: 60,
+    precisionMinimalError: 2,
+    precisionDecayRate: 0.1,
+    precisionMaximumError: 10
 };
 ```
 
@@ -231,47 +231,47 @@ const dummyConfig: GazeInputConfigDummy = {
 ```typescript
 // Dwell interaction settings
 const dwellSettings: Partial<GazeInteractionObjectDwell['defaultSettings']> = {
-  dwellTime: 1000,        // Time to trigger (ms)
-  toleranceTime: 150,     // Allowed gaze excursion time (ms)
-  bufferSize: 100,        // Data buffer size
-  onDwellProgress: (event) => {
-    // Progress callback - called during dwell
-  },
-  onDwellFinish: (event) => {
-    // Completion callback - called when dwell completes
-  },
-  onDwellCancel: (event) => {
-    // Cancellation callback - called when dwell is interrupted
-  }
+    dwellTime: 1000,        // Time to trigger (ms)
+    toleranceTime: 150,     // Allowed gaze excursion time (ms)
+    bufferSize: 100,        // Data buffer size
+    onDwellProgress: (event) => {
+      // Progress callback - called during dwell
+    },
+    onDwellFinish: (event) => {
+      // Completion callback - called when dwell completes
+    },
+    onDwellCancel: (event) => {
+      // Cancellation callback - called when dwell is interrupted
+    }
 };
 
 // Fixation interaction settings
 const fixationSettings: Partial<GazeInteractionObjectFixation['defaultSettings']> = {
-  bufferSize: 1000,
-  fixationObjectStart: (event) => {
-    // Called when fixation begins on element
-  },
-  fixationObjectEnd: (event) => {
-    // Called when fixation ends on element
-  },
-  fixationObjectProgress: (event) => {
-    // Called during fixation on element
-  }
+    bufferSize: 1000,
+    fixationObjectStart: (event) => {
+      // Called when fixation begins on element
+    },
+    fixationObjectEnd: (event) => {
+      // Called when fixation ends on element
+    },
+    fixationObjectProgress: (event) => {
+      // Called during fixation on element
+    }
 };
 
 // Saccade interaction settings
 const saccadeSettings: Partial<GazeInteractionObjectSaccade['defaultSettings']> = {
-  // Saccade-specific settings
+    // Saccade-specific settings
 };
 
 // Validation interaction settings
 const validationSettings: Partial<GazeInteractionObjectValidation['defaultSettings']> = {
-  // Validation-specific settings
+    // Validation-specific settings
 };
 
 // Intersection interaction settings
 const intersectSettings: Partial<GazeInteractionObjectIntersect['defaultSettings']> = {
-  // Intersection-specific settings
+    // Intersection-specific settings
 };
 ```
 
@@ -282,12 +282,12 @@ Registers an HTML element for gaze interaction.
 
 ```typescript
 gazeManager.register({
-  interaction: 'dwell',
-  element: document.getElementById('myButton'),
-  settings: {
-    dwellTime: 1000,
-    onDwellFinish: (event) => console.log('Dwell completed')
-  }
+    interaction: 'dwell',
+    element: document.getElementById('myButton'),
+    settings: {
+      dwellTime: 1000,
+      onDwellFinish: (event) => console.log('Dwell completed')
+    }
 });
 ```
 
@@ -296,8 +296,8 @@ Unregisters an HTML element from gaze interaction.
 
 ```typescript
 gazeManager.unregister({
-  interaction: 'dwell',
-  element: document.getElementById('myButton')
+    interaction: 'dwell',
+    element: document.getElementById('myButton')
 });
 ```
 
@@ -342,22 +342,22 @@ The GazeManager extends `EmitterGroup` and emits the following events:
 ```typescript
 // Listen to gaze data
 gazeManager.on('inputData', (gazeData) => {
-  console.log('Gaze position:', gazeData.x, gazeData.y);
+    console.log('Gaze position:', gazeData.x, gazeData.y);
 });
 
 // Listen to dwell events
 gazeManager.on('dwellFinish', (event) => {
-  console.log('Dwell completed on element');
+    console.log('Dwell completed on element');
 });
 
 // Listen to fixation events
 gazeManager.on('fixationObjectEnd', (event) => {
-  console.log('Fixation ended on element');
+    console.log('Fixation ended on element');
 });
 
 // Listen to errors
 gazeManager.on('inputError', (error) => {
-  console.error('Gaze input error:', error);
+    console.error('Gaze input error:', error);
 });
 ```
 
@@ -369,25 +369,25 @@ Union type for element registration:
 
 ```typescript
 type GazeManagerRegistration = {
-  interaction: 'fixation',
-  element: Element,
-  settings: Partial<GazeInteractionObjectFixationSettings>
+    interaction: 'fixation',
+    element: Element,
+    settings: Partial<GazeInteractionObjectFixationSettings>
 } | {
-  interaction: 'saccade',
-  element: Element,
-  settings: Partial<GazeInteractionObjectSaccadeSettings>
+    interaction: 'saccade',
+    element: Element,
+    settings: Partial<GazeInteractionObjectSaccadeSettings>
 } | {
-  interaction: 'dwell',
-  element: Element,
-  settings: Partial<GazeInteractionDwellSettingsType>
+    interaction: 'dwell',
+    element: Element,
+    settings: Partial<GazeInteractionDwellSettingsType>
 } | {
-  interaction: 'validation',
-  element: Element,
-  settings: Partial<GazeInteractionObjectValidationSettings>
+    interaction: 'validation',
+    element: Element,
+    settings: Partial<GazeInteractionObjectValidationSettings>
 } | {
-  interaction: 'intersect',
-  element: Element,
-  settings: Partial<GazeInteractionObjectIntersectSettingsType>
+    interaction: 'intersect',
+    element: Element,
+    settings: Partial<GazeInteractionObjectIntersectSettingsType>
 }
 ```
 
@@ -403,9 +403,9 @@ const gazeManager = new GazeManager();
 
 // Configure hardware tracker (requires Develex Bridge running)
 gazeManager.createInput({
-  tracker: 'gazepoint',
-  uri: 'ws://localhost:4242',  // Bridge WebSocket server
-  fixationDetection: 'device'  // Use hardware fixation detection
+    tracker: 'gazepoint',
+    uri: 'ws://localhost:4242',  // Bridge WebSocket server
+    fixationDetection: 'device'  // Use hardware fixation detection
 });
 
 // Connect to eye tracker via Bridge server
@@ -419,32 +419,32 @@ await gazeManager.start();
 
 // Calibrate window coordinates (essential for proper tracking)
 await gazeManager.setWindowCalibration(
-  { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },
-  { screen: { width: 1920, height: 1080 } }
+    { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },
+    { screen: { width: 1920, height: 1080 } }
 );
 
 // Register elements for gaze interaction
 gazeManager.register({
-  interaction: 'dwell',
-  element: document.getElementById('button'),
-  settings: {
-    dwellTime: 1000,
-    bufferSize: 100,
-    toleranceTime: 150,
-    onDwellProgress: (event) => console.log('Dwell progress'),
-    onDwellFinish: (event) => console.log('Dwell finished'),
-    onDwellCancel: (event) => console.log('Dwell cancelled')
-  }
+    interaction: 'dwell',
+    element: document.getElementById('button'),
+    settings: {
+      dwellTime: 1000,
+      bufferSize: 100,
+      toleranceTime: 150,
+      onDwellProgress: (event) => console.log('Dwell progress'),
+      onDwellFinish: (event) => console.log('Dwell finished'),
+      onDwellCancel: (event) => console.log('Dwell cancelled')
+    }
 });
 
 // Listen to processed gaze data (coordinates are already window-calibrated)
 gazeManager.on('inputData', (data) => {
-  console.log('Gaze position:', data.x, data.y); // These are window pixel coordinates
+    console.log('Gaze position:', data.x, data.y); // These are window pixel coordinates
 });
 
 // Listen to interaction events
 gazeManager.on('dwellFinish', (event) => {
-  console.log('User dwelled on element!');
+    console.log('User dwelled on element!');
 });
 
 // Cleanup
@@ -463,12 +463,12 @@ const gazeManager = new GazeManager();
 
 // Configure dummy tracker (no Bridge required)
 gazeManager.createInput({
-  tracker: 'dummy',
-  fixationDetection: 'idt',
-  frequency: 60,
-  precisionMinimalError: 2,
-  precisionDecayRate: 0.1,
-  precisionMaximumError: 10
+    tracker: 'dummy',
+    fixationDetection: 'idt',
+    frequency: 60,
+    precisionMinimalError: 2,
+    precisionDecayRate: 0.1,
+    precisionMaximumError: 10
 });
 
 // Connect (sets up mouse event listeners)
@@ -480,25 +480,25 @@ await gazeManager.start();
 
 // Calibrate window coordinates
 await gazeManager.setWindowCalibration(
-  { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },
-  { screen: { width: 1920, height: 1080 } }
+    { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },
+    { screen: { width: 1920, height: 1080 } }
 );
 
 // Register elements
 gazeManager.register({
-  interaction: 'dwell',
-  element: document.getElementById('button'),
-  settings: {
-    dwellTime: 1000,
-    bufferSize: 100,
-    toleranceTime: 150,
-    onDwellFinish: (event) => console.log('Dwell completed!')
-  }
+    interaction: 'dwell',
+    element: document.getElementById('button'),
+    settings: {
+      dwellTime: 1000,
+      bufferSize: 100,
+      toleranceTime: 150,
+      onDwellFinish: (event) => console.log('Dwell completed!')
+    }
 });
 
 // Listen to gaze data (follows mouse movement with precision simulation)
 gazeManager.on('inputData', (data) => {
-  console.log('Simulated gaze:', data.x, data.y);
+    console.log('Simulated gaze:', data.x, data.y);
 });
 ```
 
@@ -508,22 +508,22 @@ The GazeManager provides error handling through events:
 
 ```typescript
 gazeManager.on('inputError', (error) => {
-  console.error('Gaze input error:', error);
-  // Handle connection errors, calibration failures, etc.
+    console.error('Gaze input error:', error);
+    // Handle connection errors, calibration failures, etc.
 });
 
 gazeManager.on('inputState', (state) => {
-  switch (state.tracker?.status) {
-    case 'trackerConnected':
-      console.log('Eye tracker connected');
-      break;
-    case 'trackerDisconnected':
-      console.log('Eye tracker disconnected');
-      break;
-    case 'trackerCalibrating':
-      console.log('Calibration in progress');
-      break;
-  }
+    switch (state.tracker?.status) {
+      case 'trackerConnected':
+        console.log('Eye tracker connected');
+        break;
+      case 'trackerDisconnected':
+        console.log('Eye tracker disconnected');
+        break;
+      case 'trackerCalibrating':
+        console.log('Calibration in progress');
+        break;
+    }
 });
 ```
 

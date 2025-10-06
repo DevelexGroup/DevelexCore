@@ -1,6 +1,6 @@
 # Getting Started with DevelexCore
 
-This guide explains how to integrate eye tracking capabilities into your web application using DevelexCore. It covers basic setup procedures, configuration options, and common usage patterns.
+DevelexCore is a JavaScript SDK that enables eye tracking capabilities in web applications. This guide explains how to integrate it into your application, covering basic setup procedures, configuration options, and common usage patterns.
 
 ## Prerequisites
 
@@ -70,8 +70,8 @@ npm install develex-js-sdk
 │   Eye Tracker   │ -> │  Develex Bridge  │ -> │  DevelexCore    │
 │   Hardware      │    │  (WebSocket Server)│  │  SDK            │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
-                                                           │
-                                                           ▼
+                                                             │
+                                                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    Your Application                         │
 ├─────────────────────────────────────────────────────────────┤
@@ -106,19 +106,19 @@ Select your eye tracker type and create the input configuration:
 ```javascript
 // For hardware eye trackers (requires the Develex Bridge to be running)
 const gazepointConfig = {
-  tracker: 'gazepoint',
-  uri: 'ws://localhost:4242',  // WebSocket URI for the Bridge server
-  fixationDetection: 'device'  // Use the eye tracker's built-in fixation detection
+    tracker: 'gazepoint',
+    uri: 'ws://localhost:4242',  // WebSocket URI for the Bridge server
+    fixationDetection: 'device'  // Use the eye tracker's built-in fixation detection
 };
 
 // For development and testing (no hardware required)
 const dummyConfig = {
-  tracker: 'dummy',
-  fixationDetection: 'idt',     // Use the IDT algorithm for fixation detection
-  frequency: 60,               // Gaze data emission frequency in Hz
-  precisionMinimalError: 2,    // Minimum tracking error in pixels
-  precisionDecayRate: 0.1,     // Rate at which precision degrades over time
-  precisionMaximumError: 10    // Maximum tracking error limit
+    tracker: 'dummy',
+    fixationDetection: 'idt',     // Use the IDT algorithm for fixation detection
+    frequency: 60,               // Gaze data emission frequency in Hz
+    precisionMinimalError: 2,    // Minimum tracking error in pixels
+    precisionDecayRate: 0.1,     // Rate at which precision degrades over time
+    precisionMaximumError: 10    // Maximum tracking error limit
 };
 
 // Set up the input configuration
@@ -146,8 +146,8 @@ Before registering interactive elements, you must calibrate the window coordinat
 // Calibrate window coordinates (required for proper gaze tracking)
 // This maps screen coordinates (0-1) to your window's pixel coordinates
 await gazeManager.setWindowCalibration(
-  { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },  // Mouse click coordinates
-  { screen: { width: 1920, height: 1080 } }                    // Screen dimensions
+    { clientX: 100, clientY: 100, screenX: 150, screenY: 200 },  // Mouse click coordinates
+    { screen: { width: 1920, height: 1080 } }                    // Screen dimensions
 );
 ```
 
@@ -159,15 +159,15 @@ This calibration is essential because eye trackers report coordinates relative t
 // Register a button for dwell interaction
 const button = document.getElementById('myButton');
 gazeManager.register({
-  interaction: 'dwell',
-  element: button,
-  settings: {
-    dwellTime: 1000,  // 1 second dwell time
-    onDwellFinish: (event) => {
-      console.log('Button activated by gaze!');
-      button.click(); // Trigger the button action
+    interaction: 'dwell',
+    element: button,
+    settings: {
+      dwellTime: 1000,  // 1 second dwell time
+      onDwellFinish: (event) => {
+        console.log('Button activated by gaze!');
+        button.click(); // Trigger the button action
+      }
     }
-  }
 });
 ```
 
@@ -176,17 +176,17 @@ gazeManager.register({
 ```javascript
 // Listen for raw gaze data
 gazeManager.on('inputData', (gazeData) => {
-  console.log('Gaze position:', gazeData.x, gazeData.y);
+    console.log('Gaze position:', gazeData.x, gazeData.y);
 });
 
 // Listen for fixation events
 gazeManager.on('fixationObjectEnd', (event) => {
-  console.log('Fixation ended on element');
+    console.log('Fixation ended on element');
 });
 
 // Listen for dwell events
 gazeManager.on('dwellFinish', (event) => {
-  console.log('Dwell completed');
+    console.log('Dwell completed');
 });
 ```
 
@@ -201,18 +201,18 @@ const interactiveElements = document.querySelectorAll('.interactive');
 
 // Register all elements for dwell interaction
 interactiveElements.forEach(element => {
-  gazeManager.register({
-    interaction: 'dwell',
-    element: element,
-    settings: {
-      dwellTime: 800,
-      toleranceTime: 200, // Allow brief gaze excursions
-      onDwellFinish: (event) => {
-        // Trigger element activation
-        element.dispatchEvent(new CustomEvent('gazeActivated'));
+    gazeManager.register({
+      interaction: 'dwell',
+      element: element,
+      settings: {
+        dwellTime: 800,
+        toleranceTime: 200, // Allow brief gaze excursions
+        onDwellFinish: (event) => {
+          // Trigger element activation
+          element.dispatchEvent(new CustomEvent('gazeActivated'));
+        }
       }
-    }
-  });
+    });
 });
 ```
 
@@ -226,18 +226,18 @@ This pattern provides visual feedback when users focus on elements:
 const focusableElements = document.querySelectorAll('.focusable');
 
 focusableElements.forEach(element => {
-  gazeManager.register({
-    interaction: 'fixation',
-    element: element,
-    settings: {
-      fixationObjectStart: (event) => {
-        element.classList.add('gaze-focused');
-      },
-      fixationObjectEnd: (event) => {
-        element.classList.remove('gaze-focused');
+    gazeManager.register({
+      interaction: 'fixation',
+      element: element,
+      settings: {
+        fixationObjectStart: (event) => {
+          element.classList.add('gaze-focused');
+        },
+        fixationObjectEnd: (event) => {
+          element.classList.remove('gaze-focused');
+        }
       }
-    }
-  });
+    });
 });
 ```
 
@@ -251,22 +251,22 @@ This example creates a visual indicator that follows the user's gaze:
 // Create gaze cursor element
 const gazeCursor = document.createElement('div');
 gazeCursor.style.cssText = `
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  background: rgba(255, 0, 0, 0.7);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 0, 0, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
 `;
 document.body.appendChild(gazeCursor);
 
 // Update cursor position with gaze data
 gazeManager.on('inputData', (data) => {
-  // Note: data.x and data.y are in pixels after window calibration
-  gazeCursor.style.left = `${data.x}px`;
-  gazeCursor.style.top = `${data.y}px`;
+    // Note: data.x and data.y are in pixels after window calibration
+    gazeCursor.style.left = `${data.x}px`;
+    gazeCursor.style.top = `${data.y}px`;
 });
 ```
 
@@ -279,16 +279,16 @@ You can also configure other types of eye trackers:
 ```javascript
 // EyeLogic configuration
 const eyelogicConfig = {
-  tracker: 'eyelogic',
-  uri: 'ws://localhost:4242',
-  fixationDetection: 'idt'
+    tracker: 'eyelogic',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'idt'
 };
 
 // ASEE configuration
 const aseeConfig = {
-  tracker: 'asee',
-  uri: 'ws://localhost:4242',
-  fixationDetection: 'idt'
+    tracker: 'asee',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'idt'
 };
 ```
 
@@ -299,23 +299,23 @@ For complete configuration options and advanced settings, see the [GazeManager R
 ```javascript
 // Handle connection errors
 gazeManager.on('inputError', (error) => {
-  console.error('Eye tracker error:', error);
-  // Implement reconnection logic or user notification
+    console.error('Eye tracker error:', error);
+    // Implement reconnection logic or user notification
 });
 
 // Monitor connection state
 gazeManager.on('inputState', (state) => {
-  switch (state.tracker?.status) {
-    case 'trackerConnected':
-      console.log('Eye tracker connected');
-      break;
-    case 'trackerDisconnected':
-      console.log('Eye tracker disconnected');
-      break;
-    case 'trackerCalibrating':
-      console.log('Calibration in progress');
-      break;
-  }
+    switch (state.tracker?.status) {
+      case 'trackerConnected':
+        console.log('Eye tracker connected');
+        break;
+      case 'trackerDisconnected':
+        console.log('Eye tracker disconnected');
+        break;
+      case 'trackerCalibrating':
+        console.log('Calibration in progress');
+        break;
+    }
 });
 ```
 

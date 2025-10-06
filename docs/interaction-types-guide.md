@@ -26,17 +26,17 @@ const gazeManager = new GazeManager();
 
 // Register elements for interactions
 gazeManager.register({
-  interaction: 'dwell',
-  element: document.getElementById('button'),
-  settings: {
-    dwellTime: 1000,
-    onDwellFinish: () => console.log('Activated!')
-  }
+    interaction: 'dwell',
+    element: document.getElementById('button'),
+    settings: {
+      dwellTime: 1000,
+      onDwellFinish: () => console.log('Activated!')
+    }
 });
 
 // Listen to events
 gazeManager.on('dwellFinish', (event) => {
-  // Handle interaction
+    // Handle interaction
 });
 ```
 
@@ -58,20 +58,20 @@ const dwellInteraction = new GazeInteractionObjectDwell();
 
 // Register element manually
 dwellInteraction.register(buttonElement, {
-  dwellTime: 1000,
-  onDwellFinish: (event) => {
-    console.log('Dwell completed!');
-  }
+    dwellTime: 1000,
+    onDwellFinish: (event) => {
+      console.log('Dwell completed!');
+    }
 });
 
 // Process gaze data manually
 function processGazeData(gazeData) {
-  dwellInteraction.evaluate(gazeData);
+    dwellInteraction.evaluate(gazeData);
 }
 
 // Listen to events
 dwellInteraction.on('dwellFinish', (event) => {
-  // Handle interaction
+    // Handle interaction
 });
 ```
 
@@ -84,12 +84,12 @@ dwellInteraction.on('dwellFinish', (event) => {
 **Key Settings:**
 ```typescript
 interface GazeInteractionDwellSettingsType {
-  dwellTime: number;        // Required gaze duration (ms)
-  bufferSize: number;       // Element expansion (pixels)
-  toleranceTime: number;    // Allowed gaze excursions (ms)
-  onDwellProgress: (event: GazeInteractionObjectDwellEvent) => void;
-  onDwellFinish: (event: GazeInteractionObjectDwellEvent) => void;
-  onDwellCancel: (event: GazeInteractionObjectDwellEvent) => void;
+    dwellTime: number;        // Required gaze duration (ms)
+    bufferSize: number;       // Element expansion (pixels)
+    toleranceTime: number;    // Allowed gaze excursions (ms)
+    onDwellProgress: (event: GazeInteractionObjectDwellEvent) => void;
+    onDwellFinish: (event: GazeInteractionObjectDwellEvent) => void;
+    onDwellCancel: (event: GazeInteractionObjectDwellEvent) => void;
 }
 ```
 
@@ -101,16 +101,16 @@ interface GazeInteractionDwellSettingsType {
 **Example:**
 ```typescript
 gazeManager.register({
-  interaction: 'dwell',
-  element: document.getElementById('menu-item'),
-  settings: {
-    dwellTime: 800,        // 800ms to activate
-    toleranceTime: 200,    // Allow brief eye movements
-    onDwellFinish: () => {
-      // Trigger menu action
-      selectMenuItem();
+    interaction: 'dwell',
+    element: document.getElementById('menu-item'),
+    settings: {
+      dwellTime: 800,        // 800ms to activate
+      toleranceTime: 200,    // Allow brief eye movements
+      onDwellFinish: () => {
+        // Trigger menu action
+        selectMenuItem();
+      }
     }
-  }
 });
 ```
 
@@ -119,14 +119,14 @@ gazeManager.register({
 const dwell = new GazeInteractionObjectDwell();
 
 dwell.register(element, {
-  dwellTime: 1000,
-  toleranceTime: 150,
-  bufferSize: 50,  // Expand hit area
-  onDwellFinish: handleActivation
+    dwellTime: 1000,
+    toleranceTime: 150,
+    bufferSize: 50,  // Expand hit area
+    onDwellFinish: handleActivation
 });
 
 function onGazeData(data) {
-  dwell.evaluate(data);
+    dwell.evaluate(data);
 }
 ```
 
@@ -137,10 +137,10 @@ function onGazeData(data) {
 **Key Settings:**
 ```typescript
 interface GazeInteractionObjectFixationSettings {
-  bufferSize: number;  // Hit area expansion (pixels)
-  fixationObjectStart: (event: GazeInteractionObjectFixationEvent) => void;
-  fixationObjectEnd: (event: GazeInteractionObjectFixationEvent) => void;
-  fixationObjectProgress: (event: GazeInteractionObjectFixationEvent) => void;
+    bufferSize: number;  // Hit area expansion (pixels)
+    fixationObjectStart: (event: GazeInteractionObjectFixationEvent) => void;
+    fixationObjectEnd: (event: GazeInteractionObjectFixationEvent) => void;
+    fixationObjectProgress: (event: GazeInteractionObjectFixationEvent) => void;
 }
 ```
 
@@ -152,16 +152,16 @@ interface GazeInteractionObjectFixationSettings {
 **Example:**
 ```typescript
 gazeManager.register({
-  interaction: 'fixation',
-  element: document.querySelector('.focusable'),
-  settings: {
-    fixationObjectStart: (event) => {
-      element.classList.add('gaze-focused');
-    },
-    fixationObjectEnd: (event) => {
-      element.classList.remove('gaze-focused');
+    interaction: 'fixation',
+    element: document.querySelector('.focusable'),
+    settings: {
+      fixationObjectStart: (event) => {
+        element.classList.add('gaze-focused');
+      },
+      fixationObjectEnd: (event) => {
+        element.classList.remove('gaze-focused');
+      }
     }
-  }
 });
 ```
 
@@ -172,9 +172,9 @@ gazeManager.register({
 **Key Settings:**
 ```typescript
 interface GazeInteractionObjectSaccadeSettings {
-  bufferSize: number;
-  saccadeObjectFrom: (event: GazeInteractionObjectSaccadeEvent) => void;  // Leaving element
-  saccadeObjectTo: (event: GazeInteractionObjectSaccadeEvent) => void;    // Entering element
+    bufferSize: number;
+    saccadeObjectFrom: (event: GazeInteractionObjectSaccadeEvent) => void;  // Leaving element
+    saccadeObjectTo: (event: GazeInteractionObjectSaccadeEvent) => void;    // Entering element
 }
 ```
 
@@ -186,14 +186,14 @@ interface GazeInteractionObjectSaccadeSettings {
 **Example:**
 ```typescript
 gazeManager.register({
-  interaction: 'saccade',
-  element: document.querySelector('.content-area'),
-  settings: {
-    saccadeObjectTo: (event) => {
-      // User looked at this area
-      trackAttention(event.originFixation, event.targetFixation);
+    interaction: 'saccade',
+    element: document.querySelector('.content-area'),
+    settings: {
+      saccadeObjectTo: (event) => {
+        // User looked at this area
+        trackAttention(event.originFixation, event.targetFixation);
+      }
     }
-  }
 });
 ```
 
@@ -204,9 +204,9 @@ gazeManager.register({
 **Key Settings:**
 ```typescript
 interface GazeInteractionObjectValidationSettings {
-  accuracyTolerance: number;  // Acceptable accuracy (pixels)
-  validationDuration: number; // Test duration (ms)
-  onValidation: (event: GazeInteractionObjectValidationEvent) => void;
+    accuracyTolerance: number;  // Acceptable accuracy (pixels)
+    validationDuration: number; // Test duration (ms)
+    onValidation: (event: GazeInteractionObjectValidationEvent) => void;
 }
 ```
 
@@ -220,15 +220,15 @@ interface GazeInteractionObjectValidationSettings {
 const validation = new GazeInteractionObjectValidation();
 
 validation.validate(calibrationTarget, {
-  accuracyTolerance: 50,    // 50px accuracy required
-  validationDuration: 2000, // 2 second test
-  onValidation: (event) => {
-    if (event.isValid) {
-      console.log(`Accuracy: ${event.accuracy}px, Precision: ${event.precision}px`);
-    } else {
-      console.log('Calibration needs adjustment');
+    accuracyTolerance: 50,    // 50px accuracy required
+    validationDuration: 2000, // 2 second test
+    onValidation: (event) => {
+      if (event.isValid) {
+        console.log(`Accuracy: ${event.accuracy}px, Precision: ${event.precision}px`);
+      } else {
+        console.log('Calibration needs adjustment');
+      }
     }
-  }
 });
 ```
 
@@ -239,8 +239,8 @@ validation.validate(calibrationTarget, {
 **Key Settings:**
 ```typescript
 interface GazeInteractionObjectIntersectSettingsType {
-  bufferSize: number;  // Hit area expansion (pixels)
-  onIntersect: (event: GazeInteractionObjectIntersectEvent) => void;
+    bufferSize: number;  // Hit area expansion (pixels)
+    onIntersect: (event: GazeInteractionObjectIntersectEvent) => void;
 }
 ```
 
@@ -252,15 +252,15 @@ interface GazeInteractionObjectIntersectSettingsType {
 **Example:**
 ```typescript
 gazeManager.register({
-  interaction: 'intersect',
-  element: document.querySelector('.heatmap-area'),
-  settings: {
-    bufferSize: 100,  // Large detection area
-    onIntersect: (event) => {
-      // Track attention to this region
-      recordHeatmapData(event.gazeData);
+    interaction: 'intersect',
+    element: document.querySelector('.heatmap-area'),
+    settings: {
+      bufferSize: 100,  // Large detection area
+      onIntersect: (event) => {
+        // Track attention to this region
+        recordHeatmapData(event.gazeData);
+      }
     }
-  }
 });
 ```
 
@@ -272,8 +272,8 @@ Two fixation detection approaches are available:
 ```typescript
 // Use hardware-based fixation detection
 gazeManager.createInput({
-  tracker: 'gazepoint',
-  fixationDetection: 'device'  // Hardware handles fixation detection
+    tracker: 'gazepoint',
+    fixationDetection: 'device'  // Hardware handles fixation detection
 });
 ```
 
@@ -281,8 +281,8 @@ gazeManager.createInput({
 ```typescript
 // Use software-based fixation detection
 gazeManager.createInput({
-  tracker: 'dummy',
-  fixationDetection: 'idt'  // IDT algorithm in Web Worker
+    tracker: 'dummy',
+    fixationDetection: 'idt'  // IDT algorithm in Web Worker
 });
 ```
 
@@ -316,9 +316,9 @@ const gazeManager = new GazeManager();
 
 // Configure input
 gazeManager.createInput({
-  tracker: 'gazepoint',
-  uri: 'ws://localhost:4242',
-  fixationDetection: 'device'
+    tracker: 'gazepoint',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'device'
 });
 
 // Connect and calibrate
@@ -333,39 +333,39 @@ const content = document.querySelector('.content');
 
 // Dwell for activation
 gazeManager.register({
-  interaction: 'dwell',
-  element: button,
-  settings: {
-    dwellTime: 1000,
-    toleranceTime: 200,
-    onDwellFinish: () => button.click()
-  }
+    interaction: 'dwell',
+    element: button,
+    settings: {
+      dwellTime: 1000,
+      toleranceTime: 200,
+      onDwellFinish: () => button.click()
+    }
 });
 
 // Fixation for visual feedback
 gazeManager.register({
-  interaction: 'fixation',
-  element: content,
-  settings: {
-    fixationObjectStart: () => content.classList.add('focused'),
-    fixationObjectEnd: () => content.classList.remove('focused')
-  }
+    interaction: 'fixation',
+    element: content,
+    settings: {
+      fixationObjectStart: () => content.classList.add('focused'),
+      fixationObjectEnd: () => content.classList.remove('focused')
+    }
 });
 
 // Saccade for navigation tracking
 gazeManager.register({
-  interaction: 'saccade',
-  element: content,
-  settings: {
-    saccadeObjectTo: (event) => {
-      trackReadingPattern(event.originFixation, event.targetFixation);
+    interaction: 'saccade',
+    element: content,
+    settings: {
+      saccadeObjectTo: (event) => {
+        trackReadingPattern(event.originFixation, event.targetFixation);
+      }
     }
-  }
 });
 
 // Handle events
 gazeManager.on('dwellFinish', (event) => {
-  console.log('Element activated:', event.target[0]);
+    console.log('Element activated:', event.target[0]);
 });
 ```
 
