@@ -40,7 +40,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         // IDT specific parameters
         minimumFixationDuration: number = 100,
         maximumFixationDispersion: number = 1.35,
-        distanceFromScreen: number = 0.7,
+        distanceFromScreen: number = 70,
         DPI: number = 96
     ) {
         super();
