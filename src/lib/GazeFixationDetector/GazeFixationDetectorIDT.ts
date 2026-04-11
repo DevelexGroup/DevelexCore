@@ -6,7 +6,7 @@ import { getDifferenceInMilliseconds } from "$lib/utils/timeUtils";
  * Default parameters are from Andersson et al. (2017):
  * "The original default values for this implementation were 100 ms minimum fixation duration and 1.35° maximum fixation dispersion."
  * The IDT algorithm works with x- and y data, and two fixed thresholds: the maximum fixation dispersion threshold and the minimum fixation duration threshold.
- * To be a fixation, data samples constituting at least enough time to fulfill the duration threshold has to be within a spatial area not exceeding the dispersion threshold. 
+ * To be a fixation, data samples constituting at least enough time to fulfill the duration threshold has to be within a spatial area not exceeding the dispersion threshold.
  */
 export class GazeFixationDetectorIDT extends GazeFixationDetector {
 
@@ -21,7 +21,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
     currentFixationId: number = 0;
 
     // Track last valid fixation snapshot (for precise fixationEnd)
-    private lastValidSnapshotTimestamp: string | null = null;
+    private lastValidSnapshotDeviceTimestamp: string | null = null;
     private lastValidSnapshotDuration: number = 0;
     private lastValidSnapshotAverages: { x: number; y: number; xScreenRelative: number; yScreenRelative: number } | null = null;
     private lastValidSnapshotSample: GazeDataPoint | null = null;
@@ -48,25 +48,25 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         this.pixelTolerance = getSizeInPixelsFromCentimeters(sizeInCentimeters, DPI);
         this.minimumFixationDuration = minimumFixationDuration;
     }
-    
+
     processFixationPoint(): void {
         // do nothing as nothing from Bridge is relevant
     }
 
     /**
      * It takes a gaze point and processes it to determine if it is a fixation or not. If so, it emits a fixationStart or fixationEnd event.
-     * @param gazePoint 
+     * @param gazePoint
      */
     processGazePoint(gazePoint: GazeDataPoint): void {
         // Handle null/undefined samples gracefully: treat as stream break
         // and close an ongoing fixation, if any, using the last valid snapshot.
         if (gazePoint == null) {
-            if (this.wasPreviousPointValidFixation && this.lastValidSnapshotSample && this.lastValidSnapshotAverages && this.lastValidSnapshotTimestamp) {
+            if (this.wasPreviousPointValidFixation && this.lastValidSnapshotSample && this.lastValidSnapshotAverages && this.lastValidSnapshotDeviceTimestamp) {
                 const s = this.lastValidSnapshotSample;
                 const fixationPoint: FixationDataPoint = {
                     type: 'fixationEnd',
                     deviceId: s.deviceId,
-                    timestamp: this.lastValidSnapshotTimestamp,
+                    timestamp: this.lastValidSnapshotDeviceTimestamp,
                     deviceTimestamp: s.deviceTimestamp,
                     duration: this.lastValidSnapshotDuration,
                     x: this.lastValidSnapshotAverages.x,
@@ -84,7 +84,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         }
 
         // Check validity of the gaze point, if both eyes are invalid, do nothing
-        // TODO: OPTIMISE IDT PROCESS 
+        // TODO: OPTIMISE IDT PROCESS
         if (!gazePoint.validityL && !gazePoint.validityR) return;
 
         // Guard against non-finite coordinates which could break dispersion calc
@@ -123,12 +123,12 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
                 this.currentFixationId = this.fixationId;
                 // Get average coordinates for fixation start
                 const averageCoords = this.getAverageCoordinates();
-                
+
                 // Emit fixation start event
                 const fixationPoint: FixationDataPoint = {
                     type: 'fixationStart',
                     deviceId: gazePoint.deviceId,
-                    timestamp: this.windowGazePoints[this.windowGazePoints.length - 1].timestamp,
+                    timestamp: this.windowGazePoints[this.windowGazePoints.length - 1].deviceTimestamp,
                     deviceTimestamp: gazePoint.deviceTimestamp,
                     duration: duration,
                     x: averageCoords.x,
@@ -147,18 +147,18 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
             const averages = this.getAverageCoordinates();
             const last = this.windowGazePoints[this.windowGazePoints.length - 1];
             this.lastValidSnapshotAverages = averages;
-            this.lastValidSnapshotTimestamp = last.timestamp;
+            this.lastValidSnapshotDeviceTimestamp = last.deviceTimestamp;
             this.lastValidSnapshotDuration = duration;
             this.lastValidSnapshotSample = last;
         } else {
             if (this.wasPreviousPointValidFixation) {
                 // Emit fixation end using the LAST VALID snapshot
-                if (this.lastValidSnapshotSample && this.lastValidSnapshotAverages && this.lastValidSnapshotTimestamp) {
+                if (this.lastValidSnapshotSample && this.lastValidSnapshotAverages && this.lastValidSnapshotDeviceTimestamp) {
                     const s = this.lastValidSnapshotSample;
                     const fixationPoint: FixationDataPoint = {
                         type: 'fixationEnd',
                         deviceId: s.deviceId,
-                        timestamp: this.lastValidSnapshotTimestamp,
+                        timestamp: this.lastValidSnapshotDeviceTimestamp,
                         deviceTimestamp: s.deviceTimestamp,
                         duration: this.lastValidSnapshotDuration,
                         x: this.lastValidSnapshotAverages.x,
@@ -182,7 +182,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
     getAverageCoordinates() {
         const count = this.windowGazePoints.length;
         if (count === 0) return { x: 0, y: 0, xScreenRelative: 0, yScreenRelative: 0 };
-        
+
         return {
             x: (this.sumXL + this.sumXR) / (2 * count),
             y: (this.sumYL + this.sumYR) / (2 * count),
@@ -195,7 +195,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         if (this.windowGazePoints.length === 0) return 0;
         const first = this.windowGazePoints[0];
         const last = this.windowGazePoints[this.windowGazePoints.length - 1];
-        return getDifferenceInMilliseconds(last.timestamp, first.timestamp);
+        return getDifferenceInMilliseconds(last.deviceTimestamp, first.deviceTimestamp);
     }
 
     reset(): void {
@@ -214,7 +214,7 @@ export class GazeFixationDetectorIDT extends GazeFixationDetector {
         // Don't reset the currentFixationId here - we want to keep it until the next fixation starts
         // Reset last valid snapshot
         this.lastValidSnapshotAverages = null;
-        this.lastValidSnapshotTimestamp = null;
+        this.lastValidSnapshotDeviceTimestamp = null;
         this.lastValidSnapshotDuration = 0;
         this.lastValidSnapshotSample = null;
     }
