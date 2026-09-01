@@ -1,4 +1,4 @@
-import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveResponsePayload, GazeDataPayload, ReceiveFromWebSocketMessages, FixationDataPayload } from './GazeInputBridge.types';
+import type { SendToWorkerMessages, ReceiveMessagePayload, ReceiveErrorPayload, ReceiveResponsePayload, GazeDataPayload, ReceiveFromWebSocketMessages, FixationDataPayload, BridgeWireLogPayload } from './GazeInputBridge.types';
 import { Emitter, type EventMap } from '$lib/Emitter/Emitter';
 import { createISO8601Timestamp } from '$lib/utils/timeUtils';
 
@@ -9,6 +9,7 @@ interface WebSocketEvents extends EventMap {
     gaze: GazeDataPayload;
     fixationStart: FixationDataPayload;
     fixationEnd: FixationDataPayload;
+    wireLog: BridgeWireLogPayload;
 }
 
 export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
@@ -20,6 +21,18 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
     private emitError(content: string): void {
         this.emit('error', {
             type: 'error',
+            content,
+            timestamp: createISO8601Timestamp(),
+        });
+    }
+
+    /**
+     * Emit a copy of a console entry so listeners can persist it.
+     */
+    private emitWireLog(level: BridgeWireLogPayload['level'], content: string): void {
+        this.emit('wireLog', {
+            type: 'wireLog',
+            level,
             content,
             timestamp: createISO8601Timestamp(),
         });
@@ -83,6 +96,7 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
                     this.emit(data.type, data);
                 } catch (error) {
                     console.error('Failed to parse WebSocket message:', error);
+                    this.emitWireLog('error', `Failed to parse WebSocket message: ${error}`);
                 }
             };
         });
@@ -116,6 +130,8 @@ export class GazeInputBridgeApiClient extends Emitter<WebSocketEvents> {
             throw new Error('WebSocket is not connected');
         }
         console.info('%c[GazeInputBridgeApiClient] Sending command:', 'color: blue; font-weight: bold', message);
-        this.websocket.send(JSON.stringify(message));
+        const serialized = JSON.stringify(message);
+        this.emitWireLog('info', `Sending command: ${serialized}`);
+        this.websocket.send(serialized);
     }
 } 

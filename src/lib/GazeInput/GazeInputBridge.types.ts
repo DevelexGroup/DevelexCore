@@ -125,6 +125,15 @@ export interface ReceiveErrorPayload extends Timestamp {
   content: string;
 }
 
+/**
+ * Mirror of a console entry the API client prints about bridge communication.
+ */
+export interface BridgeWireLogPayload extends Timestamp {
+  type: 'wireLog';
+  level: 'info' | 'error';
+  content: string;
+}
+
 export interface ViewportCalibrationPayload extends GazeWindowCalibratorConfig, CorrelationId, InitiatorId {
     type: 'viewportCalibration';
 }
@@ -146,4 +155,4 @@ export type SendToWorkerMessages = SendToWorkerAsyncMessages | SendToWorkerSyncM
 
 export type ReceiveFromWebSocketMessages = ReceiveResponsePayload | ReceiveMessagePayload | ReceiveErrorPayload | GazeDataPayload | FixationDataPayload;
 
-export type ReceiveFromWorkerMessages = ReceiveFromWebSocketMessages | ReadyPayload;
+export type ReceiveFromWorkerMessages = ReceiveFromWebSocketMessages | ReadyPayload | BridgeWireLogPayload;

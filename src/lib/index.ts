@@ -52,10 +52,11 @@ export type {
 /**
  * Event types and interfaces for gaze input state management
  */
-export type { 
+export type {
     GazeInputEventState,
     GazeInputEventError,
     GazeInputEventMessage,
+    GazeInputEventLog,
     GazeInputEvents,
 } from '$lib/GazeInput/GazeInputEvent.js';
 

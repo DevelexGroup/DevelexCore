@@ -5,7 +5,7 @@ import type { FixationDataPoint, GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
 import BridgeWebWorker from '$lib/GazeInput/GazeInputBridge.worker.ts?worker&inline';
-import type { InnerCommandPayloadBase, InnerCommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, ViewportCalibrationPayload } from "./GazeInputBridge.types";
+import type { BridgeWireLogPayload, InnerCommandPayloadBase, InnerCommandType, ReceiveErrorPayload, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, ViewportCalibrationPayload } from "./GazeInputBridge.types";
 import { createISO8601Timestamp } from "$lib/utils/timeUtils";
 
 /**
@@ -44,6 +44,7 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             | ReceiveMessagePayload
             | ViewportCalibrationPayload
             | InnerCommandPayloadBase
+            | BridgeWireLogPayload
         >
     ) => {
         const { type } = event.data;
@@ -71,6 +72,16 @@ export class GazeInputBridge extends GazeInput<GazeInputConfigBridge> {
             case 'message':
                 this.processMessageMessage(event.data as ReceiveMessagePayload);
                 break;
+            case 'wireLog': {
+                const data = event.data as BridgeWireLogPayload;
+                this.emit('inputLog', {
+                    type: 'inputLog',
+                    timestamp: data.timestamp,
+                    level: data.level,
+                    content: data.content,
+                });
+                break;
+            }
             case 'open':
             case 'close':
                 this.resolvePendingPromise((event.data as InnerCommandPayloadBase).correlationId);

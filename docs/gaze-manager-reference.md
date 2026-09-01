@@ -310,6 +310,7 @@ The GazeManager extends `EmitterGroup` and emits the following events:
 - `inputState` - Input device state changes (connected, disconnected, calibrating, etc.)
 - `inputMessage` - Messages from the input device
 - `inputError` - Errors from the input device
+- `inputLog` - Mirror of console entries about bridge communication (sent commands, parse errors)
 - `inputFixationStart` - Fixation started (from input device)
 - `inputFixationEnd` - Fixation ended (from input device)
 

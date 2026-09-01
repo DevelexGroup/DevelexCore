@@ -1,7 +1,7 @@
 import type { FixationDataPoint, GazeDataPoint } from "$lib/GazeData/GazeData";
 
 // Inlining the worker is necessary for the worker to be created by Vite.
-import type { GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload, InnerCommandPayloadBase, FixationDataPayload } from "./GazeInputBridge.types";
+import type { GazeDataPayload, ReceiveErrorPayload, ReceiveFromWorkerMessages, ReceiveMessagePayload, ReceiveResponsePayload, SendToWorkerAsyncMessages, SendToWorkerMessages, SetupPayload, ViewportCalibrationPayload, InnerCommandPayloadBase, FixationDataPayload, BridgeWireLogPayload } from "./GazeInputBridge.types";
 import { GazeWindowCalibrator } from "$lib/GazeWindowCalibrator/GazeWindowCalibrator";
 import type { GazeFixationDetector } from "$lib/GazeFixationDetector/GazeFixationDetector";
 import { createGazeFixationDetector } from "$lib/GazeFixationDetector";
@@ -47,6 +47,10 @@ apiClient.on('response', (data: ReceiveResponsePayload) => {
 });
 
 apiClient.on('message', (data: ReceiveMessagePayload) => {
+    sendToTheMainThread(data);
+});
+
+apiClient.on('wireLog', (data: BridgeWireLogPayload) => {
     sendToTheMainThread(data);
 });
 

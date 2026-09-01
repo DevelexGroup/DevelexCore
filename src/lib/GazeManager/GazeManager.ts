@@ -106,6 +106,7 @@ export class GazeManager extends EmitterGroup<
             inputState: input,
             inputMessage: input,
             inputError: input,
+            inputLog: input,
             windowCalibrated: input,
             windowCalibrationContested: input,
             calibrated: input,

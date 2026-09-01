@@ -21,6 +21,11 @@ export interface GazeInputEventError extends GazeInputEvent {
     content: string;
 }
 
+export interface GazeInputEventLog extends GazeInputEvent {
+    level: 'info' | 'error';
+    content: string;
+}
+
 export type GazeInputEvents = {
     "inputData": GazeDataPoint;
     "inputFixationStart": FixationDataPoint;
@@ -28,4 +33,5 @@ export type GazeInputEvents = {
     "inputState": GazeInputEventState;
     "inputMessage": GazeInputEventMessage;
     "inputError": GazeInputEventError;
+    "inputLog": GazeInputEventLog;
 };
