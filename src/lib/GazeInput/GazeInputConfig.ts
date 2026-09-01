@@ -6,7 +6,7 @@ export type GazeInputConfig = GazeInputConfigBridge | GazeInputConfigDummy;
  */
 export type GazeInputConfigWithFixations = GazeInputConfig & { fixationDetection: 'device' | 'idt' };
 
-export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigEyelogic | GazeInputConfigAsee;
+export type GazeInputConfigBridge = GazeInputConfigGazePoint | GazeInputConfigEyelogic | GazeInputConfigAsee | GazeInputConfigMock;
 
 /**
  * Configuration for the input of GazePoint remote eye tracker.
@@ -42,6 +42,18 @@ export type GazeInputConfigAsee = {
     tracker: 'asee';
     uri: string;
     fixationDetection: 'none' | 'idt';
+};
+
+/**
+ * Configuration for the input of the mock eye tracker simulated by the DeveLex Bridge.
+ * @property type - The type of the input, 'mock'.
+ * @property uri - The URI of the DeveLex Bridge WebSocket server.
+ * @property fixationDetection - The fixation detection method, either 'none', 'idt' or 'device'.
+ */ 
+export type GazeInputConfigMock = {
+    tracker: 'mock';
+    uri: string;
+    fixationDetection: 'none' | 'idt' | 'device';
 };
 
 /**

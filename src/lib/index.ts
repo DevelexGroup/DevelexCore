@@ -45,6 +45,7 @@ export type {
     GazeInputConfigGazePoint,
     GazeInputConfigEyelogic,
     GazeInputConfigAsee,
+    GazeInputConfigMock,
     GazeInputConfigDummy,
     GazeInputConfigWithFixations 
 } from '$lib/GazeInput/GazeInputConfig.js';

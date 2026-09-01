@@ -215,6 +215,13 @@ const aseeConfig: GazeInputConfigAsee = {
     fixationDetection: 'idt'
 };
 
+// Mock tracker configuration (simulated device provided by the Bridge)
+const mockConfig: GazeInputConfigMock = {
+    tracker: 'mock',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'device'
+};
+
 // Dummy tracker configuration
 const dummyConfig: GazeInputConfigDummy = {
     tracker: 'dummy',

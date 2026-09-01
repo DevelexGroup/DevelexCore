@@ -24,6 +24,8 @@ export const createGazeInput = <T extends GazeInputConfig>(
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
 		case 'eyelogic':
 			return new GazeInputBridge(config) as unknown as GazeInput<T>;
+		case 'mock':
+			return new GazeInputBridge(config) as unknown as GazeInput<T>;
 		default:
 			// @ts-expect-error - In case of unsupported input type, throw an error and give a hint.
 			throw new GazeInputError(`Unsupported input type: ${config.type}`);

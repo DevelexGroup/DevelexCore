@@ -290,6 +290,13 @@ const aseeConfig = {
     uri: 'ws://localhost:4242',
     fixationDetection: 'idt'
 };
+
+// Mock configuration (simulated device provided by the Bridge)
+const mockConfig = {
+    tracker: 'mock',
+    uri: 'ws://localhost:4242',
+    fixationDetection: 'device'
+};
 ```
 
 For complete configuration options and advanced settings, see the [GazeManager Reference](gaze-manager-reference.md#configuration-options).

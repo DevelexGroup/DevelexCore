@@ -295,6 +295,15 @@ interface GazeInputConfigAsee {
 }
 ```
 
+**GazeInputConfigMock:**
+```typescript
+interface GazeInputConfigMock {
+    tracker: 'mock';
+    uri: string;
+    fixationDetection: 'none' | 'idt' | 'device';
+}
+```
+
 **GazeInputConfigDummy:**
 ```typescript
 interface GazeInputConfigDummy {

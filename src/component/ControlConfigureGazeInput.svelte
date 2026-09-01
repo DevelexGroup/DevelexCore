@@ -3,6 +3,7 @@
 	import ConfigureGazeInputEyelogic from "./ConfigureGazeInputEyelogic.svelte";
     import ConfigureInputGazePoint from "./ConfigureGazeInputGazePoint.svelte";
 	import ConfigureGazeInputAsee from "./ConfigureGazeInputAsee.svelte";
+	import ConfigureGazeInputMock from "./ConfigureGazeInputMock.svelte";
     import Tabs from "./Tabs.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -23,6 +24,11 @@
             label: "Asee",
             value: 4,
             component: ConfigureGazeInputAsee
+        },
+        {
+            label: "Mock",
+            value: 5,
+            component: ConfigureGazeInputMock
         }
     ];
 </script>
