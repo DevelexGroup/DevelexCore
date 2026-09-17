@@ -144,7 +144,7 @@ await gazeManager.setWindowCalibration(
 
 **How it works:**
 1. **Mouse Click Data**: Uses `clientX`/`clientY` (window-relative) and `screenX`/`screenY` (screen-absolute) coordinates
-2. **Offset Calculation**: Calculates window position offset: `clientX - screenX`, `clientY - screenY`
+2. **Offset Calculation**: Calculates window position offset on its monitor: `clientX - (screenX - screen.availLeft)`, `clientY - (screenY - screen.availTop)`
 3. **Worker Setup**: For hardware trackers, sends calibration data to Web Worker
 4. **Coordinate Translation**: All future gaze data is automatically converted from screen coordinates to window pixel coordinates
 5. **DOM Compatibility**: Ensures gaze coordinates align with HTML elements for proper intersection detection
@@ -162,6 +162,8 @@ Window calibration needs a mouse click event because it provides **two types of 
 - **`screenX`/`screenY`**: Where the click happened **on the entire screen** (absolute screen position)
 
 The difference between these coordinates (`clientX - screenX`, `clientY - screenY`) tells us exactly where your browser window is positioned on the screen.
+
+`screenX`/`screenY` are measured from the primary monitor's corner, while gaze is relative to the tracked monitor. The monitor's own position (`screen.availLeft`/`screen.availTop`) is subtracted so a window on a secondary monitor maps correctly. A taskbar docked to the left or top of that monitor shifts the result by its size.
 
 **The Math Behind Calibration:**
 ```javascript

@@ -239,6 +239,8 @@ interface GazeWindowCalibratorConfig {
     screenY: number;             // Mouse screen Y coordinate
     windowScreenWidth: number;   // Window screen width
     windowScreenHeight: number;  // Window screen height
+    windowScreenLeft?: number;   // Monitor left edge on the virtual desktop
+    windowScreenTop?: number;    // Monitor top edge on the virtual desktop
 }
 ```
 
@@ -260,6 +262,8 @@ interface GazeWindowCalibratorConfigWindowFields {
     screen: {
       width: number;             // Screen width in pixels
       height: number;            // Screen height in pixels
+      availLeft?: number;        // Monitor left edge, read from the browser when omitted
+      availTop?: number;         // Monitor top edge, read from the browser when omitted
     };
 }
 ```

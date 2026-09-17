@@ -33,8 +33,8 @@ export class GazeWindowCalibrator {
 	processPointerEvent(config: GazeWindowCalibratorConfig): { xCoeff: number; yCoeff: number } {
 		const x = config.clientX;
 		const y = config.clientY;
-		const screenX = config.screenX;
-		const screenY = config.screenY;
+		const screenX = config.screenX - (config.windowScreenLeft ?? 0);
+		const screenY = config.screenY - (config.windowScreenTop ?? 0);
 		return {
 			xCoeff: x - screenX,
 			yCoeff: y - screenY

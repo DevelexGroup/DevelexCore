@@ -5,6 +5,8 @@ import { createISO8601Timestamp } from "$lib/utils/timeUtils";
  * @property event - The pointer move event.
  * @property windowScreenWidth - window.screen.width
  * @property windowScreenHeight - window.screen.height
+ * @property windowScreenLeft - left edge of the monitor on the virtual desktop
+ * @property windowScreenTop - top edge of the monitor on the virtual desktop
  */
 export type GazeWindowCalibratorConfig = {
     timestamp: string; // ISO 8601 timestamp to track when the calibration was made
@@ -14,6 +16,8 @@ export type GazeWindowCalibratorConfig = {
     screenY: number; //event.screenY
     windowScreenWidth: number; //window.screen.width
     windowScreenHeight: number; //window.screen.height
+    windowScreenLeft?: number; //window.screen.availLeft
+    windowScreenTop?: number; //window.screen.availTop
 };
 
 /**
@@ -35,6 +39,8 @@ export interface GazeWindowCalibratorConfigWindowFields {
     screen: {
         width: number;
         height: number;
+        availLeft?: number;
+        availTop?: number;
     };
 }
 
@@ -42,6 +48,7 @@ export const createGazeWindowCalibrator = (
     event: GazeWindowCalibratorConfigMouseEventFields,
     window: GazeWindowCalibratorConfigWindowFields
 ): GazeWindowCalibratorConfig => {
+    const globalScreen = (globalThis as { screen?: { availLeft?: number; availTop?: number } }).screen;
     return {
         timestamp: createISO8601Timestamp(),
         clientX: event.clientX,
@@ -49,6 +56,8 @@ export const createGazeWindowCalibrator = (
         screenX: event.screenX,
         screenY: event.screenY,
         windowScreenWidth: window.screen.width,
-        windowScreenHeight: window.screen.height
+        windowScreenHeight: window.screen.height,
+        windowScreenLeft: window.screen.availLeft ?? globalScreen?.availLeft ?? 0,
+        windowScreenTop: window.screen.availTop ?? globalScreen?.availTop ?? 0
     };
 }
